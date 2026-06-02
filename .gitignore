@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Local environments and secrets
+.env
+.env.*
+*.key
+*.pem
+
+# Salesforce local state
+.sf/
+.sfdx/
+.salesforce-agent-knowledge/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
