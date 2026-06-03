@@ -1,42 +1,125 @@
 # Installation
 
-## Codex
+Use `sfao` as the primary installation path. It copies packaged templates into
+the current project without symlinks and without silently overwriting user-owned
+files.
 
-Ask Codex:
+## Recommended User Install
+
+```bash
+uv tool install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
+```
+
+Alternative:
+
+```bash
+pipx install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
+```
+
+Before PyPI publication, install from GitHub:
+
+```bash
+uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
+
+## Main Install Targets
+
+All supported agents:
+
+```bash
+sfao install --project --platform all
+```
+
+Only Codex:
+
+```bash
+sfao install --project --platform codex
+```
+
+Only Claude Code:
+
+```bash
+sfao install --project --platform claude
+```
+
+Only GitHub Copilot:
+
+```bash
+sfao install --project --platform copilot
+```
+
+## Installed Paths
+
+Codex:
+
+```text
+.agents/skills/salesforce-agent-optimizer/SKILL.md
+.agents/skills/salesforce-agent-optimizer/references/
+.agents/skills/salesforce-agent-optimizer/scripts/
+.agents/skills/salesforce-agent-optimizer/agents/openai.yaml
+```
+
+Claude Code:
+
+```text
+.claude/skills/salesforce-agent-optimizer/SKILL.md
+.claude/skills/salesforce-agent-optimizer/references/
+.claude/skills/salesforce-agent-optimizer/scripts/
+```
+
+GitHub Copilot:
+
+```text
+AGENTS.md
+.github/copilot-instructions.md
+.github/instructions/salesforce-agent-optimizer.instructions.md
+```
+
+## Update
+
+```bash
+uv tool upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+`sfao update` updates only generated files that still contain the managed-file
+marker. User-edited files are skipped and reported.
+
+## Uninstall
+
+```bash
+sfao uninstall --project --platform all --yes
+uv tool uninstall salesforce-agent-optimizer
+```
+
+`sfao uninstall` removes only generated files. It keeps user-owned files and
+project folders.
+
+## Manual Fallback
+
+Codex can still install directly from the public repository:
 
 ```text
 Install the Salesforce AI Agent Optimizer skill from https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
 ```
 
-The installer command is:
+Installer script fallback:
 
 ```bash
 python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
 ```
 
-Native paths:
+Claude Code can use `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
 
-- Repo skill: `.agents/skills/salesforce-agent-optimizer`
-- User skill: `$HOME/.agents/skills/salesforce-agent-optimizer`
-
-Restart Codex after installation.
-
-## Claude Code
-
-Clone or download the repository, then:
-
-- Install or keep `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
-- Optionally merge `agents/claude-code.md` into `CLAUDE.md`.
-- Copy `agents/sf-init-project-skill.md` to `.claude/commands/sf-init-project-skill.md`.
-- Copy `agents/sf-version-update-skill.md` to `.claude/commands/sf-version-update-skill.md`.
-
-## GitHub Copilot
-
-Clone or download the repository, then:
-
-- Use `AGENTS.md`.
-- Use `.github/copilot-instructions.md`.
-- Use `.github/instructions/salesforce-agent-optimizer.instructions.md` for scoped instructions.
+GitHub Copilot can use `AGENTS.md`, `.github/copilot-instructions.md`, and
+`.github/instructions/salesforce-agent-optimizer.instructions.md`.
 
 ## Prerequisites
 
@@ -44,4 +127,5 @@ Clone or download the repository, then:
 - Git.
 - Salesforce CLI for org operations.
 - Explicit authenticated org aliases for Salesforce access.
-- Sandbox org for write/execute operations; production orgs are read-only.
+- Sandbox org for write or execute operations; production orgs are read-only
+  through the skill guardrails.

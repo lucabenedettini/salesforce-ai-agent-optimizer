@@ -117,8 +117,8 @@ def generated_files(root: Path) -> dict[Path, str]:
                 "short_description": "Salesforce delivery with routed least-privilege and delete guardrails",
                 "default_prompt": (
                     "Use $salesforce-agent-optimizer to route Salesforce work through minimal context, "
-                    "configuration-first planning, least-privilege org inspection, explicit delete approval, "
-                    "package.xml generation, and validation."
+                    "mandatory request review, planning, approval, implementation decision, validation, "
+                    "least-privilege org inspection, explicit delete approval, and package.xml generation."
                 ),
             },
             "metadata": {"version": version},

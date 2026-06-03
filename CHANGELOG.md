@@ -8,6 +8,27 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.2] - 2026-06-03
+
+### Fixed
+
+- Strengthened Copilot, Codex, Claude Code, and shared agent instructions so request review, planning, approval/implementation decision, validation, failure handling, and completion gates are mandatory for every Salesforce project request.
+- Clarified that metadata-information questions, bugfixes, new metadata implementations, architecture, review, release, and org-inspection tasks must all follow the same phase-gated workflow.
+- Added explicit no-change handling for information-only requests: implementation can be marked `not required`, but planning/evidence and validation still happen before the final answer.
+
+### Added
+
+- Added a regression test that fails if generated Copilot instructions no longer enforce mandatory phase gates.
+- Added a trigger evaluation for Salesforce metadata-information requests.
+- Added a concise end-user `sfao` command reference to the README.
+- Added wiki packaging and publishing guidance for maintainer-only build, release, and PyPI details.
+- Added regression coverage so all multilingual README files document the main `sfao` commands without maintainer-only noise.
+
+### Changed
+
+- Simplified the README by moving package build, release, and publishing details to the wiki.
+- Aligned English, Italian, Spanish, and Simplified Chinese README files to the same concise end-user structure.
+
 ## [1.0.1] - 2026-06-03
 
 ### Fixed

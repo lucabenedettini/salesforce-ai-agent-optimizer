@@ -2,7 +2,9 @@
 
 ## Loop Contract
 
-Use this workflow for Salesforce implementation, architecture, debugging, migration, or release tasks. Track `cycle_count`, starting at 1. A cycle becomes unsuccessful when the user rejects the plan, tests fail, validation fails, or the implemented change no longer matches the approved plan.
+Use this workflow for every Salesforce project request: metadata information, implementation, architecture, debugging, bugfix, migration, release, org inspection, package.xml, or review tasks. These phases are mandatory even when no implementation is needed. Track `cycle_count`, starting at 1. A cycle becomes unsuccessful when the user rejects the plan, tests fail, validation fails, or the implemented change no longer matches the approved plan.
+
+Keep every phase token-efficient. A small metadata-information request can use a compact one-paragraph phase output, but it still needs request review, planning/evidence, implementation decision, validation, and completion.
 
 Maximum: 3 unsuccessful cycles. On the fourth unsuccessful cycle, stop implementation and return to requirement explanation before proposing another plan.
 
@@ -15,6 +17,7 @@ Restate:
 - Known target org or environment.
 - Expected business outcome.
 - Acceptance criteria, if available.
+- Whether the request is information-only, bugfix, implementation, architecture, review, or release work.
 
 Ask questions only when needed. Prefer 1-3 high-value questions. Do not ask about details that can be discovered from the repository or safe read-only org inspection.
 
@@ -64,6 +67,8 @@ Then produce a plan with:
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
 - Destructive action scope and separate deletion approval needs, if any.
+- Implementation decision: `required`, `not required`, or `blocked pending approval/evidence`.
+- Evidence that will be used to validate the answer or implementation.
 
 Do not invent missing evidence. If a plan depends on an unknown product behavior, metadata dependency, package version, record set, permission scope, user persona, or org state, ask the user for the missing fact or present multiple scenarios with tradeoffs and ask the user to choose.
 
@@ -80,6 +85,8 @@ After approval:
 - Preserve existing project conventions.
 - Do not broaden scope because adjacent issues are visible.
 - If a materially better plan appears during implementation, stop and ask for approval on the revised plan.
+
+If implementation is not required, explicitly record `Implementation: not required` with the reason, then continue to Phase 4 validation. Do not create or edit files just to satisfy the workflow.
 
 At the end of development, before optional handoff files and before validation handoff, generate a `package.xml` containing every metadata component added or modified for the approved request.
 
@@ -126,6 +133,8 @@ Use an actual subagent when available. If no subagent capability exists in the c
 
 Do not pass hidden conclusions to the subagent. Pass requirements, diffs/artifacts, commands, and risks.
 
+For information-only metadata requests, validation means re-checking the cited project Knowledge, metadata files, official documentation, or compact org inspection result before final response. Include the evidence paths or commands checked.
+
 ## Phase 5: Failure Handling
 
 If validation or tests fail:
@@ -148,6 +157,7 @@ If `cycle_count` exceeds 3, stop and restart from Phase 1. Explain that the prev
 When validation passes:
 
 - Summarize final requirements and changes.
+- If no implementation was required, summarize the validated answer and evidence instead of changes.
 - List validation evidence and any remaining risk.
 - If changes were deployed, ensure `.salesforce-agent-knowledge/history/project-history.md` contains an event with the requirement and all modified metadata; if it does not, append one with `scripts/knowledge_history.py --action deploy` before final reporting.
 - Ask whether the user wants a push, and ask which branch should receive it.

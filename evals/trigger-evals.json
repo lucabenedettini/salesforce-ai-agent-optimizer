@@ -34,6 +34,10 @@
     {
       "prompt": "Build a Field Service mobile configuration plan for technicians.",
       "reason": "Field Service, mobile development, metadata dependencies, and access planning apply."
+    },
+    {
+      "prompt": "Tell me which Salesforce metadata in this project controls Account page visibility.",
+      "reason": "Metadata-information requests still require request review, planning/evidence, validation, and concise Salesforce project guidance."
     }
   ],
   "should_not_trigger": [

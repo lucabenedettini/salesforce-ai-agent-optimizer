@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.0.1
+  version: 1.0.2
 ---
 
 # Salesforce Agent Optimizer
@@ -38,20 +38,18 @@ For every Salesforce task:
 - Use official Salesforce documentation when local guidance is missing, uncertain, or release-sensitive.
 - Optimize tokens at every step: load only the smallest relevant reference, summarize long logs, prefer diffs and paths over pasted files, and compact task context after each meaningful iteration.
 
-## Delivery Loop
+## Mandatory Phase Gates
 
-Use this compact loop unless the user asks for analysis only:
+For every Salesforce project request, run the functional phases below. Do not skip them for metadata-information questions, bugfixes, new metadata implementations, architecture work, reviews, or release tasks. Keep each phase compact, but make the phase outcome visible to the user.
 
-1. Restate the request, target org/environment, products/packages, and acceptance criteria.
-2. Read `references/routing.md`, product/package references, project Knowledge, history, dependency guidance, least-privilege guidance, and version guidance as needed.
-3. Plan configuration-first changes, custom work only when justified, metadata dependencies, tests, package.xml scope, risks, rollback, estimates, and destructive-approval needs.
-4. Ask whether the user wants an optional PDF of planned tasks and estimates.
-5. Ask for approval before file or org metadata changes; ask separately for destructive approval.
-6. Implement only the approved minimal changes.
-7. Generate `package.xml` for added or modified metadata before validation handoff.
-8. Ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
-9. Validate with tests or an independent validation subagent. If validation or approval fails, replan; stop after three unsuccessful cycles and restart from requirements.
-10. After successful validation, record deploy/push history in Knowledge when applicable, then ask whether to push and which branch.
+1. Request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
+2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Produce a configuration-first plan, including evidence sources. For information-only requests, plan the answer path and state that no implementation is expected.
+3. Approval gate: ask for approval before any file, metadata, org, or deployable change. Ask separately for destructive operations. If no implementation is needed, say so and continue to validation.
+4. Implementation: implement only the approved minimal changes. If the request is information-only, mark this phase as `not required`.
+5. Manifest/artifact gate: when metadata is added or modified, generate `package.xml` before validation handoff. Ask about optional release notes, technical specs, impact assessment, user testing, and manual procedures after implementation.
+6. Validation: validate the result before final answer. For information-only requests, re-check the cited metadata/Knowledge/source evidence. For implementation requests, run tests/static checks or an independent validation pass.
+7. Failure loop: if approval, tests, or validation fail, return to planning with a smaller revised plan. Stop after three unsuccessful cycles and restart from requirements.
+8. Completion: summarize final requirements, evidence, changes or no-change result, validation, risks, and ask whether to push and which branch when repository changes exist.
 
 After each meaningful step, compact the current task context with: goal, state, changed files, commands executed, validation status, risks, and next minimal action. Remove repeated explanations, raw logs when summaries are enough, duplicate file contents, stale assumptions, and irrelevant metadata. Preserve safety warnings, validation errors, permission impacts, destructive-operation scope, and package.xml/deployment scope.
 

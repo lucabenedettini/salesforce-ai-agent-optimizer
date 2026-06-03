@@ -1,184 +1,239 @@
-# Salesforce AI Agent Optimizer
+# Salesforce Agent Optimizer
 
-[English](README.md) | [Italiano](README.it.md) | [Espanol](README.es.md) | 简体中文
+[English](README.md) | [Italiano](README.it.md) | [Espanol](README.es.md) | [Simplified Chinese](README.zh-CN.md)
 
-[![Validate Skill](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Latest release](https://img.shields.io/github/v/release/lucabenedettini/salesforce-ai-agent-optimizer)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/releases)
-[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#安装)
+Salesforce Agent Optimizer 是一个 MIT 许可的 Salesforce Agent Skill，以
+`sfao` 命令形式分发，适用于 Codex、Claude Code 和 GitHub Copilot。
 
-Salesforce AI Agent Optimizer 是一个采用 MIT 许可证的公开 AI Agent 技能包，用于 Salesforce 项目。它帮助 Codex、Claude Code、GitHub Copilot 以及类似 Agent 规划、实现、验证、打包和记录 Salesforce 变更，同时保持上下文精简并应用强安全护栏。
+当前版本：`1.0.2`
 
-公开仓库名称是 **Salesforce AI Agent Optimizer**。Codex 技能名称保持为 `salesforce-agent-optimizer`。
+它安装面向 Agent 的指令，用于执行 Salesforce-first 方案设计、优先配置而非
+自定义代码、最小且可回滚的变更、节省 token 的 Knowledge、least privilege、
+显式 org alias、`package.xml` 意识，以及破坏性操作 guardrails。
 
-当前版本：`1.0.1`
-
-## 核心原则
-
-- Salesforce 优先：优先使用标准能力、配置、Flow、Permission Set、LDS/UI API、Named Credential 和托管包能力，再考虑自定义 Apex、LWC、Trigger 或集成。
-- Token 高效：使用渐进式披露、本地 Knowledge、紧凑 CLI 输出、定向源码读取和最小补丁。
-- 本地 Knowledge：`/sf-init-project-skill` 会创建面向 Agent 的紧凑 Markdown 元数据索引，灵感来自 LLM wiki 模式。
-- Agent 原生 CLI：`scripts/sf_agent_cli.py` 封装官方 Salesforce CLI，提供显式 org alias、紧凑 JSON、敏感信息脱敏、dry-run、生产只读和删除审批 enforcement。
-- Least privilege：规划阶段必须检查目标 org 中相关用户/persona 的当前权限，并只授予完成业务任务所需的最小访问权限。
-- 不编造：如果证据不足，Agent 必须询问用户，或给出多个场景和取舍让用户选择。
-
-## 安全护栏
-
-- 通过 facade 执行时，生产 org 对 write、execute 和 destructive 操作保持只读。
-- 所有 org、data、metadata 命令都必须使用显式 target org alias。
-- 破坏性操作绝不能自动执行。数据删除、元数据删除、package uninstall、source delete、purge、hard delete、`destructiveChanges.xml` 部署，都必须针对精确范围获得单独用户审批。
-- 用户批准后，CLI 仍会要求提供以下精确 flag：
+## Quick Start
 
 ```bash
---delete-approval "I explicitly approve this deletion"
+uv tool install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao knowledge init --project-root .
+sfao doctor
 ```
 
-- 被删除的元数据应放在 `destructiveChanges.xml`，不要放进 `package.xml`。
-- 如果记录范围、元数据依赖、package 版本或 org 行为不明确，Agent 必须询问用户或提供选项。
-
-## 主要命令
-
-创建或刷新项目 Knowledge：
-
-```text
-/sf-init-project-skill
-```
-
-从 Salesforce 官方来源刷新 release/API/SOAP/package 版本上下文：
-
-```text
-/sf-version-update-skill
-```
-
-运行本地测试：
-
-```bash
-python scripts/sync_agent_instructions.py --check
-python scripts/validate_skill.py
-python scripts/self_test.py --json
-python -m pytest
-```
-
-为新增或修改的元数据生成 package manifest：
-
-```bash
-python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<date>-<change>/package.xml --from-git-status
-```
-
-查看目标 org 中已安装的 package：
-
-```bash
-python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
-```
-
-在规划权限变更前检查当前用户访问：
-
-```bash
-python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
-```
-
-只有在明确审批后才删除记录：
-
-```bash
-python scripts/sf_agent_cli.py data-record-delete --target-org <alias> --sobject Account --record-id 001... --delete-approval "I explicitly approve this deletion"
-```
+推荐用 `uv tool install` 或 `pipx install` 隔离 CLI。`pip install` 也能用，
+但隔离安装通常能减少 PATH 和依赖冲突。
 
 ## 安装
 
-向 Codex 提出请求：
-
-```text
-Install the Salesforce AI Agent Optimizer skill from https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
-```
-
-Codex 安装命令：
+推荐：
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
+uv tool install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
 ```
 
-Codex 原生路径：
+替代方式：
 
-- Repo skill：`.agents/skills/salesforce-agent-optimizer`
-- User skill：`$HOME/.agents/skills/salesforce-agent-optimizer`
+```bash
+pipx install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
+```
 
-Claude Code：
+在 PyPI 发布前，或需要直接从 GitHub 安装时：
 
-- 将 skill 安装或保留在 `.claude/skills/salesforce-agent-optimizer/SKILL.md`。
-- 也可以将 `agents/claude-code.md` 合并到 `CLAUDE.md`。
-- 将 `agents/sf-init-project-skill.md` 复制到 `.claude/commands/sf-init-project-skill.md`。
-- 将 `agents/sf-version-update-skill.md` 复制到 `.claude/commands/sf-version-update-skill.md`。
+```bash
+uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
 
-GitHub Copilot：
+如果你明确希望把命令安装到当前 Python 环境，也可以使用普通 `pip`：
 
-- 使用 `AGENTS.md`、`.github/copilot-instructions.md` 和 `.github/instructions/salesforce-agent-optimizer.instructions.md`。
+```bash
+pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
 
-## 前置条件
+## 主要 `sfao` 命令
 
-- Python 3.10+。
-- Git。
-- 用于 Knowledge、deploy、retrieve 或 manifest 工作流的 Salesforce DX 项目。
-- 用于 org 操作的官方 Salesforce CLI，命令名为 `sf`。
-- 已认证的 org alias。Agent 必须询问 alias，不能依赖 default org。
-- write/execute 操作需要 sandbox。生产环境只读。
+| 命令 | 用途 |
+| --- | --- |
+| `sfao version` | 输出已安装版本。 |
+| `sfao install --project --platform all` | 在当前项目安装 Codex、Claude Code 和 GitHub Copilot adapters。 |
+| `sfao install --project --platform codex` | 只在 `.agents/skills/` 安装 Codex skill。 |
+| `sfao install --project --platform claude` | 只在 `.claude/skills/` 安装 Claude Code skill。 |
+| `sfao install --project --platform copilot` | 只安装 `AGENTS.md` 和 GitHub Copilot 指令。 |
+| `sfao update --project --platform all` | 只更新由 `sfao` 生成的文件；用户编辑过的文件会被跳过。 |
+| `sfao uninstall --project --platform all --yes` | 只删除生成的 adapters；保留项目目录和用户文件。 |
+| `sfao doctor` | 检查本地环境、已安装 adapters、Salesforce CLI 和常见 PATH 问题。 |
+| `sfao doctor --verbose` | 输出完整诊断信息。 |
+| `sfao doctor --json` | 输出紧凑 JSON 诊断。 |
+| `sfao validate` | 校验安装或源码：frontmatter、YAML、TOML、JSON、Python、版本和换行格式。 |
+| `sfao validate --verbose` | 输出用于排查问题的详细校验信息。 |
+| `sfao validate --json` | 输出紧凑 JSON 校验结果。 |
+| `sfao knowledge init --project-root .` | 为 Salesforce 项目创建 `.salesforce-agent-knowledge/`。 |
+| `sfao knowledge refresh --project-root .` | metadata 变更后刷新本地 Knowledge。 |
+| `sfao knowledge doctor --project-root .` | 检查本地 Knowledge 是否存在且可用。 |
+| `sfao knowledge refresh --project-root . --target-org <alias>` | 可选地从 org 丰富 Knowledge。必须显式提供 alias。 |
+| `sfao version-context scaffold` | 缺失时创建本地 Salesforce release/API context 文件。 |
+| `sfao version-context update` | 从 Salesforce 官方来源刷新 release/API/package guidance。 |
+| `sfao version-context validate` | 检查 version-context 文件。 |
 
-可选：
+## 安装内容
 
-- PyYAML，用于 Codex skill 校验。
-- Node.js/npm，用于 `npm install -g @salesforce/cli`。
-- Go 和 `cli-printing-press`，仅用于 CLI 实验。
+Codex:
 
-## 版本上下文
+```text
+.agents/skills/salesforce-agent-optimizer/SKILL.md
+.agents/skills/salesforce-agent-optimizer/references/
+.agents/skills/salesforce-agent-optimizer/scripts/
+.agents/skills/salesforce-agent-optimizer/agents/openai.yaml
+```
 
-已在 2026-06-03 验证：
+Claude Code:
 
-- Salesforce release：Summer '26。
-- Platform API、Metadata API、SOAP API：`67.0`。
-- SOAP API `login()` 在 API `65.0+` 中不可用；Salesforce 已宣布在 Summer '27 退役 API `31.0-64.0` 的 SOAP `login()`。
-- 托管包版本取决于目标 org。不要假设 namespace、对象名称或功能可用性，先检查已安装 package。
+```text
+.claude/skills/salesforce-agent-optimizer/SKILL.md
+.claude/skills/salesforce-agent-optimizer/references/
+.claude/skills/salesforce-agent-optimizer/scripts/
+```
 
-权威资源：
+GitHub Copilot:
 
-- `references/salesforce-current-version.md`
-- `references/salesforce-version.json`
-- `references/version-update.md`
+```text
+AGENTS.md
+.github/copilot-instructions.md
+.github/instructions/salesforce-agent-optimizer.instructions.md
+```
 
-## 验证与交付
+生成文件包含以下标记：
 
-交付方法要求：
+```md
+<!-- Generated by salesforce-agent-optimizer. Managed by sfao. -->
+```
 
-- 复述用户请求。
-- 只在必要时提出聚焦问题。
-- 识别相关 Salesforce 产品、package 和元数据依赖。
-- 规划最小变更并请求批准。
-- 对破坏性操作单独请求审批。
-- 只实现已批准的工作。
-- 为新增或修改的元数据生成 `package.xml`。
-- 提供 release notes、technical specifications、impact assessment、user testing 和 manual procedures 的可选生成。
-- 使用测试或验证子 Agent 进行验证。
-- 验证通过后再询问是否 push 以及 push 到哪个 branch。
+`sfao` 不会静默覆盖或删除用户文件。
 
-## 关键文件
+## Agent 工作流
 
-- `SKILL.md`：核心技能说明。
-- `agents/`：Codex、Claude Code、GitHub Copilot 和 slash command 适配器。
-- `references/`：Salesforce 架构、产品、CLI、测试、删除、版本和交付的渐进式参考资料。
-- `scripts/sf_agent_cli.py`：安全 Salesforce CLI facade。
-- `scripts/sf_knowledge_init.py`：本地元数据 Knowledge 生成器。
-- `scripts/generate_package_manifest.py`：`package.xml` 生成器。
-- `scripts/git_knowledge_push.py`：带 Knowledge history 的远程 push。
-- `scripts/self_test.py`：跨平台本地测试。
+安装后，Agent 指令要求所有 Salesforce 项目请求都遵守同一套阶段流程，包括
+metadata 信息问题、bugfix、新实现、架构、review、release 和 org inspection：
 
-## 官方来源
+1. 审阅请求，并复述 scope、产品/package、org/环境和验收标准。
+2. 基于相关 references、本地 Knowledge、metadata 依赖、least privilege 和必要的 Salesforce 官方上下文制定计划。
+3. 在修改文件、metadata、org、deployable 或执行破坏性操作前请求批准。
+4. 只实现已批准的最小变更；信息类请求将实现阶段标记为 `not required`。
+5. 新增或修改 metadata 时生成 `package.xml`。
+6. 最终回复前完成验证。
+7. 如果批准、测试或验证失败，回到计划阶段；三次失败后停止。
+8. 总结证据、变更或无变更结果、验证、风险；当 repository 有变更时询问是否 push 以及目标 branch。
 
-- Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
-- Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
-- Metadata API deploy and destructive changes: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
-- GraphQL delete record: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
-- LWC `deleteRecord`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
-- Salesforce release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
-- Salesforce Well-Architected Secure: https://architect.salesforce.com/docs/architect/well-architected/guide/secure
+## Knowledge 与 Version Context
 
-## 许可证
+创建或刷新紧凑的本地 Salesforce 项目 Knowledge：
 
-MIT。任何人都可以在 `LICENSE` 条款下使用、复制、修改、分发和 fork 本仓库。
+```bash
+sfao knowledge init --project-root .
+sfao knowledge refresh --project-root .
+sfao knowledge doctor --project-root .
+```
+
+刷新 Salesforce release/API/package 上下文：
+
+```bash
+sfao version-context scaffold
+sfao version-context update
+sfao version-context validate
+```
+
+Org 访问绝不能是隐式的。命令需要 Salesforce org metadata 或 data 时，Agent 必须
+询问显式 alias。通过 skill guardrails，生产 org 为只读。
+
+## Update
+
+```bash
+uv tool upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+替代方式：
+
+```bash
+pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+## Uninstall
+
+```bash
+sfao uninstall --project --platform all --yes
+uv tool uninstall salesforce-agent-optimizer
+```
+
+替代方式：
+
+```bash
+sfao uninstall --project --platform all --yes
+pipx uninstall salesforce-agent-optimizer
+```
+
+## 隐私与安全
+
+- 不要提交 Salesforce credentials、`.sf/`、`.sfdx/`、auth 文件、token、私钥或本地 secrets。
+- 计划阶段必须应用 least privilege：先检查当前访问，再授予完成任务所需的最小权限。
+- 数据或 metadata 破坏性操作必须针对精确 scope 获得显式批准。
+- 破坏性 CLI 操作需要精确短语 `I explicitly approve this deletion`。
+- Knowledge 只保存紧凑摘要和 hash，不保存原始 secrets。
+
+## Troubleshooting
+
+`sfao: command not found`
+
+- 运行 `uv tool update-shell`，打开新终端，或把 tool bin 目录加入 PATH。
+- Windows 上请检查 `pip` 输出的用户 Scripts 目录。
+
+`uv: command not found`
+
+- 安装 `uv`，或使用 `pipx install salesforce-agent-optimizer`。
+
+PyPI 找不到 package
+
+- 在 PyPI 发布前使用 GitHub 安装命令。
+
+找不到 Salesforce CLI `sf`
+
+- 安装官方 Salesforce CLI，并确认 `sf --version` 可用。
+
+Codex、Claude Code 或 GitHub Copilot 看不到 skill
+
+- 重新运行匹配的 `sfao install --project --platform ...` 命令。
+- 如果 Agent surface 缓存指令，请重启。
+- 运行 `sfao doctor` 和 `sfao validate`。
+
+生成文件过期或版本不匹配
+
+- 运行 `sfao update --project --platform all`。
+- 运行 `sfao validate --verbose`。
+
+## 更多文档
+
+用户和 maintainer 细节位于 `docs/wiki/`：
+
+- `docs/wiki/Home.md`
+- `docs/wiki/Installation.md`
+- `docs/wiki/Packaging-And-Publishing.md`
+- `docs/wiki/Principles.md`
+- `docs/wiki/Testing-And-Manifests.md`
+- `docs/wiki/Versioning.md`
+
+build、release、publishing 和 package maintenance 细节故意不放在 README 中，
+以保持用户安装路径简短。
+
+## License
+
+MIT。任何人都可以根据 `LICENSE` 使用、复制、修改、分发和 fork 本 repository。

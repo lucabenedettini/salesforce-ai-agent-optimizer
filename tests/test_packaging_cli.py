@@ -48,10 +48,55 @@ def test_cli_entry_point_declared() -> None:
     assert 'sfao = "salesforce_agent_optimizer.cli:main"' in pyproject
 
 
+def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
+    readmes = [
+        ROOT / "README.md",
+        ROOT / "README.it.md",
+        ROOT / "README.es.md",
+        ROOT / "README.zh-CN.md",
+    ]
+    required_commands = [
+        "sfao version",
+        "sfao install --project --platform all",
+        "sfao install --project --platform codex",
+        "sfao install --project --platform claude",
+        "sfao install --project --platform copilot",
+        "sfao update --project --platform all",
+        "sfao uninstall --project --platform all --yes",
+        "sfao doctor",
+        "sfao doctor --verbose",
+        "sfao doctor --json",
+        "sfao validate",
+        "sfao validate --verbose",
+        "sfao validate --json",
+        "sfao knowledge init --project-root .",
+        "sfao knowledge refresh --project-root .",
+        "sfao knowledge doctor --project-root .",
+        "sfao version-context scaffold",
+        "sfao version-context update",
+        "sfao version-context validate",
+    ]
+    maintainer_only_fragments = [
+        "python -m build",
+        "python -m pytest",
+        "python scripts/self_test.py",
+        "python scripts/sync_agent_instructions.py",
+        "python scripts/validate_skill.py",
+        "python -m twine",
+        "git tag v",
+    ]
+    for path in readmes:
+        readme = path.read_text(encoding="utf-8")
+        for command in required_commands:
+            assert command in readme, f"{path.name} missing {command}"
+        for fragment in maintainer_only_fragments:
+            assert fragment not in readme, f"{path.name} contains maintainer-only {fragment}"
+
+
 def test_sfao_version() -> None:
     completed = run_cli(["version"], ROOT)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "salesforce-agent-optimizer 1.0.1" in completed.stdout
+    assert "salesforce-agent-optimizer 1.0.2" in completed.stdout
 
 
 def test_sfao_validate_and_doctor() -> None:
@@ -62,7 +107,7 @@ def test_sfao_validate_and_doctor() -> None:
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     payload = json.loads(doctor.stdout)
-    assert payload["Core"][0]["detail"].endswith("v1.0.1")
+    assert payload["Core"][0]["detail"].endswith("v1.0.2")
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -147,7 +192,7 @@ def test_uninstall_skips_non_generated_files(tmp_path: Path) -> None:
 def test_versions_align() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'^version = "1\.0\.1"$', pyproject, re.MULTILINE)
+    assert re.search(r'^version = "1\.0\.2"$', pyproject, re.MULTILINE)
     skill_data, _, _ = parse_frontmatter(ROOT / "SKILL.md")
     assert skill_data["metadata"]["version"] == version
     codex_data, _, _ = parse_frontmatter(
@@ -166,6 +211,22 @@ def test_source_generated_files_have_markers() -> None:
     ]
     for path in files:
         assert GENERATED_MARKER in path.read_text(encoding="utf-8")
+
+
+def test_copilot_instructions_enforce_mandatory_phase_gates() -> None:
+    text = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
+    required = [
+        "Mandatory phase gates",
+        "metadata information",
+        "bugfix",
+        "new metadata implementation",
+        "approval gate",
+        "Implementation: not required",
+        "validate before final response",
+        "Stop after three unsuccessful cycles",
+    ]
+    for phrase in required:
+        assert phrase in text
 
 
 def test_source_validation_catches_text_shape() -> None:
@@ -255,7 +316,7 @@ def test_release_manifest_and_workflow_requirements() -> None:
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     manifest = json.loads((dist / "release-manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "1.0.1"
+    assert manifest["version"] == "1.0.2"
     assert "sfao update" in manifest["commands"]
     assert "sfao uninstall" in manifest["commands"]
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
