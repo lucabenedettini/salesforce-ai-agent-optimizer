@@ -26,7 +26,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.5.1`
+- Current version: `0.6.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 
@@ -38,13 +38,20 @@ Use `/sf-version-update-skill` to refresh Salesforce release/API/SOAP/package gu
 
 Before planning, an agent should:
 
-1. Identify products/packages from `references/products-packages/index.md`.
-2. Read `references/salesforce-current-version.md` for release/API/package-sensitive work.
-3. Read only relevant product/package files.
-4. Read `references/metadata-dependencies.md`.
-5. Read `references/least-privilege-planning.md` for access, sharing, UI, integration, automation, or package exposure.
-6. Read the local project Knowledge.
-7. Inspect source metadata and targeted org access before modifying.
+1. Start from `references/routing.md` and load only task-relevant references.
+2. Identify products/packages from `references/products-packages/index.md`.
+3. Read `references/salesforce-current-version.md` for release/API/package-sensitive work.
+4. Read only relevant product/package files.
+5. Read `references/metadata-dependencies.md`.
+6. Read `references/least-privilege-planning.md` for access, sharing, UI, integration, automation, or package exposure.
+7. Read the local project Knowledge.
+8. Inspect source metadata and targeted org access before modifying.
+
+Agent adapters are synchronized from `references/agent-instruction-spine.md` with:
+
+```bash
+python scripts/sync_agent_instructions.py --check
+```
 
 At the end of development, the agent asks whether to generate delivery artifacts using `references/completion-artifacts.md`.
 

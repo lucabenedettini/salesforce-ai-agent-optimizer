@@ -1,26 +1,4 @@
----
-name: salesforce-agent-optimizer
-description: Claude Code shim for Salesforce Agent Optimizer. Read the root SKILL.md
-  and routed references.
-license: MIT
-compatibility:
-  agents:
-  - Claude Code
-  platforms:
-  - Windows
-  - macOS
-  - Linux
-  prerequisites:
-  - Python 3.10+
-  - Git
-  - Salesforce CLI
-metadata:
-  version: 0.6.0
----
-
-# Salesforce Agent Optimizer For Claude Code
-
-This is a Claude Code discovery shim. Read `../../../SKILL.md` as canonical.
+# Agent Instruction Spine
 
 Use this Salesforce Agent Optimizer guidance for Salesforce architecture, metadata, Apex, LWC, Flow, DevOps, package.xml, org inspection, and release tasks.
 

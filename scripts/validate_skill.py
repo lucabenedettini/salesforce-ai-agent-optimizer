@@ -7,6 +7,7 @@ import argparse
 import json
 import py_compile
 import re
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,8 @@ REQUIRED_FILES = [
     "README.it.md",
     "README.es.md",
     "README.zh-CN.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
     "AGENTS.md",
     "agents/openai.yaml",
     ".agents/skills/salesforce-agent-optimizer/SKILL.md",
@@ -40,6 +43,16 @@ REQUIRED_FILES = [
     ".github/copilot-instructions.md",
     ".github/instructions/salesforce-agent-optimizer.instructions.md",
     ".github/workflows/validate.yml",
+    "references/routing.md",
+    "references/agent-instruction-spine.md",
+    "scripts/sync_agent_instructions.py",
+    "evals/trigger-evals.json",
+    "tests/conftest.py",
+    "tests/test_skill_validation.py",
+    "tests/test_salesforce_workflows.py",
+    ".github/ISSUE_TEMPLATE/bug_report.yml",
+    ".github/ISSUE_TEMPLATE/feature_request.yml",
+    ".github/ISSUE_TEMPLATE/salesforce_skill_gap.yml",
 ]
 
 
@@ -165,6 +178,37 @@ def validate_json(root: Path, errors: list[str]) -> None:
             fail(errors, f"Invalid JSON {path.relative_to(root)}: {exc}")
 
 
+def validate_generated_files(root: Path, errors: list[str]) -> None:
+    script = root / "scripts" / "sync_agent_instructions.py"
+    completed = subprocess.run(
+        [sys.executable, str(script), "--root", str(root), "--check"],
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        fail(errors, "Generated agent instruction files are stale. Run: python scripts/sync_agent_instructions.py")
+
+
+def validate_trigger_evals(root: Path, errors: list[str]) -> None:
+    path = root / "evals" / "trigger-evals.json"
+    try:
+        payload = json.loads(read_text(path))
+    except json.JSONDecodeError as exc:
+        fail(errors, f"Invalid trigger evals JSON: {exc}")
+        return
+    for key in ("should_trigger", "should_not_trigger"):
+        items = payload.get(key)
+        if not isinstance(items, list) or len(items) < 5:
+            fail(errors, f"evals/trigger-evals.json must include at least five {key} examples")
+            continue
+        for index, item in enumerate(items):
+            if not isinstance(item, dict) or not item.get("prompt") or not item.get("reason"):
+                fail(errors, f"evals/trigger-evals.json {key}[{index}] must include prompt and reason")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate Salesforce Agent Optimizer skill compatibility.")
     parser.add_argument("root", nargs="?", default=Path(__file__).resolve().parent.parent)
@@ -179,6 +223,8 @@ def main() -> int:
     validate_json(root, errors)
     validate_python(root, errors)
     validate_text_shape(root, errors)
+    validate_trigger_evals(root, errors)
+    validate_generated_files(root, errors)
 
     result = {"ok": not errors, "errors": errors}
     if args.json:

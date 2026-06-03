@@ -36,3 +36,6 @@ jobs:
 
       - name: Run self tests
         run: python scripts/self_test.py --json
+
+      - name: Run pytest
+        run: python -m pytest

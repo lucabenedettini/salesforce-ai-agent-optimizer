@@ -15,6 +15,7 @@ Every version update must include:
 
 ## Current Version
 
+- `0.6.0`: instruction architecture refactor with concise routing, generated agent adapters, trigger evals, pytest coverage, and public maintenance files.
 - `0.5.1`: compatibility hotfix for valid skill frontmatter, native Codex/Claude Code/GitHub Copilot install targets, local validation, and minimal cross-platform CI.
 
 ## Examples

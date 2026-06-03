@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible problem in the skill, scripts, or agent adapters.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Skill version or commit SHA.
+      placeholder: "0.6.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent surface
+      options:
+        - Codex
+        - Claude Code
+        - GitHub Copilot
+        - CLI/script only
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem
+      description: What happened, what you expected, and the smallest safe reproduction.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation output
+      description: Paste redacted output from validate_skill, self_test, pytest, or the failing command.
+      render: shell
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed Salesforce credentials, tokens, customer data, and sensitive org details.
+          required: true

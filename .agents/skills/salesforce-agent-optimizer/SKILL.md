@@ -1,29 +1,47 @@
 ---
 name: salesforce-agent-optimizer
-description: Repository-local Salesforce Agent Skill shim for Codex. Use the root SKILL.md plus references and scripts for Salesforce planning, implementation, validation, package.xml, org inspection, least privilege, and destructive-operation guardrails.
+description: Repository-local Codex shim for Salesforce Agent Optimizer. Read the
+  root SKILL.md and routed references.
 license: MIT
 compatibility:
   agents:
-    - Codex
+  - Codex
   platforms:
-    - Windows
-    - macOS
-    - Linux
+  - Windows
+  - macOS
+  - Linux
   prerequisites:
-    - Python 3.10+
-    - Git
-    - Salesforce CLI
+  - Python 3.10+
+  - Git
+  - Salesforce CLI
 metadata:
-  version: 0.5.1
+  version: 0.6.0
 ---
 
 # Salesforce Agent Optimizer Repo Skill
 
-This is the repository-native Codex discovery entry. The canonical skill is at `../../../SKILL.md`.
+This is a repository-native Codex discovery shim. Read `../../../SKILL.md` as canonical.
 
-When this skill is selected:
+Use this Salesforce Agent Optimizer guidance for Salesforce architecture, metadata, Apex, LWC, Flow, DevOps, package.xml, org inspection, and release tasks.
 
-- Read `../../../SKILL.md` first.
-- Use `../../../references/` only as needed for the task.
-- Use `../../../scripts/` for deterministic Salesforce CLI, Knowledge, manifest, history, and validation workflows.
-- Keep context compact and preserve the Salesforce-first, least-privilege, minimal-patch, destructive-guardrail behavior.
+Canonical workflow:
+
+- Start with `SKILL.md`, then read `references/routing.md` and only the task-relevant references.
+- Prefer Salesforce standard capabilities, configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before custom code.
+- Keep patches minimal, reversible, and scoped to the approved request.
+- Before planning, use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance when relevant.
+- Use `scripts/sf_agent_cli.py` for org access. Ask for an explicit org alias; use compact redacted output; treat production orgs as read-only.
+- Never invent Salesforce behavior. Ask the user or present scenarios when evidence is unclear.
+- Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
+- Generate `package.xml` for added or modified metadata before validation handoff.
+- Validate with tests or an independent validation pass before asking whether to push.
+
+Important references:
+
+- Routing: `references/routing.md`
+- Delivery loop: `references/delivery-methodology.md`
+- Metadata dependencies: `references/metadata-dependencies.md`
+- Least privilege: `references/least-privilege-planning.md`
+- CLI facade: `references/sf-agent-cli-commands.md`
+- Testing and manifests: `references/testing-and-manifest-guardrails.md`
+- Version context: `references/salesforce-current-version.md`

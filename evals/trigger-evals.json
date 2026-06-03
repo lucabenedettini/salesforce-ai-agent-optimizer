@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "skill": "salesforce-agent-optimizer",
+  "purpose": "Document prompts where the skill should or should not activate.",
+  "should_trigger": [
+    {
+      "prompt": "Review this Apex trigger for bulkification, CRUD/FLS, and package.xml impact.",
+      "reason": "Apex and Salesforce metadata review require backend, testing, and manifest guidance."
+    },
+    {
+      "prompt": "Plan a Salesforce CPQ change for quote approval routing and ask what metadata is impacted.",
+      "reason": "CPQ, Advanced Approval-style dependencies, metadata dependency planning, and package context apply."
+    },
+    {
+      "prompt": "Run /sf-init-project-skill for this Salesforce DX repo.",
+      "reason": "The slash command builds project Knowledge from Salesforce metadata."
+    },
+    {
+      "prompt": "Generate a package.xml for the Salesforce metadata I changed.",
+      "reason": "Manifest generation is a core skill workflow."
+    },
+    {
+      "prompt": "Delete obsolete Salesforce custom fields after deploy validation.",
+      "reason": "Destructive metadata operations require explicit deletion guardrails."
+    },
+    {
+      "prompt": "Inspect the org permissions before granting users access to a new Lightning page.",
+      "reason": "Least-privilege planning and targeted org inspection are required."
+    },
+    {
+      "prompt": "Update the Salesforce API version guidance to the latest production release.",
+      "reason": "/sf-version-update-skill and official Salesforce source refresh apply."
+    },
+    {
+      "prompt": "Build a Field Service mobile configuration plan for technicians.",
+      "reason": "Field Service, mobile development, metadata dependencies, and access planning apply."
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "prompt": "Write a generic Python script that renames image files.",
+      "reason": "No Salesforce product, metadata, org, or delivery workflow is involved."
+    },
+    {
+      "prompt": "Summarize this non-technical marketing blog post.",
+      "reason": "No Salesforce implementation or architecture work is requested."
+    },
+    {
+      "prompt": "Create a React landing page for a bakery.",
+      "reason": "Frontend web work unrelated to Salesforce should use a frontend skill instead."
+    },
+    {
+      "prompt": "Explain the difference between REST and SOAP in general terms.",
+      "reason": "General API explanation without Salesforce release/API context does not require this skill."
+    },
+    {
+      "prompt": "Find today's weather in Rome.",
+      "reason": "No repository, Salesforce, or agent-delivery task is involved."
+    },
+    {
+      "prompt": "Fix a typo in a plain README for a Node package.",
+      "reason": "No Salesforce metadata, org, or product guidance is needed."
+    }
+  ]
+}

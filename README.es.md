@@ -2,11 +2,16 @@
 
 [English](README.md) | [Italiano](README.it.md) | Espanol | [简体中文](README.zh-CN.md)
 
+[![Validate Skill](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/lucabenedettini/salesforce-ai-agent-optimizer)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/releases)
+[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#instalacion)
+
 Salesforce AI Agent Optimizer es una skill publica con licencia MIT para agentes AI que trabajan en proyectos Salesforce. Ayuda a Codex, Claude Code, GitHub Copilot y agentes similares a planificar, implementar, validar, empaquetar y documentar cambios Salesforce con uso compacto de contexto y guardrails fuertes.
 
 El repositorio publico se llama **Salesforce AI Agent Optimizer**. El nombre de la skill Codex sigue siendo `salesforce-agent-optimizer`.
 
-Version actual: `0.5.1`
+Version actual: `0.6.0`
 
 ## Principios
 
@@ -48,8 +53,10 @@ Actualizar contexto de version Salesforce release/API/SOAP/package desde fuentes
 Ejecutar tests locales:
 
 ```bash
+python scripts/sync_agent_instructions.py --check
 python scripts/validate_skill.py
 python scripts/self_test.py --json
+python -m pytest
 ```
 
 Generar manifest para metadata agregada o modificada:

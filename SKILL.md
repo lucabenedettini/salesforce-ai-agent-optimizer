@@ -16,181 +16,65 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 0.5.1
+  version: 0.6.0
 ---
 
 # Salesforce Agent Optimizer
 
-## Operating Principles
+Use this skill for Salesforce solution design, implementation, review, validation, metadata/package.xml work, org inspection, release/API version context, and safe agent delivery.
 
-Treat Salesforce as a metadata-driven platform first. Prefer standard features, setup configuration, Flow, permission sets, validation rules, Dynamic Forms, Lightning App Builder, standard APIs, and managed package capabilities before Apex, LWC, triggers, or bespoke integrations.
+## First Reads
 
-Optimize for Salesforce Well-Architected outcomes: trusted, easy, and adaptable. Make tradeoffs explicit when security, maintainability, performance, scalability, user experience, or delivery speed compete.
+Start with `references/routing.md`. Load only the rows needed for the user's request, then read `references/delivery-methodology.md` for implementation work.
 
-Apply Salesforce least privilege during every planning phase. Read `references/least-privilege-planning.md`; when a change affects or may expose data, metadata, UI, automation, integrations, packages, or users, inspect current org permissions for the affected personas/users and grant only the minimum access needed for the approved business task.
+For every Salesforce task:
 
-Keep patches minimal. Change the fewest metadata/code files that solve the stated problem. Avoid broad refactors unless needed to remove a defect or unblock a safe design.
+- Prefer Salesforce standard capabilities, setup configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before Apex, LWC, triggers, or custom integrations.
+- Keep patches minimal, reversible, and scoped to the approved request.
+- Consult `.salesforce-agent-knowledge/` before modifying a project; run `/sf-init-project-skill` when Knowledge is missing, stale, or requested.
+- Apply least privilege in planning and inspect current org permissions when access, sharing, UI exposure, packages, integrations, automation, or users are affected.
+- Never invent Salesforce behavior. Ask the user or present scenarios when product behavior, package version, org state, record scope, or permission scope is unclear.
+- Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
+- Use official Salesforce documentation when local guidance is missing, uncertain, or release-sensitive.
 
-Use org evidence before assumptions. Inspect only the metadata needed for the decision, summarize findings compactly, and avoid dumping raw CLI output into context.
+## Delivery Loop
 
-Never invent missing Salesforce facts. If evidence is unclear during planning, ask the user for the missing fact or present distinct scenarios with tradeoffs and ask the user to choose. If the agent is unsure which permissions users should receive, ask the user explicitly before planning or applying the access change.
+Use this compact loop unless the user asks for analysis only:
 
-Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` before any data delete, metadata delete, package uninstall, destructive change, purge, or hard delete. Every destructive action requires explicit user approval for the exact scope.
+1. Restate the request, target org/environment, products/packages, and acceptance criteria.
+2. Read `references/routing.md`, product/package references, project Knowledge, history, dependency guidance, least-privilege guidance, and version guidance as needed.
+3. Plan configuration-first changes, custom work only when justified, metadata dependencies, tests, package.xml scope, risks, rollback, estimates, and destructive-approval needs.
+4. Ask whether the user wants an optional PDF of planned tasks and estimates.
+5. Ask for approval before file or org metadata changes; ask separately for destructive approval.
+6. Implement only the approved minimal changes.
+7. Generate `package.xml` for added or modified metadata before validation handoff.
+8. Ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
+9. Validate with tests or an independent validation subagent. If validation or approval fails, replan; stop after three unsuccessful cycles and restart from requirements.
+10. After successful validation, record deploy/push history in Knowledge when applicable, then ask whether to push and which branch.
 
-Before any modification, consult the project Knowledge if it exists. If it is missing, stale, or explicitly requested by the user, run `/sf-init-project-skill` to build or refresh it.
+## Salesforce CLI
 
-## Product, Package, And Dependency Context
+Use `scripts/sf_agent_cli.py` for org access. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
 
-Before planning, read `references/products-packages/index.md`. Use the brief descriptions to identify relevant Salesforce products, AppExchange packages, and mobile-development surfaces from the user's request, project metadata, installed packages, object names, namespaces, and app names. Then read only the matching product/package files.
-
-For release-sensitive tasks, API work, SOAP/REST/Metadata/Tooling/UI/GraphQL API work, package planning, LWC `apiVersion`, Apex/Flow version behavior, or `sourceApiVersion` changes, read `references/salesforce-current-version.md` before planning. If it is stale or the user invokes `/sf-version-update-skill`, refresh it.
-
-Before planning, also read `references/metadata-dependencies.md` and `references/least-privilege-planning.md`. Account for relationships across permission sets, permission set groups, users, fields, page layouts, Lightning pages, record types, picklist values, Flow, Apex, integrations, sharing, reports, dashboards, and mobile exposure.
-
-## `/sf-init-project-skill` Metadata Knowledge
-
-Read `references/knowledge-init.md` when the user invokes `/sf-init-project-skill`, asks to inspect Salesforce metadata, asks to refresh project Knowledge, or starts work in a Salesforce repo without an existing Knowledge index.
-
-`/sf-init-project-skill` creates or refreshes an indexed Knowledge folder inside the Salesforce project:
-
-```text
-.salesforce-agent-knowledge/
-```
-
-Run:
-
-```bash
-python scripts/sf_knowledge_init.py --project-root <salesforce-project-root> --refresh
-```
-
-The user can update `.salesforce-agent-knowledge/config.json` to add, remove, or enrich metadata types and path patterns for the project. Treat the generated Knowledge as a compact context layer, not as a replacement for source metadata files.
-
-Each indexed metadata artifact gets a same-format Markdown page under `.salesforce-agent-knowledge/metadata/`. The Knowledge also includes `markdown-index.md` for all Markdown files and `history/project-history.md` for compact change, deploy, and remote-branch push history. History entries must include the requirement that caused the change and all modified metadata.
-
-## `/sf-version-update-skill` Version Refresh
-
-Read `references/version-update.md` when the user invokes `/sf-version-update-skill` or asks to refresh Salesforce release, API, SOAP API, Metadata API, LWC API, product, or package version context.
-
-`/sf-version-update-skill` must search online in official Salesforce sources only, identify the latest production Salesforce release and API versions, capture relevant functional/technical changes, update `references/salesforce-version.json` and `references/salesforce-current-version.md`, and update only the other resources whose version-sensitive guidance actually changed.
-
-Use:
+Common compact commands:
 
 ```bash
-python scripts/sf_version_update.py --skill-root <skill-root> --verified-date <yyyy-mm-dd> --release-name "Summer '26" --api-version 67.0 --source "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
+python scripts/sf_agent_cli.py org-inspect --target-org <alias> --select org_display.username,organization.records.0.IsSandbox
+python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
+python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
+python scripts/sf_agent_cli.py deploy-preview --target-org <alias> --source-dir force-app --select result
 ```
 
-For managed packages, do not assume a public latest installed version. Ask for the target org alias and inspect installed packages before planning package-specific work.
+## Slash Commands
 
-## Mandatory Delivery Methodology
+- `/sf-init-project-skill`: build or refresh `.salesforce-agent-knowledge/`; read `references/knowledge-init.md`.
+- `/sf-version-update-skill`: refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources; read `references/version-update.md`.
 
-Read `references/delivery-methodology.md` for the full loop. Follow it for every Salesforce project task unless the user explicitly asks for analysis only.
+## Adapter Maintenance
 
-1. Restate the user's Salesforce request and project context in concise terms.
-2. Ask focused clarification questions only when requirements, target org, risk, or acceptance criteria are unclear.
-3. Identify relevant products/packages from `references/products-packages/index.md`, then read the matching product/package files.
-4. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
-5. Read `references/metadata-dependencies.md` and `references/least-privilege-planning.md`; inspect the minimum repository/org evidence needed to plan dependencies and current access safely. If current permissions cannot be inspected, ask for the org alias and target personas/users before proposing access changes.
-6. Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, or destructive metadata work is possible.
-7. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version; invoke `/sf-version-update-skill` when local version guidance is stale.
-8. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, least-privilege permission deltas based on current org evidence, testable metadata coverage, deletion approval needs, risks, estimates, and rollback. If facts are uncertain, ask the user or present scenarios rather than inventing.
-9. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
-10. Ask the user to approve the plan before modifying project files or org metadata. Ask separately for explicit deletion approval when destructive work is in scope.
-11. After approval, implement only the approved minimal changes.
-12. At the end of development, read `references/testing-and-manifest-guardrails.md` and generate a `package.xml` for all added or modified metadata, using `scripts/generate_package_manifest.py` when possible.
-13. Read `references/completion-artifacts.md` and ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
-14. Summarize requirements, changes, affected artifacts, generated package manifest, assumptions, and validation commands.
-15. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
-16. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
-17. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
-
-## Token Discipline
-
-Use `scripts/sf_agent_cli.py` for Salesforce CLI operations that connect to an org. It is an agent-native facade over the official `sf` CLI: it requires explicit org aliases, uses secure auth flows, emits compact redacted JSON, and blocks write/execute operations against production orgs.
-
-Default to these patterns:
+Agent-specific instruction files are generated from canonical sources. After changing `SKILL.md`, `references/routing.md`, or `references/agent-instruction-spine.md`, run:
 
 ```bash
-python scripts/sf_agent_cli.py auth-web --alias dev-sandbox --instance-url https://test.salesforce.com
-python scripts/sf_agent_cli.py org-inspect --target-org dev-sandbox --select org_display.username,organization.records.0.IsSandbox
-python scripts/sf_agent_cli.py data-query --target-org dev-sandbox --query "SELECT Id, Name FROM Account LIMIT 20" --select result.records
-python scripts/sf_agent_cli.py access-inspect --target-org dev-sandbox --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
-python scripts/sf_agent_cli.py deploy-preview --target-org dev-sandbox --source-dir force-app --select result
-python scripts/sf_agent_cli.py deploy-start --target-org dev-sandbox --source-dir force-app --requirements "Add priority tracking to Account" --changed-metadata CustomField:Account.Priority__c --select result
-python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- data query --query "SELECT Id FROM Account LIMIT 1" --select result.records
+python scripts/sync_agent_instructions.py
+python scripts/validate_skill.py
 ```
-
-Do not use a default org for metadata or data access. Ask the user for the org alias every time the target org is not already explicit in the current approved plan.
-
-Do not paste full `sf` JSON, describe screens, or retrieve broad metadata unless needed. Prefer facade commands, `--metadata Type:Name`, `--source-dir` for the touched path, narrow SOQL field lists, `--select`, and bounded output.
-
-Use `access-inspect` before planning access changes. Ask for the org alias and target users/personas; pass `--sobject` for affected objects to inspect CRUD/FLS compactly.
-
-Read `references/sf-agent-cli-commands.md` before using or extending the facade. Use `references/sf-official-command-catalog.md` only when you need the generated one-by-one catalog of installed official Salesforce CLI commands. Read `references/sf-cli-token-patterns.md` before creating new CLI wrappers or deciding whether to rewrite another Salesforce CLI command.
-
-Read `references/salesforce-current-version.md` before choosing API versions for manifests, integrations, LWC, Apex, Flow, or package-sensitive work.
-
-Read `references/deletion-guardrails.md` before any delete, uninstall, destructive change, purge, hard delete, or source delete. The facade requires explicit deletion approval for destructive commands.
-
-## Backend Guidelines
-
-For Apex, read `references/backend-apex.md` when implementing or reviewing custom backend logic.
-
-Read `references/testing-and-manifest-guardrails.md` during planning and validation when changes touch Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
-
-Always check:
-
-- Bulk safety: no SOQL/DML/callouts in record loops; handlers accept collections.
-- Limits: queries, DML, CPU, heap, queueable/future/batch constraints.
-- Security: sharing model, CRUD/FLS, user-mode operations where appropriate, guest-user exposure, named credentials.
-- Trigger design: one trigger per object, delegated logic, deterministic recursion control.
-- Tests: meaningful assertions, positive/negative paths, bulk tests, permission-aware tests, no SeeAllData unless justified.
-- Coverage: changed Apex at least 80%, preferably 90%-100%; Flow and other testable metadata must be tested where Salesforce/project capabilities support it.
-
-## Frontend Guidelines
-
-For LWC, read `references/frontend-lwc.md` before editing user-facing components.
-
-Prefer Lightning base components, Lightning Data Service, UI API wire adapters, GraphQL wire adapter, and standard navigation before Apex-backed bespoke UI logic. Use Apex only when data shape, transactionality, or server-side processing requires it.
-
-Keep components small, accessible, secure under Lightning Web Security, and efficient in rerendering. Avoid custom CSS that fights SLDS unless the product need is concrete.
-
-## Architecture And Solution Design
-
-For architecture or discovery tasks, read `references/architecture-solution.md`.
-
-For product/package or metadata dependency tasks, read `references/products-packages/index.md`, the matching product/package files, and `references/metadata-dependencies.md`.
-
-For end-of-development handoff files, read `references/completion-artifacts.md`.
-
-For Salesforce testing guardrails and required `package.xml` generation, read `references/testing-and-manifest-guardrails.md`.
-
-For data/metadata deletion, package uninstall, destructive changes, purge, hard delete, or source delete, read `references/deletion-guardrails.md`.
-
-Produce designs that include:
-
-- Business capability and user outcome.
-- Standard/configuration path first.
-- Custom path only with justification.
-- Data model, security model, automation model, integration pattern, lifecycle/deployment model.
-- Risks, limits, operational ownership, observability, rollback, and future adaptability.
-
-## Agent Installation Adapters
-
-Use `references/agent-installation.md` when packaging this skill for Codex, Claude Code, or GitHub Copilot. The `agents/` folder contains compact instruction adapters:
-
-- `agents/openai.yaml`: Codex/OpenAI UI metadata.
-- `agents/claude-code.md`: Claude Code importable instruction block.
-- `agents/github-copilot-instructions.md`: GitHub Copilot repository instruction block.
-- `agents/sf-init-project-skill.md`: portable `/sf-init-project-skill` slash-command definition.
-- `agents/sf-version-update-skill.md`: portable `/sf-version-update-skill` slash-command definition.
-- `references/completion-artifacts.md`: release notes, technical specifications, impact assessment, user testing, and manual procedure artifact rules.
-- `references/testing-and-manifest-guardrails.md`: Apex, Flow, testable metadata, and required `package.xml` rules.
-- `references/salesforce-current-version.md`: current Salesforce release/API/SOAP/package version context.
-- `references/deletion-guardrails.md`: explicit approval and evidence rules for destructive operations.
-- `references/least-privilege-planning.md`: current-org access inspection and least-privilege planning rules.
-
-Keep adapters short. The canonical behavior lives in this `SKILL.md` and the `references/` files.
-
-## Official Sources
-
-Read `references/official-salesforce-sources.md` when you need to verify current Salesforce guidance, confirm uncertain platform behavior, or update this skill's recommendations. Prefer the latest available official Salesforce documentation.

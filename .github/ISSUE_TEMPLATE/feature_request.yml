@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a focused improvement to the skill.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Need
+      description: What Salesforce agent workflow should improve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Describe the smallest useful change.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Skill routing
+        - Salesforce CLI facade
+        - Knowledge init
+        - Product or package reference
+        - Testing or package.xml
+        - Agent installation
+        - Documentation
+        - Other
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Principle check
+      options:
+        - label: This can preserve Salesforce-first, configuration-first, minimal-patch guidance.
+        - label: This can preserve token efficiency and avoid duplicated long instructions.

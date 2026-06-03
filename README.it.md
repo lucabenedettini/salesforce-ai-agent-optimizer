@@ -2,11 +2,16 @@
 
 [English](README.md) | Italiano | [Espanol](README.es.md) | [简体中文](README.zh-CN.md)
 
+[![Validate Skill](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/lucabenedettini/salesforce-ai-agent-optimizer)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/releases)
+[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#installazione)
+
 Salesforce AI Agent Optimizer e' una skill pubblica con licenza MIT per agenti AI che lavorano su progetti Salesforce. Aiuta Codex, Claude Code, GitHub Copilot e agenti simili a pianificare, implementare, validare, pacchettizzare e documentare modifiche Salesforce usando poco contesto e guardrail di sicurezza forti.
 
 Il repository pubblico si chiama **Salesforce AI Agent Optimizer**. Il nome della skill Codex resta `salesforce-agent-optimizer`.
 
-Versione corrente: `0.5.1`
+Versione corrente: `0.6.0`
 
 ## Principi
 
@@ -48,8 +53,10 @@ Aggiornare il contesto versione Salesforce release/API/SOAP/package da fonti uff
 Eseguire i test locali:
 
 ```bash
+python scripts/sync_agent_instructions.py --check
 python scripts/validate_skill.py
 python scripts/self_test.py --json
+python -m pytest
 ```
 
 Generare il manifest per metadata aggiunti o modificati:
@@ -156,11 +163,14 @@ La metodologia richiede:
 - `SKILL.md`: istruzioni canoniche.
 - `agents/`: adapter Codex, Claude Code, GitHub Copilot e slash command.
 - `references/`: guide progressive per architettura Salesforce, prodotti, CLI, test, delete, versioni e delivery.
+- `references/routing.md`: mappa compatta per caricare solo le referenze necessarie.
 - `scripts/sf_agent_cli.py`: facade sicura Salesforce CLI.
+- `scripts/sync_agent_instructions.py`: generatore degli adapter per agenti.
 - `scripts/sf_knowledge_init.py`: generatore Knowledge metadata.
 - `scripts/generate_package_manifest.py`: generatore `package.xml`.
 - `scripts/git_knowledge_push.py`: push remoto con history Knowledge.
 - `scripts/self_test.py`: test locali cross-platform.
+- `evals/trigger-evals.json`: esempi di attivazione e non attivazione della skill.
 
 ## Fonti Ufficiali
 

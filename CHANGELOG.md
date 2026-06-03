@@ -8,6 +8,24 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.6.0 - 2026-06-03
+
+### Added
+
+- Added `references/routing.md` so agents can load only the task-relevant Salesforce guidance before planning.
+- Added `references/agent-instruction-spine.md` as the canonical lightweight instruction spine for generated agent adapters.
+- Added `scripts/sync_agent_instructions.py` to synchronize `AGENTS.md`, Codex repo shims, Claude Code shims, GitHub Copilot instructions, and `agents/openai.yaml`.
+- Added `evals/trigger-evals.json` with realistic should-trigger and should-not-trigger prompts.
+- Added pytest coverage for skill validation, adapter synchronization, package manifest generation, Knowledge init, destructive guardrails, and Windows path metadata mapping.
+- Added `SECURITY.md`, `CONTRIBUTING.md`, and GitHub issue templates for public repository maintenance.
+
+### Changed
+
+- Refactored `SKILL.md` into a concise router that preserves the Salesforce-first, token-efficient, least-privilege, deletion-safe workflow while moving detailed guidance into `references/`.
+- Deduplicated long agent-specific instructions by generating them from canonical sources.
+- Updated CI to run pytest across Windows, macOS, and Linux with Python 3.10, 3.11, and 3.12.
+- Updated README files, wiki source pages, versioning files, and adapter metadata for version `0.6.0`.
+
 ## 0.5.1 - 2026-06-03
 
 ### Added

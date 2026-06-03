@@ -57,6 +57,17 @@ GitHub Copilot consumes repository custom instructions, not the Codex skill form
 
 Keep the skill folder in the repository when teams need the Salesforce references and CLI wrappers.
 
+## Adapter Synchronization
+
+Agent-specific instruction files are generated from `references/agent-instruction-spine.md`. After changing core routing or installation guidance, run:
+
+```bash
+python scripts/sync_agent_instructions.py
+python scripts/sync_agent_instructions.py --check
+```
+
+Generated files include `AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/salesforce-agent-optimizer.instructions.md`, `.agents/skills/salesforce-agent-optimizer/SKILL.md`, `.claude/skills/salesforce-agent-optimizer/SKILL.md`, `agents/claude-code.md`, `agents/github-copilot-instructions.md`, and `agents/openai.yaml`.
+
 ## Shared Repository Layout
 
 Recommended portable layout:

@@ -1,0 +1,33 @@
+name: Salesforce skill gap
+description: Request missing Salesforce product, package, metadata, or version guidance.
+title: "[Salesforce gap]: "
+labels:
+  - salesforce
+  - documentation
+body:
+  - type: input
+    id: product
+    attributes:
+      label: Product, package, or metadata area
+      placeholder: "Salesforce CPQ, Flow, Permission Set Groups, Data Cloud..."
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: Missing or unclear guidance
+      description: Describe what the agent should know or route to.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Official Salesforce sources
+      description: Add official Salesforce documentation links when available.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: This request does not include Salesforce credentials, tokens, customer data, or sensitive org details.
+          required: true

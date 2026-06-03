@@ -1,6 +1,7 @@
 interface:
-  display_name: "Salesforce Agent Optimizer"
-  short_description: "Salesforce delivery with least-privilege and delete guardrails"
-  default_prompt: "Use $salesforce-agent-optimizer to plan, approve, implement, test, validate, package, and refresh release/API context for Salesforce work with minimal custom code, least-privilege access inspection, explicit delete approval, and token-efficient org inspection."
+  display_name: Salesforce Agent Optimizer
+  short_description: Salesforce delivery with routed least-privilege and delete guardrails
+  default_prompt: Use $salesforce-agent-optimizer to route Salesforce work through minimal context, configuration-first planning,
+    least-privilege org inspection, explicit delete approval, package.xml generation, and validation.
 metadata:
-  version: 0.5.1
+  version: 0.6.0

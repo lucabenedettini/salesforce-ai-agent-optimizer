@@ -2,11 +2,16 @@
 
 English | [Italiano](README.it.md) | [Espanol](README.es.md) | [简体中文](README.zh-CN.md)
 
+[![Validate Skill](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/lucabenedettini/salesforce-ai-agent-optimizer)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/releases)
+[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#installation)
+
 Salesforce AI Agent Optimizer is a public MIT-licensed skill for AI agents that work on Salesforce projects. It helps Codex, Claude Code, GitHub Copilot, and similar agents plan, implement, validate, package, and document Salesforce changes with compact context usage and strong safety guardrails.
 
 The public repository is **Salesforce AI Agent Optimizer**. The Codex skill name remains `salesforce-agent-optimizer`.
 
-Current version: `0.5.1`
+Current version: `0.6.0`
 
 ## Core Principles
 
@@ -48,8 +53,10 @@ Refresh Salesforce release/API/SOAP/package version context from official Salesf
 Run local tests:
 
 ```bash
+python scripts/sync_agent_instructions.py --check
 python scripts/validate_skill.py
 python scripts/self_test.py --json
+python -m pytest
 ```
 
 Generate a package manifest for added or modified metadata:
@@ -156,11 +163,14 @@ The delivery methodology requires:
 - `SKILL.md`: canonical skill instructions.
 - `agents/`: Codex, Claude Code, GitHub Copilot, and slash-command adapters.
 - `references/`: progressive-disclosure guidance for Salesforce architecture, products, CLI, testing, deletion, versions, and delivery.
+- `references/routing.md`: compact reference-loading map for token-efficient planning.
 - `scripts/sf_agent_cli.py`: safe Salesforce CLI facade.
+- `scripts/sync_agent_instructions.py`: generator for agent-specific instruction adapters.
 - `scripts/sf_knowledge_init.py`: local metadata Knowledge generator.
 - `scripts/generate_package_manifest.py`: `package.xml` generator.
 - `scripts/git_knowledge_push.py`: remote push with Knowledge history.
 - `scripts/self_test.py`: cross-platform local tests.
+- `evals/trigger-evals.json`: trigger examples for when the skill should and should not activate.
 
 ## Official Sources
 

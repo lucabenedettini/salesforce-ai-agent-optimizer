@@ -8,6 +8,10 @@ Use Salesforce as a metadata-driven platform first. Prefer standard product capa
 
 AI agents should spend context on decisions, not noise. The skill uses progressive disclosure, local Knowledge, Markdown indexes, compact CLI output, `--select` filters, bounded JSON, redaction, and minimal source inspection to reduce token usage.
 
+## Routing And Adapter Sync
+
+The root `SKILL.md` stays concise and routes detailed work to focused `references/` files. Agent-specific files are generated from `references/agent-instruction-spine.md` with `scripts/sync_agent_instructions.py` so Codex, Claude Code, and GitHub Copilot stay aligned without duplicated long instructions.
+
 ## LLM Wiki Pattern
 
 The Knowledge system follows the LLM Wiki idea popularized by Andrej Karpathy: raw source files remain the source of truth, while a compact Markdown wiki stores summaries, links, hashes, indexes, history, and navigation optimized for repeated agent work.
