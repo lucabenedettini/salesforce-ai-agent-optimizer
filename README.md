@@ -1,423 +1,162 @@
 # Salesforce AI Agent Optimizer
 
-Skill per agenti AI che lavorano su progetti Salesforce. Guida design, architettura, implementazione, verifica, Knowledge locale, Salesforce CLI token-efficient, deploy sicuri e push tracciati.
+English | [Italiano](README.it.md) | [简体中文](README.zh-CN.md)
 
-Il repository pubblico si chiama **Salesforce AI Agent Optimizer** per essere chiaro e ricercabile da persone, motori di ricerca e agenti AI. Il nome tecnico della skill Codex resta `salesforce-agent-optimizer` per compatibilita' con l'installazione e con `$salesforce-agent-optimizer`.
+Salesforce AI Agent Optimizer is a public MIT-licensed skill for AI agents that work on Salesforce projects. It helps Codex, Claude Code, GitHub Copilot, and similar agents plan, implement, validate, package, and document Salesforce changes with compact context usage and strong safety guardrails.
 
-## Principi Di Progettazione
+The public repository is **Salesforce AI Agent Optimizer**. The Codex skill name remains `salesforce-agent-optimizer`.
 
-Questa skill e' stata costruita su quattro principi:
+Current version: `0.4.0`
 
-- Ottimizzazione Salesforce: partire da configurazione, standard product capability, Flow, permission set, UI API/LDS, named credential e pattern Well-Architected prima di proporre Apex, LWC o integrazioni custom.
-- Ottimizzazione token: usare progressive disclosure, Knowledge locale, indici Markdown, output CLI filtrato, patch minimali e letture mirate invece di riversare metadata o JSON completi nel contesto dell'agente.
-- LLM Wiki di Andrej Karpathy: mantenere il source metadata come verita', compilare una wiki Markdown compatta, indicizzata e refreshabile, e consultarla prima di rianalizzare il progetto da zero.
-- Printing Press per CLI agent-native: usare una facade sopra Salesforce CLI con comandi composti, JSON compatto, redazione dei segreti, dry-run, alias org esplicito e guardrail produzione read-only.
+## Core Principles
 
-## Requisiti Della Skill
+- Salesforce first: prefer standard capabilities, configuration, Flow, permission sets, LDS/UI API, named credentials, and managed package features before custom Apex, LWC, triggers, or integrations.
+- Token efficiency: use progressive disclosure, indexed local Knowledge, compact CLI output, targeted source reads, and minimal patches.
+- Local Knowledge: `/sf-init-project-skill` builds a compact Markdown index of project metadata inspired by the LLM wiki pattern.
+- Agent-native CLI: `scripts/sf_agent_cli.py` wraps official Salesforce CLI commands with aliases, compact JSON, redaction, dry-run, production read-only protection, and delete approval enforcement.
+- No invention: when evidence is missing, the agent must ask the user or present scenarios with tradeoffs.
 
-La skill deve:
+## Safety Guardrails
 
-- far rileggere e riassumere all'agente la richiesta utente prima di agire;
-- fare domande solo quando servono requisiti, org target, rischio o criteri di accettazione;
-- consultare la Knowledge locale prima di pianificare o modificare;
-- usare `references/salesforce-current-version.md` per le informazioni correnti su release Salesforce, API, SOAP API, Metadata API, LWC API e package;
-- supportare `/sf-version-update-skill` per aggiornare online le risorse version-sensitive usando solo fonti ufficiali Salesforce;
-- identificare prima della pianificazione i prodotti Salesforce, i pacchetti AppExchange e le superfici mobile rilevanti tramite le descrizioni brevi in `references/products-packages/index.md`;
-- leggere i file prodotto/pacchetto rilevanti prima di pianificare;
-- considerare le dipendenze metadata Salesforce tra accessi, campi, layout, Lightning pages, record type, picklist, automazioni, codice, integrazioni, sharing, analytics e mobile;
-- preferire configurazione, standard Salesforce, Flow, LDS/UI API, permission set, named credential e managed package prima di custom code;
-- pianificare modifiche minimali e chiedere approvazione prima di scrivere file o metadata;
-- bloccare write/execute su org di produzione;
-- richiedere sempre alias org esplicito per accessi a dati o metadata Salesforce;
-- usare auth sicura: `auth-web`, `auth-device`, `auth-jwt`;
-- validare con test/static check/subagent quando disponibile;
-- ripianificare se approvazione, test o validazione falliscono, con massimo tre cicli falliti;
-- chiedere a fine pianificazione se generare opzionalmente un PDF con task di configurazione/customizzazione, spiegazione e stima tempi;
-- applicare guardrail di test: Apex modificato almeno all'80% e preferibilmente 90%-100%, piu' test per Flow e altri metadata testabili quando supportati dal progetto/Salesforce;
-- generare a fine implementazione un `package.xml` Salesforce Metadata API con tutti i metadata aggiunti o modificati;
-- chiedere a fine sviluppo se generare release notes, specifiche tecniche, impact assessment, user testing e manual procedures;
-- chiedere se fare push e su quale branch solo a validazione completata;
-- registrare nella Knowledge deploy e push remoti con requisito e tutti i metadata modificati.
-
-## Prerequisiti
-
-Minimi:
-
-- Python 3.10+.
-- Git.
-- Un progetto Salesforce DX quando si usa `/sf-init-project-skill`, deploy o metadata retrieval.
-
-Per operazioni su org Salesforce:
-
-- Salesforce CLI aggiornata e disponibile come `sf`.
-- Su Windows PowerShell, se `sf.ps1` viene bloccato dalla execution policy, usare `sf.cmd`; la facade `sf_agent_cli.py` lo fa automaticamente.
-- Almeno un alias org autenticato. L'agente deve chiedere l'alias all'utente, non usare default org.
-
-Opzionali:
-
-- Node.js/npm per installare Salesforce CLI con `npm install -g @salesforce/cli`.
-- PyYAML solo per eseguire il validator ufficiale delle skill Codex.
-- Go e `cli-printing-press` solo se vuoi rigenerare o sperimentare CLI agent-native; non servono per usare gli script principali.
-
-## Licenza Pubblica
-
-La skill e' pubblicata con licenza MIT. Chiunque puo' usarla, copiarla, modificarla, distribuirla e forkare il repository rispettando il testo in `LICENSE`.
-
-## Changelog
-
-Le modifiche nel tempo sono tracciate in `CHANGELOG.md`. Aggiorna quel file a ogni release o modifica pubblica rilevante.
-
-## Versionamento
-
-La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1` ed e' attualmente a `0.3.0`.
-
-Regole:
-
-- Bug fix: incrementa l'ultimo numero (`0.0.x`).
-- Nuova feature o refactor minor: incrementa il secondo numero (`0.x.0`).
-- Refactor esteso o molte funzionalita nuove: incrementa il primo numero (`x.0.0`).
-
-Ogni aggiornamento di versione deve aggiornare `VERSION`, aggiungere le specifiche in `CHANGELOG.md`, creare il tag `v<version>` e pubblicare una GitHub release quando il commit viene pubblicato.
-
-Dettagli: `VERSIONING.md`.
-
-## Wiki
-
-La wiki del progetto spiega visione generale, principi, installazione e versionamento. I sorgenti sono in `docs/wiki/` e vengono pubblicati nella GitHub Wiki del repository:
-
-```text
-https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/wiki
-```
-
-Fonti ufficiali utili, verificate al 2026-06-03:
-
-- Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
-- Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
-- Salesforce Summer '26 Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
-- Salesforce API Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api.htm&language=en_US&type=5
-- Salesforce SOAP API Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soap.htm&language=en_US&type=5
-- Platform SOAP API login() retirement: https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1
-- Salesforce API and Data Loader versions: https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1
-- Salesforce Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
-- Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
-- Salesforce application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
-- Claude Code slash commands: https://docs.anthropic.com/en/docs/claude-code/slash-commands
-- Claude Code memory/CLAUDE.md: https://code.claude.com/docs/en/memory
-- GitHub Copilot custom instructions: https://docs.github.com/en/copilot/concepts/prompting/response-customization
-- Codex plugins and skills: https://openai.com/academy/codex-plugins-and-skills/
-- OpenAI Agent Skills catalog: https://github.com/openai/skills
-
-## Installazione
-
-### Installazione Da Repository GitHub
-
-Quando il repository pubblico sara' disponibile, l'utente potra' dare all'agente AI il link del repository e chiedere:
-
-```text
-Installa la skill Salesforce AI Agent Optimizer da https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
-```
-
-Per Codex, l'agente deve usare la skill `skill-installer` con il repository come sorgente, path root e nome esplicito:
+- Production orgs are read-only for write, execute, and destructive operations through the facade.
+- Every org/data/metadata command requires an explicit target org alias.
+- Destructive operations are never automatic. Data delete, metadata delete, package uninstall, source delete, purge, hard delete, and `destructiveChanges.xml` deploys require separate user approval for the exact scope.
+- The CLI blocks destructive commands unless this exact flag is provided after user approval:
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
+--delete-approval "I explicitly approve this deletion"
 ```
 
-In alternativa, se si usa un URL GitHub con path, l'agente puo' installare dalla root del branch:
+- Deleted metadata belongs in `destructiveChanges.xml`, not `package.xml`.
+- If a record set, metadata dependency, package version, or org behavior is uncertain, the agent must ask or present options.
 
-```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --ref main --name salesforce-agent-optimizer
-```
+## Main Commands
 
-Per Claude Code e GitHub Copilot non esiste lo stesso formato di skill nativa Codex: l'agente deve clonare o scaricare il repository, poi applicare gli adapter in `agents/` come indicato sotto.
-
-### Codex
-
-Metti la cartella `salesforce-agent-optimizer` in:
-
-```text
-~/.codex/skills/salesforce-agent-optimizer
-```
-
-Oppure, se usi `CODEX_HOME`:
-
-```text
-$CODEX_HOME/skills/salesforce-agent-optimizer
-```
-
-Codex usera' `SKILL.md`, `agents/openai.yaml`, `references/` e `scripts/` come skill nativa.
-
-### Claude Code
-
-Claude Code non usa automaticamente il formato Codex `agents/openai.yaml`. Usa quindi l'adapter:
-
-- copia o richiama `agents/claude-code.md` nel `CLAUDE.md` del progetto;
-- copia `agents/sf-init-project-skill.md` in `.claude/commands/sf-init-project-skill.md`.
-
-Le istruzioni in `CLAUDE.md` sono contesto, non enforcement tecnico: per blocchi hard usa anche policy/hook di Claude Code quando disponibili.
-
-### GitHub Copilot
-
-Opzione repository-wide:
-
-```text
-.github/copilot-instructions.md
-```
-
-Unisci il contenuto di `agents/github-copilot-instructions.md`.
-
-Opzione modulare:
-
-```text
-.github/instructions/salesforce-agent-optimizer.instructions.md
-```
-
-Mantieni la cartella skill nel repository, ad esempio:
-
-```text
-.agent-skills/salesforce-agent-optimizer/
-```
-
-Copilot legge instruction file repository/path-scoped, non installa questa cartella come skill nativa. L'adapter punta Copilot alla cartella skill e mantiene le istruzioni compatte.
-
-## Uso Principale
-
-### Inizializzare O Aggiornare La Knowledge
-
-Comando agente:
+Build or refresh project Knowledge:
 
 ```text
 /sf-init-project-skill
 ```
 
-Nel root del progetto Salesforce:
-
-```bash
-python scripts/sf_knowledge_init.py --project-root . --refresh
-```
-
-La Knowledge viene creata in:
-
-```text
-.salesforce-agent-knowledge/
-```
-
-Contiene:
-
-- `index.md`: ingresso principale per l'agente;
-- `markdown-index.md`: indice di tutti i Markdown;
-- `metadata/<Tipo>/*.md`: un file uniforme per ogni metadata;
-- `history/project-history.md`: storia compatta di change, deploy e push;
-- `history/events/*.md`: eventi dettagliati con requisiti e metadata modificati;
-- `index.json` e `sources.json`: indici machine-readable;
-- `config.json`: lista metadata modificabile dall'utente.
-
-Prima di pianificare o modificare, l'agente deve leggere:
-
-1. `references/products-packages/index.md`
-2. `references/salesforce-current-version.md` quando la richiesta e' release/API/package-sensitive
-3. i file prodotto/pacchetto rilevanti sotto `references/products-packages/`
-4. `references/metadata-dependencies.md`
-5. `.salesforce-agent-knowledge/index.md`
-6. `.salesforce-agent-knowledge/markdown-index.md` se serve trovare il file giusto
-7. il file specifico sotto `.salesforce-agent-knowledge/metadata/`
-8. `.salesforce-agent-knowledge/history/project-history.md`
-9. il source file originale prima di scrivere
-
-### Aggiornare Versioni Salesforce E Package
-
-Comando agente:
+Refresh Salesforce release/API/SOAP/package version context from official Salesforce sources:
 
 ```text
 /sf-version-update-skill
 ```
 
-La skill deve cercare online solo su fonti ufficiali Salesforce, individuare l'ultima release production e aggiornare le risorse version-sensitive.
-
-Snapshot corrente verificato al 2026-06-03:
-
-- Salesforce release: Summer '26.
-- Platform API, Metadata API e SOAP API: `67.0`.
-- SOAP API `login()` non e' disponibile nelle API `65.0+`; Salesforce ha annunciato il retirement di `login()` per SOAP API `31.0-64.0` con Summer '27.
-- I managed package non hanno una versione installata globale affidabile: la versione da usare e' quella installata nella target org.
-
-Per aggiornare i file centrali dopo la verifica ufficiale:
-
-```bash
-python scripts/sf_version_update.py --skill-root . --verified-date 2026-06-03 --release-name "Summer '26" --api-version 67.0 --source "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
-```
-
-Per package version-sensitive, chiedere alias org e leggere:
-
-```bash
-python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
-```
-
-### Usare Salesforce CLI In Modo Sicuro
-
-Usa sempre la facade:
-
-```bash
-python scripts/sf_agent_cli.py org-inspect --target-org dev-sandbox
-python scripts/sf_agent_cli.py data-query --target-org dev-sandbox --query "SELECT Id, Name FROM Account LIMIT 20" --select result.records
-```
-
-Per comandi ufficiali `sf` non esposti come wrapper dedicati:
-
-```bash
-python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- data query --query "SELECT Id FROM Account LIMIT 1" --select result.records
-```
-
-Deploy con history obbligatoria:
-
-```bash
-python scripts/sf_agent_cli.py deploy-start --target-org dev-sandbox --source-dir force-app --requirements "Add priority tracking to Account" --changed-metadata CustomField:Account.Priority__c
-```
-
-Se mancano `--requirements` o `--changed-metadata`, il deploy viene bloccato prima della connessione.
-
-### Push Remoto Con History Inclusa
-
-Usa il wrapper:
-
-```bash
-python scripts/git_knowledge_push.py --project-root . --remote origin --branch feature/account-priority --requirements "Add priority tracking to Account" --metadata CustomField:Account.Priority__c
-```
-
-Il wrapper:
-
-1. registra un evento `git-push` nella Knowledge;
-2. committa la history Knowledge;
-3. esegue `git push`;
-4. fa arrivare la history anche sul branch remoto.
-
-Usa `--no-commit-history` solo se l'utente vuole esplicitamente history locale per quel push.
-
-### Artefatti Di Fine Sviluppo
-
-Alla fine della fase di sviluppo, prima della validazione o della consegna finale, l'agente deve chiedere se generare uno o piu' file:
-
-- `release-notes.md`: lista di tutti i metadata aggiunti, modificati e rimossi.
-- `technical-specifications.md`: requisiti e come sono stati soddisfatti con metadata aggiunti, modificati e rimossi.
-- `impact-assessment.md`: punti preesistenti modificati o impattati.
-- `user-testing.md`: test utente eseguibili su Salesforce per validare i nuovi requisiti.
-- `manual-procedures.md`: configurazioni manuali post-deploy come record di configurazione, custom settings, custom metadata, utenti, permission set, permission set group, gruppi, code, licenze, segreti di named credential, scheduled job o data load.
-
-Regole e template sono in `references/completion-artifacts.md`.
-
-### Test E Manifest Di Deploy
-
-Durante pianificazione e validazione, l'agente deve leggere `references/testing-and-manifest-guardrails.md` quando la modifica tocca Apex, Flow, automazioni, UI metadata, integrazioni, accessi o metadata deployabili.
-
-Guardrail principali:
-
-- Apex modificato: almeno 80% di copertura, preferibilmente 90%-100% per codice nuovo, critico, riusabile, di sicurezza, integrazione, async o trigger handler.
-- Flow e altri metadata testabili: test automatici quando Salesforce/progetto li supportano; in caso contrario, test manuali e motivazione documentata.
-- Coverage non basta: servono assertion e scenari positivi, negativi, bulk, sicurezza e async dove rilevanti.
-
-A fine implementazione deve essere generato un `package.xml` con tutti i metadata aggiunti o modificati. Usa:
-
-```bash
-python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml --from-git-status
-```
-
-Oppure, quando la lista metadata e' gia' nota:
-
-```bash
-python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml --metadata ApexClass:AccountService --metadata Flow:Account_Onboarding
-```
-
-Il manifest usa la struttura Salesforce Metadata API `Package/types/members/name/version`. I metadata rimossi non vanno in `package.xml`: richiedono `destructiveChanges.xml` con approvazione esplicita.
-
-## Sicurezza
-
-- Produzione e' read-only per la facade.
-- I comandi write/execute interrogano `Organization.IsSandbox`; se non possono determinarlo, vengono bloccati.
-- Output CLI redatto per token/session/auth URL/segreti.
-- Nessun default org per dati o metadata.
-- SOQL sempre con campi espliciti e limiti ragionevoli.
-- Non inserire segreti in Knowledge, README, history o file metadata.
-
-## Compatibilita' OS
-
-Supporto previsto:
-
-- Windows 10/11 con PowerShell, cmd o Git Bash.
-- macOS con shell POSIX.
-- Linux con shell POSIX.
-
-Gli script sono Python standard library e usano `pathlib`/`subprocess`, quindi non richiedono Bash o shell POSIX. Le differenze principali sono:
-
-- Windows: la facade preferisce `sf.cmd`.
-- macOS/Linux: la facade usa `sf`.
-- Esempi shell possono usare `python` o `python3` in base all'installazione locale.
-- I test locali usano solo repository temporanei e non richiedono una org Salesforce.
-- Se Salesforce CLI non e' nel `PATH`, imposta `SF_AGENT_SF_BIN` al percorso completo di `sf`, `sf.cmd` o `sf.exe`.
-
-## Test
-
-Test locale completo:
+Run local tests:
 
 ```bash
 python scripts/self_test.py --json
 ```
 
-Copre:
-
-- generazione `/sf-init-project-skill` con file Markdown per metadata;
-- `markdown-index.md` e history;
-- history con requisito e metadata;
-- blocco deploy senza requisito/metadata;
-- blocco accesso org senza alias;
-- dry-run senza scrittura history;
-- push verso remote Git temporaneo con history inclusa sul ramo remoto.
-- generazione `package.xml` da metadata modificati/aggiunti rilevati da git status.
-- aggiornamento ripetibile di `salesforce-version.json` e `salesforce-current-version.md`.
-
-Validazione Codex skill:
+Generate a package manifest for added or modified metadata:
 
 ```bash
-python <skill-creator>/scripts/quick_validate.py <path>/salesforce-agent-optimizer
+python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<date>-<change>/package.xml --from-git-status
 ```
 
-Richiede PyYAML nel Python usato dal validator.
+Inspect installed packages in a target org:
 
-## File Principali
+```bash
+python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
+```
 
-- `SKILL.md`: istruzioni canoniche della skill.
-- `VERSION`: versione corrente.
-- `VERSIONING.md`: regole di versionamento.
-- `LICENSE`: licenza MIT pubblica.
-- `CHANGELOG.md`: storico delle modifiche e delle release.
-- `docs/wiki/`: sorgenti della GitHub Wiki.
-- `agents/openai.yaml`: metadata Codex.
-- `agents/claude-code.md`: adapter Claude Code.
-- `agents/github-copilot-instructions.md`: adapter GitHub Copilot.
-- `agents/sf-init-project-skill.md`: comando `/sf-init-project-skill` portabile.
-- `agents/sf-version-update-skill.md`: comando `/sf-version-update-skill` portabile.
-- `scripts/sf_knowledge_init.py`: crea/aggiorna Knowledge.
-- `scripts/sf_agent_cli.py`: facade sicura Salesforce CLI.
-- `scripts/knowledge_history.py`: registra eventi Knowledge.
-- `scripts/git_knowledge_push.py`: push remoto con history inclusa.
-- `scripts/generate_package_manifest.py`: genera `package.xml` per metadata aggiunti/modificati.
-- `scripts/sf_version_update.py`: aggiorna le risorse con release/API/SOAP/package version context verificato.
-- `scripts/self_test.py`: test locali cross-platform.
-- `references/products-packages/index.md`: indice per identificare prodotti Salesforce e pacchetti AppExchange rilevanti.
-- `references/products-packages/products/`: file Markdown per prodotto Salesforce e sviluppo mobile.
-- `references/products-packages/packages/`: file Markdown per pacchetto AppExchange.
-- `references/salesforce-current-version.md`: contesto corrente Salesforce release/API/SOAP/package.
-- `references/salesforce-version.json`: versione machine-readable per script.
-- `references/version-update.md`: metodologia per `/sf-version-update-skill`.
-- `references/metadata-dependencies.md`: checklist delle relazioni metadata da considerare in pianificazione.
-- `references/completion-artifacts.md`: strutture per release notes, specifiche tecniche, impact assessment, user testing e manual procedures.
-- `references/testing-and-manifest-guardrails.md`: guardrail per test Apex/Flow/metadata testabili e generazione `package.xml`.
-- `references/`: guide dettagliate e catalogo comandi Salesforce CLI.
+Delete a record only after explicit approval:
 
-## Note Operative Per Agenti
+```bash
+python scripts/sf_agent_cli.py data-record-delete --target-org <alias> --sobject Account --record-id 001... --delete-approval "I explicitly approve this deletion"
+```
 
-- Leggere meno file possibile: `index.md`, pagina metadata rilevante, history, poi source.
-- Prima della pianificazione, identificare prodotti/pacchetti da `references/products-packages/index.md` e leggere solo i file rilevanti.
-- Usare `references/metadata-dependencies.md` per evitare piani su metadata isolati quando esistono dipendenze con accessi, UI, automazioni, codice o integrazioni.
-- Non usare la Knowledge come fonte unica: il source metadata resta la verita'.
-- Se la Knowledge generata da `/sf-init-project-skill` e' vecchia rispetto ai file modificati, refreshare prima di pianificare.
-- Se una modifica viene deployata o pushata, la history deve spiegare il requisito e tutti i metadata modificati.
+## Installation
+
+Ask Codex:
+
+```text
+Install the Salesforce AI Agent Optimizer skill from https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
+```
+
+Codex installer command:
+
+```bash
+python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
+```
+
+Claude Code:
+
+- Merge `agents/claude-code.md` into `CLAUDE.md`.
+- Copy `agents/sf-init-project-skill.md` to `.claude/commands/sf-init-project-skill.md`.
+- Copy `agents/sf-version-update-skill.md` to `.claude/commands/sf-version-update-skill.md`.
+
+GitHub Copilot:
+
+- Merge `agents/github-copilot-instructions.md` into `.github/copilot-instructions.md`, or use `.github/instructions/salesforce-agent-optimizer.instructions.md`.
+
+## Prerequisites
+
+- Python 3.10+.
+- Git.
+- Salesforce DX project for metadata Knowledge, deploy, retrieve, or manifest workflows.
+- Official Salesforce CLI available as `sf` for org operations.
+- Authenticated org aliases. The agent must ask for aliases and must not rely on default orgs.
+- Sandbox org for write/execute operations. Production is read-only.
+
+Optional:
+
+- PyYAML for Codex skill validation.
+- Node.js/npm to install Salesforce CLI with `npm install -g @salesforce/cli`.
+- Go and `cli-printing-press` only for CLI experimentation.
+
+## Version Context
+
+Verified on 2026-06-03:
+
+- Salesforce release: Summer '26.
+- Platform API, Metadata API, SOAP API: `67.0`.
+- SOAP API `login()` is unavailable in API `65.0+`; Salesforce announced retirement of SOAP `login()` for API `31.0-64.0` with Summer '27.
+- Managed package versions are target-org-specific. Inspect installed packages before assuming namespace, object names, or feature availability.
+
+Canonical resources:
+
+- `references/salesforce-current-version.md`
+- `references/salesforce-version.json`
+- `references/version-update.md`
+
+## Validation And Handoff
+
+The delivery methodology requires:
+
+- Restate the request.
+- Ask focused questions only when needed.
+- Identify relevant Salesforce products/packages and metadata dependencies.
+- Plan minimal changes and ask for approval.
+- Ask separately for destructive approval when needed.
+- Implement only approved work.
+- Generate `package.xml` for added/modified metadata.
+- Offer release notes, technical specifications, impact assessment, user testing, and manual procedure files.
+- Validate with tests or a validation subagent.
+- Ask whether to push and which branch after validation passes.
+
+## Key Files
+
+- `SKILL.md`: canonical skill instructions.
+- `agents/`: Codex, Claude Code, GitHub Copilot, and slash-command adapters.
+- `references/`: progressive-disclosure guidance for Salesforce architecture, products, CLI, testing, deletion, versions, and delivery.
+- `scripts/sf_agent_cli.py`: safe Salesforce CLI facade.
+- `scripts/sf_knowledge_init.py`: local metadata Knowledge generator.
+- `scripts/generate_package_manifest.py`: `package.xml` generator.
+- `scripts/git_knowledge_push.py`: remote push with Knowledge history.
+- `scripts/self_test.py`: cross-platform local tests.
+
+## Official Sources
+
+- Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
+- Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
+- Metadata API deploy and destructive changes: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
+- GraphQL delete record: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
+- LWC `deleteRecord`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
+- Salesforce release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
+
+## License
+
+MIT. Everyone can use, copy, modify, distribute, and fork this repository under the terms in `LICENSE`.

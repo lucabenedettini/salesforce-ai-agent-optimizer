@@ -28,6 +28,10 @@ Salesforce metadata is a graph. Plans must account for permission sets, permissi
 
 Salesforce release, API, SOAP API, Metadata API, LWC API, and managed package versions affect behavior. Agents must use current official Salesforce version context, refresh it with `/sf-version-update-skill` when stale, and verify managed package versions in the target org.
 
+## Destructive Safety
+
+Agents must never delete Salesforce data or metadata automatically. Destructive operations require separate explicit approval for the exact target org and scope. Missing facts must be resolved by asking the user or offering scenarios, not by guessing.
+
 ## Human Approval And Validation
 
 Agents must restate the request, ask focused questions only when needed, plan before changing, ask for approval, validate with tests or a subagent when available, and retry failed plans no more than three times before returning to requirements.

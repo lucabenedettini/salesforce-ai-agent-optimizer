@@ -12,7 +12,10 @@ Use these official Salesforce sources to refresh guidance when the task needs ex
 - Salesforce SOAP API release notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soap.htm&language=en_US&type=5
 - Salesforce API and Data Loader versions: https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1
 - Platform SOAP API login() retirement: https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1
-- Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
+- Metadata API deploy manifest/package.xml and destructive changes: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
+- GraphQL API record deletion: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
+- LWC `deleteRecord(recordId)`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
+- Salesforce MCP SObject Deletes: https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-deletes.html
 - Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
 - Application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
 - LWC data access guidelines: https://developer.salesforce.com/docs/platform/lwc/guide/data.html

@@ -170,7 +170,97 @@ def test_agent_cli_guardrails() -> dict[str, object]:
         )
         assert no_alias.returncode != 0
         assert "Ask the user for the Salesforce org alias" in (no_alias.stdout + no_alias.stderr)
-        return {"missing_history_details_blocked": True, "dry_run_no_history": True, "missing_alias_blocked": True}
+        delete_missing_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "data-record-delete",
+                "--target-org",
+                "dev",
+                "--sobject",
+                "Account",
+                "--record-id",
+                "001000000000001AAA",
+                "--dry-run",
+            ],
+            cwd=root,
+            check=False,
+        )
+        assert delete_missing_approval.returncode != 0
+        assert "Blocked destructive operation" in (delete_missing_approval.stdout + delete_missing_approval.stderr)
+
+        delete_with_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "data-record-delete",
+                "--target-org",
+                "dev",
+                "--sobject",
+                "Account",
+                "--record-id",
+                "001000000000001AAA",
+                "--delete-approval",
+                "I explicitly approve this deletion",
+                "--dry-run",
+            ],
+            cwd=root,
+        )
+        assert '"dry_run": true' in delete_with_approval.stdout
+
+        safe_run_delete_missing_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "safe-run",
+                "--target-org",
+                "dev",
+                "--",
+                "data",
+                "delete",
+                "record",
+                "--sobject",
+                "Account",
+                "--record-id",
+                "001000000000001AAA",
+                "--dry-run",
+            ],
+            cwd=root,
+            check=False,
+        )
+        assert safe_run_delete_missing_approval.returncode != 0
+        assert "Blocked destructive operation" in (safe_run_delete_missing_approval.stdout + safe_run_delete_missing_approval.stderr)
+
+        sf_min_delete = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_min.py"),
+                "--",
+                "data",
+                "delete",
+                "record",
+                "--target-org",
+                "dev",
+                "--sobject",
+                "Account",
+                "--record-id",
+                "001000000000001AAA",
+            ],
+            cwd=root,
+            check=False,
+        )
+        assert sf_min_delete.returncode != 0
+        assert "Blocked destructive command" in (sf_min_delete.stdout + sf_min_delete.stderr)
+
+        return {
+            "missing_history_details_blocked": True,
+            "dry_run_no_history": True,
+            "missing_alias_blocked": True,
+            "delete_missing_approval_blocked": True,
+            "delete_approval_allows_dry_run": True,
+            "safe_run_delete_missing_approval_blocked": True,
+            "sf_min_destructive_blocked": True,
+        }
 
 
 def test_git_push_records_history() -> dict[str, object]:
@@ -333,6 +423,23 @@ def test_version_update_resources() -> dict[str, object]:
         return checks
 
 
+def test_multilingual_readmes() -> dict[str, object]:
+    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    files = {
+        "en": ROOT / "README.md",
+        "it": ROOT / "README.it.md",
+        "zh": ROOT / "README.zh-CN.md",
+    }
+    checks: dict[str, object] = {}
+    for language, path in files.items():
+        text = path.read_text(encoding="utf-8")
+        checks[f"{language}_exists"] = path.exists()
+        checks[f"{language}_version"] = version in text
+        checks[f"{language}_delete_guardrail"] = "I explicitly approve this deletion" in text
+    assert all(checks.values())
+    return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run local cross-platform tests for the Salesforce Agent Optimizer skill.")
     parser.add_argument("--json", action="store_true")
@@ -345,6 +452,7 @@ def main() -> int:
         "package_manifest": test_package_manifest_generation(),
         "package_manifest_version_fallback": test_package_manifest_uses_version_context_fallback(),
         "version_update_resources": test_version_update_resources(),
+        "multilingual_readmes": test_multilingual_readmes(),
     }
     if args.json:
         print(json.dumps(results, indent=2, sort_keys=True))

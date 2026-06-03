@@ -1,4 +1,4 @@
 interface:
   display_name: "Salesforce Agent Optimizer"
-  short_description: "Salesforce delivery, testing, manifests, and version updates"
-  default_prompt: "Use $salesforce-agent-optimizer to plan, approve, implement, test, validate, package, and refresh release/API context for a Salesforce change with minimal custom code and token-efficient org inspection."
+  short_description: "Salesforce delivery with destructive-change guardrails"
+  default_prompt: "Use $salesforce-agent-optimizer to plan, approve, implement, test, validate, package, and refresh release/API context for Salesforce work with minimal custom code, explicit delete approval, and token-efficient org inspection."

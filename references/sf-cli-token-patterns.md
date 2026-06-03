@@ -4,7 +4,7 @@
 
 Prefer `scripts/sf_agent_cli.py` for Salesforce org operations. It wraps the official `sf` CLI with compact output, explicit alias requirements, secure auth commands, and production read-only guardrails.
 
-Use `scripts/sf_min.py` only as a compact fallback for a read-only official `sf` command that has not yet been added to `sf_agent_cli.py`.
+Use `scripts/sf_min.py` only as a compact fallback for a read-only official `sf` command that has not yet been added to `sf_agent_cli.py`. It blocks destructive commands.
 
 ## Token-Efficient Rules
 
@@ -24,6 +24,7 @@ Use `scripts/sf_agent_cli.py`:
 - Authenticate with `auth-web`, `auth-device`, or `auth-jwt`.
 - Never use default orgs for agent work.
 - Let the facade block write/execute operations on production orgs.
+- Let the facade enforce explicit deletion approval for delete, uninstall, purge, hard-delete, source delete, and destructiveChanges workflows.
 - Use `--select`, narrow SOQL, and narrow metadata selectors.
 - Use `safe-run` for installed official `sf` commands that are not exposed as first-class facade commands.
 - Run `catalog-refresh` after upgrading Salesforce CLI to regenerate `sf-official-command-catalog.md` and `.json`.

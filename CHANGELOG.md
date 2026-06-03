@@ -8,6 +8,21 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.4.0 - 2026-06-03
+
+### Added
+
+- Added mandatory destructive-operation guardrails for Salesforce data deletes, metadata deletes, package uninstalls, source deletes, purge/hard-delete operations, and destructive changes.
+- Added `references/deletion-guardrails.md` with explicit approval, evidence, backup, rollback, and uncertainty-handling rules.
+- Updated `scripts/sf_agent_cli.py` to block destructive commands unless `--delete-approval "I explicitly approve this deletion"` is provided.
+- Added self-tests for destructive-operation approval enforcement.
+- Added English, Italian, and Simplified Chinese README files and a self-test that keeps their version and delete guardrail references aligned.
+
+### Changed
+
+- Reworked README content for token efficiency and clearer public installation guidance.
+- Updated delivery methodology, agent adapters, official sources, manifest rules, and completion artifacts to avoid invented facts and to require user choice when planning evidence is uncertain.
+
 ## 0.3.0 - 2026-06-03
 
 ### Added

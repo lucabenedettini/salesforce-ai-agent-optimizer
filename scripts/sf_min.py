@@ -18,6 +18,7 @@ SECRET_KEYS = re.compile(
     r"(access.?token|session.?id|auth.?url|refresh.?token|client.?secret|password|cookie|sid)",
     re.IGNORECASE,
 )
+DESTRUCTIVE_TERMS = {"delete", "uninstall", "purge", "truncate", "hard-delete", "harddelete"}
 
 
 def redact(value: Any) -> Any:
@@ -92,6 +93,18 @@ def sf_binary() -> str:
     return shutil.which("sf") or "sf"
 
 
+def is_destructive(sf_args: list[str]) -> bool:
+    parts: list[str] = []
+    for token in sf_args:
+        if token.startswith("-"):
+            break
+        parts.extend(part for part in token.replace(":", " ").replace("-", " ").split() if part)
+    if set(parts) & DESTRUCTIVE_TERMS:
+        return True
+    lowered = " ".join(sf_args).lower()
+    return any(term in lowered for term in ("destructivechanges", "destructive changes", "purge-on-delete", "hard-delete"))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run sf with compact redacted output.")
     parser.add_argument("--select", help="Comma-separated JSON paths to keep.")
@@ -106,6 +119,8 @@ def main() -> int:
         sf_args = sf_args[1:]
     if not sf_args:
         parser.error("Provide an sf command, for example: org display --target-org dev")
+    if is_destructive(sf_args):
+        raise SystemExit("Blocked destructive command. Use scripts/sf_agent_cli.py with explicit deletion approval.")
 
     command = [sf_binary(), *sf_args]
     if not args.raw and "--json" not in command:

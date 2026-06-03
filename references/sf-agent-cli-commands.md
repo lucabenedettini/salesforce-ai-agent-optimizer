@@ -13,6 +13,7 @@ Rules:
 - Before write or execute commands, query `Organization.IsSandbox`.
 - If `IsSandbox=false` or the org type cannot be determined, block write/execute commands.
 - Production orgs are read-only.
+- Destructive commands require separate explicit user approval and `--delete-approval "I explicitly approve this deletion"`.
 - If Salesforce CLI is not discoverable in `PATH`, set `SF_AGENT_SF_BIN` to the full `sf`, `sf.cmd`, or `sf.exe` path.
 - Use `--select`, explicit SOQL fields, specific metadata selectors, and bounded output.
 
@@ -32,12 +33,14 @@ Rules:
 - Provide `--target-org <alias>` when the command connects to Salesforce.
 - The facade appends `--json` unless `--raw` is used.
 - The facade classifies safety and blocks `write`/`execute` commands on production.
+- Delete, uninstall, purge, hard-delete, source delete, and destructiveChanges deploy commands require `--delete-approval "I explicitly approve this deletion"` after the user approves the exact destructive scope.
 - If the official command is `project deploy start` and succeeds, the facade appends deploy history.
 
 ```bash
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- data query --query "SELECT Id, Name FROM Account LIMIT 20" --select result.records
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- project retrieve preview --concise
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox --requirements "Add priority tracking to Account" --changed-metadata CustomField:Account.Priority__c -- project deploy start --source-dir force-app
+python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox --delete-approval "I explicitly approve this deletion" -- data delete record --sobject Account --record-id 001...
 ```
 
 ### `catalog-refresh`
@@ -278,8 +281,10 @@ Delete one record. Blocked on production.
 Maps to: `sf data delete record`
 
 ```bash
-python scripts/sf_agent_cli.py data-record-delete --target-org dev-sandbox --sobject Account --record-id 001...
+python scripts/sf_agent_cli.py data-record-delete --target-org dev-sandbox --sobject Account --record-id 001... --delete-approval "I explicitly approve this deletion"
 ```
+
+Requires explicit user approval for the exact record before execution.
 
 ### `apex-test-run`
 
@@ -360,8 +365,10 @@ Uninstall a package. Blocked on production.
 Maps to: `sf package uninstall`
 
 ```bash
-python scripts/sf_agent_cli.py package-uninstall --target-org dev-sandbox --package 04t...
+python scripts/sf_agent_cli.py package-uninstall --target-org dev-sandbox --package 04t... --delete-approval "I explicitly approve this deletion"
 ```
+
+Requires explicit user approval for the exact package and org before execution.
 
 ### `user-display`
 
@@ -404,4 +411,5 @@ When an agent needs an official Salesforce CLI command that is not listed:
 5. Mark safety as `read`, `write`, `execute`, `auth`, or `local`.
 6. Require `--target-org` for org access.
 7. Block `write` and `execute` commands on production.
-8. Add one section to this file documenting the command.
+8. Require explicit deletion approval for destructive commands.
+9. Add one section to this file documenting the command.

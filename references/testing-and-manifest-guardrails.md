@@ -40,7 +40,7 @@ Use the official Metadata API manifest shape:
 Rules:
 
 - Include added and modified metadata only.
-- Do not include deleted metadata in `package.xml`; use `destructiveChanges.xml` for deletions and ask for explicit approval before destructive deploy work.
+- Do not include deleted metadata in `package.xml`; use `destructiveChanges.xml` for deletions only after following `references/deletion-guardrails.md` and receiving explicit deletion approval for the exact scope.
 - Use explicit metadata members such as `ApexClass:AccountService`, `Flow:Account_Onboarding`, `CustomField:Account.Priority__c`, and `PermissionSet:Sales_Manager`.
 - Use the project's `sfdx-project.json` `sourceApiVersion` when available, otherwise use `references/salesforce-current-version.md` for the current Metadata API version.
 - Default output path: `release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml`.

@@ -26,6 +26,7 @@ Consult project Knowledge first:
 - Read `references/salesforce-current-version.md` for release-sensitive API, SOAP, Metadata API, LWC API, Apex/Flow version, package, or `sourceApiVersion` planning.
 - Read only the matching product/package files under `references/products-packages/products/` or `references/products-packages/packages/`.
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
+- Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, destructive changes, or source delete are possible.
 - Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
 - Read `.salesforce-agent-knowledge/markdown-index.md` when the exact metadata page is not obvious.
@@ -59,10 +60,13 @@ Then produce a plan with:
 - Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
+- Destructive action scope and separate deletion approval needs, if any.
+
+Do not invent missing evidence. If a plan depends on an unknown product behavior, metadata dependency, package version, record set, or org state, ask the user for the missing fact or present multiple scenarios with tradeoffs and ask the user to choose.
 
 At the end of planning, ask whether the user wants an optional PDF containing all planned configuration/customization tasks, task explanations, metadata dependencies, and estimated execution time.
 
-Ask for explicit approval before making file or org metadata changes.
+Ask for explicit approval before making file or org metadata changes. Ask separately for deletion approval before any destructive data or metadata action; general plan approval is not enough.
 
 ## Phase 3: Implementation
 
@@ -81,6 +85,7 @@ At the end of development, before optional handoff files and before validation h
 - Default output: `release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml`.
 - Use explicit `--metadata Type:Member` values when git status cannot map all changed metadata.
 - Do not include deleted metadata in `package.xml`; plan `destructiveChanges.xml` separately with explicit approval when deletion deploys are required.
+- For destructive changes, follow `references/deletion-guardrails.md`; validation or preview is not approval to execute deletion.
 - Do not overwrite an existing broad `manifest/package.xml` unless the user approved that exact overwrite.
 
 At the end of development, before validation handoff, read `references/completion-artifacts.md` and ask whether the user wants one or more end-of-development files:

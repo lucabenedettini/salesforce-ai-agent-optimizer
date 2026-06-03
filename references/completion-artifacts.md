@@ -157,4 +157,5 @@ Never include secrets. For secrets, state where the authorized admin must enter 
 - Keep files concise but complete enough for handoff.
 - Mark unknowns explicitly as `To verify`.
 - Include added, modified, removed metadata in every relevant file.
+- When metadata was removed, include the explicit deletion approval evidence or mark it `To verify`.
 - Link to Knowledge history when available.

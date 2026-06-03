@@ -15,6 +15,10 @@ Keep patches minimal. Change the fewest metadata/code files that solve the state
 
 Use org evidence before assumptions. Inspect only the metadata needed for the decision, summarize findings compactly, and avoid dumping raw CLI output into context.
 
+Never invent missing Salesforce facts. If evidence is unclear during planning, ask the user for the missing fact or present distinct scenarios with tradeoffs and ask the user to choose.
+
+Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` before any data delete, metadata delete, package uninstall, destructive change, purge, or hard delete. Every destructive action requires explicit user approval for the exact scope.
+
 Before any modification, consult the project Knowledge if it exists. If it is missing, stale, or explicitly requested by the user, run `/sf-init-project-skill` to build or refresh it.
 
 ## Product, Package, And Dependency Context
@@ -68,17 +72,18 @@ Read `references/delivery-methodology.md` for the full loop. Follow it for every
 3. Identify relevant products/packages from `references/products-packages/index.md`, then read the matching product/package files.
 4. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
 5. Read `references/metadata-dependencies.md` and inspect the minimum repository/org evidence needed to plan dependencies safely.
-6. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version; invoke `/sf-version-update-skill` when local version guidance is stale.
-7. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, testable metadata coverage, risks, estimates, and rollback.
-8. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
-9. Ask the user to approve the plan before modifying project files or org metadata.
-10. After approval, implement only the approved minimal changes.
-11. At the end of development, read `references/testing-and-manifest-guardrails.md` and generate a `package.xml` for all added or modified metadata, using `scripts/generate_package_manifest.py` when possible.
-12. Read `references/completion-artifacts.md` and ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
-13. Summarize requirements, changes, affected artifacts, generated package manifest, assumptions, and validation commands.
-14. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
-15. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
-16. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
+6. Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, or destructive metadata work is possible.
+7. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version; invoke `/sf-version-update-skill` when local version guidance is stale.
+8. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, testable metadata coverage, deletion approval needs, risks, estimates, and rollback. If facts are uncertain, ask the user or present scenarios rather than inventing.
+9. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
+10. Ask the user to approve the plan before modifying project files or org metadata. Ask separately for explicit deletion approval when destructive work is in scope.
+11. After approval, implement only the approved minimal changes.
+12. At the end of development, read `references/testing-and-manifest-guardrails.md` and generate a `package.xml` for all added or modified metadata, using `scripts/generate_package_manifest.py` when possible.
+13. Read `references/completion-artifacts.md` and ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
+14. Summarize requirements, changes, affected artifacts, generated package manifest, assumptions, and validation commands.
+15. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
+16. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
+17. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
 
 ## Token Discipline
 
@@ -102,6 +107,8 @@ Do not paste full `sf` JSON, describe screens, or retrieve broad metadata unless
 Read `references/sf-agent-cli-commands.md` before using or extending the facade. Use `references/sf-official-command-catalog.md` only when you need the generated one-by-one catalog of installed official Salesforce CLI commands. Read `references/sf-cli-token-patterns.md` before creating new CLI wrappers or deciding whether to rewrite another Salesforce CLI command.
 
 Read `references/salesforce-current-version.md` before choosing API versions for manifests, integrations, LWC, Apex, Flow, or package-sensitive work.
+
+Read `references/deletion-guardrails.md` before any delete, uninstall, destructive change, purge, hard delete, or source delete. The facade requires explicit deletion approval for destructive commands.
 
 ## Backend Guidelines
 
@@ -136,6 +143,8 @@ For end-of-development handoff files, read `references/completion-artifacts.md`.
 
 For Salesforce testing guardrails and required `package.xml` generation, read `references/testing-and-manifest-guardrails.md`.
 
+For data/metadata deletion, package uninstall, destructive changes, purge, hard delete, or source delete, read `references/deletion-guardrails.md`.
+
 Produce designs that include:
 
 - Business capability and user outcome.
@@ -156,6 +165,7 @@ Use `references/agent-installation.md` when packaging this skill for Codex, Clau
 - `references/completion-artifacts.md`: release notes, technical specifications, impact assessment, user testing, and manual procedure artifact rules.
 - `references/testing-and-manifest-guardrails.md`: Apex, Flow, testable metadata, and required `package.xml` rules.
 - `references/salesforce-current-version.md`: current Salesforce release/API/SOAP/package version context.
+- `references/deletion-guardrails.md`: explicit approval and evidence rules for destructive operations.
 
 Keep adapters short. The canonical behavior lives in this `SKILL.md` and the `references/` files.
 

@@ -13,6 +13,8 @@ Follow these rules:
 - For Salesforce org access, use `scripts/sf_agent_cli.py`; ask for the org alias, authenticate with `auth-web`, `auth-device`, or `auth-jwt`, use `safe-run` for official commands without a first-class wrapper, and never perform write/execute commands on production.
 - Prefer Salesforce configuration and standard product capabilities before custom code.
 - Make minimal patches and avoid unrelated refactors.
+- Never invent missing Salesforce facts; if evidence is unclear, ask the user or present scenarios with tradeoffs.
+- Never delete data or metadata automatically. Read `references/deletion-guardrails.md` and get separate explicit approval for the exact destructive scope before any delete, uninstall, purge, hard delete, source delete, or destructiveChanges deploy.
 - Inspect only the org metadata needed for the task.
 - Use `scripts/sf_min.py` only as read-only compact fallback for official `sf` commands not yet exposed by the facade.
 - Load `references/sf-agent-cli-commands.md`, `references/knowledge-init.md`, `references/delivery-methodology.md`, `references/architecture-solution.md`, `references/backend-apex.md`, `references/frontend-lwc.md`, or `references/sf-cli-token-patterns.md` only when relevant.

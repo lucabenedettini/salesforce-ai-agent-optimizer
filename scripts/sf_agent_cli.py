@@ -23,6 +23,7 @@ SECRET_KEYS = re.compile(
 
 PROD_CHECK_QUERY = "SELECT IsSandbox, OrganizationType, Name FROM Organization LIMIT 1"
 KNOWLEDGE_DIR = ".salesforce-agent-knowledge"
+DELETE_APPROVAL_PHRASE = "I explicitly approve this deletion"
 
 
 @dataclass(frozen=True)
@@ -279,6 +280,29 @@ def classify_official_safety(command_id: str, connects_to_org: bool = False) -> 
     return "read"
 
 
+def is_destructive_operation(command_id: str, sf_args: list[str]) -> bool:
+    normalized = command_id.replace(" ", ":").replace("-", ":")
+    parts = [part for part in normalized.split(":") if part]
+    if parts and parts[-1] in {"report", "list", "get", "display", "preview", "status"}:
+        return False
+    destructive_terms = {"delete", "uninstall", "purge", "truncate", "hard-delete", "harddelete"}
+    if set(parts) & destructive_terms:
+        return True
+    lowered = " ".join(sf_args).lower()
+    return any(term in lowered for term in ("destructivechanges", "destructive changes", "purge-on-delete", "hard-delete"))
+
+
+def require_delete_approval(operation: str, args: argparse.Namespace, sf_args: list[str] | None = None) -> None:
+    if not is_destructive_operation(operation, sf_args or []):
+        return
+    approval = getattr(args, "delete_approval", None)
+    if approval != DELETE_APPROVAL_PHRASE:
+        raise SystemExit(
+            "Blocked destructive operation. Ask the user for explicit approval before deleting data or metadata, "
+            f"then pass --delete-approval \"{DELETE_APPROVAL_PHRASE}\"."
+        )
+
+
 def command_likely_connects(command_id: str, sf_args: list[str], target_org: str | None) -> bool:
     if target_org:
         return True
@@ -449,6 +473,7 @@ def require_deploy_history_details(command_id: str, args: argparse.Namespace) ->
 def run_simple(command_name: str, sf_args: list[str], args: argparse.Namespace) -> int:
     if command_name == "deploy-start":
         require_deploy_history_details("project:deploy:start", args)
+    require_delete_approval(command_name, args, sf_args)
     enforce_safety(command_name, args)
     completed = sf_run(sf_args, args)
     code = emit_result(completed, args)
@@ -492,6 +517,7 @@ def safe_run(args: argparse.Namespace) -> int:
         sf_args.extend(["--target-org", target_org])
 
     require_deploy_history_details(command_id, args)
+    require_delete_approval(command_id, args, sf_args)
     enforce_dynamic_safety(command_id, safety, target_org, args)
     if args.dry_run:
         dry_command = [sf_binary(), *sf_args]
@@ -553,6 +579,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--safety", choices=["read", "write", "execute", "auth", "local"], help="Override automatic safety classification.")
     p.add_argument("--requirements", help="Requirement that caused a deploy; required for `project deploy start`.")
     p.add_argument("--changed-metadata", action="append", help="Modified metadata; required and repeatable for `project deploy start`.")
+    p.add_argument("--delete-approval", help=f"Required exact phrase for destructive operations: {DELETE_APPROVAL_PHRASE}")
     p.add_argument("sf_args", nargs=argparse.REMAINDER)
     p.set_defaults(func=safe_run)
 
@@ -661,6 +688,7 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "deploy-start":
             p.add_argument("--requirements", help="Requirement that caused the deployed metadata changes.")
             p.add_argument("--changed-metadata", action="append", help="Modified metadata, for example ApexClass:AccountService. Repeat for all changed metadata.")
+            p.add_argument("--delete-approval", help=f"Required exact phrase when deploying destructive changes: {DELETE_APPROVAL_PHRASE}")
         p.set_defaults(func=lambda a, n=name, tail=sf_tail: run_simple(n, with_common_deploy_args(tail + ["--target-org", a.target_org] + source_args(a), a), a))
 
     p = sub.add_parser("deploy-report", help=DOCS["deploy-report"].description)
@@ -703,6 +731,7 @@ def build_parser() -> argparse.ArgumentParser:
     common_org(p)
     p.add_argument("--sobject", required=True)
     p.add_argument("--record-id", required=True)
+    p.add_argument("--delete-approval", help=f"Required exact phrase: {DELETE_APPROVAL_PHRASE}")
     p.set_defaults(func=lambda a: run_simple("data-record-delete", ["data", "delete", "record", "--target-org", a.target_org, "--sobject", a.sobject, "--record-id", a.record_id, "--no-prompt"], a))
 
     p = sub.add_parser("apex-test-run", help=DOCS["apex-test-run"].description)
@@ -757,6 +786,7 @@ def build_parser() -> argparse.ArgumentParser:
     common_org(p)
     p.add_argument("--package", required=True)
     p.add_argument("--wait", type=int, default=30)
+    p.add_argument("--delete-approval", help=f"Required exact phrase: {DELETE_APPROVAL_PHRASE}")
     p.set_defaults(func=lambda a: run_simple("package-uninstall", ["package", "uninstall", "--target-org", a.target_org, "--package", a.package, "--wait", str(a.wait), "--no-prompt"], a))
 
     p = sub.add_parser("user-display", help=DOCS["user-display"].description)

@@ -11,6 +11,8 @@ When assisting in this repository on Salesforce work, follow the local `.agent-s
 - For Salesforce org access, use `scripts/sf_agent_cli.py`; ask for the org alias, authenticate with `auth-web`, `auth-device`, or `auth-jwt`, use `safe-run` for official commands without a first-class wrapper, and never perform write/execute commands on production.
 - Prefer configuration, standard Salesforce features, Flow, LDS/UI API, permission sets, named credentials, and managed package capabilities before custom Apex/LWC.
 - Keep patches minimal and scoped to the requested behavior.
+- Never invent missing Salesforce facts; if evidence is unclear, ask the user or present scenarios with tradeoffs.
+- Never delete data or metadata automatically. Read `references/deletion-guardrails.md` and get separate explicit approval for the exact destructive scope before any delete, uninstall, purge, hard delete, source delete, or destructiveChanges deploy.
 - For Apex, enforce bulk safety, sharing/security, governor-limit awareness, and meaningful tests.
 - Changed Apex must be at least 80% covered, preferably 90%-100%, and Flow or other testable metadata must be tested where Salesforce/project capabilities support it.
 - For LWC, prefer Lightning base components, LDS/UI API, accessible SLDS-based UI, and efficient data loading.
