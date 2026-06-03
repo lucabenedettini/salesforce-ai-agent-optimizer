@@ -31,6 +31,7 @@ La skill deve:
 - validare con test/static check/subagent quando disponibile;
 - ripianificare se approvazione, test o validazione falliscono, con massimo tre cicli falliti;
 - chiedere a fine pianificazione se generare opzionalmente un PDF con task di configurazione/customizzazione, spiegazione e stima tempi;
+- chiedere a fine sviluppo se generare release notes, specifiche tecniche, impact assessment, user testing e manual procedures;
 - chiedere se fare push e su quale branch solo a validazione completata;
 - registrare nella Knowledge deploy e push remoti con requisito e tutti i metadata modificati.
 
@@ -250,6 +251,18 @@ Il wrapper:
 
 Usa `--no-commit-history` solo se l'utente vuole esplicitamente history locale per quel push.
 
+### Artefatti Di Fine Sviluppo
+
+Alla fine della fase di sviluppo, prima della validazione o della consegna finale, l'agente deve chiedere se generare uno o piu' file:
+
+- `release-notes.md`: lista di tutti i metadata aggiunti, modificati e rimossi.
+- `technical-specifications.md`: requisiti e come sono stati soddisfatti con metadata aggiunti, modificati e rimossi.
+- `impact-assessment.md`: punti preesistenti modificati o impattati.
+- `user-testing.md`: test utente eseguibili su Salesforce per validare i nuovi requisiti.
+- `manual-procedures.md`: configurazioni manuali post-deploy come record di configurazione, custom settings, custom metadata, utenti, permission set, permission set group, gruppi, code, licenze, segreti di named credential, scheduled job o data load.
+
+Regole e template sono in `references/completion-artifacts.md`.
+
 ## Sicurezza
 
 - Produzione e' read-only per la facade.
@@ -322,6 +335,7 @@ Richiede PyYAML nel Python usato dal validator.
 - `references/products-packages/products/`: file Markdown per prodotto Salesforce e sviluppo mobile.
 - `references/products-packages/packages/`: file Markdown per pacchetto AppExchange.
 - `references/metadata-dependencies.md`: checklist delle relazioni metadata da considerare in pianificazione.
+- `references/completion-artifacts.md`: strutture per release notes, specifiche tecniche, impact assessment, user testing e manual procedures.
 - `references/`: guide dettagliate e catalogo comandi Salesforce CLI.
 
 ## Note Operative Per Agenti

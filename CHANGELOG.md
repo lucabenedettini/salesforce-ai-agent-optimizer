@@ -8,6 +8,15 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.1.0 - 2026-06-03
+
+### Added
+
+- Added end-of-development completion artifact workflow.
+- Added `references/completion-artifacts.md` with required structures for `release-notes.md`, `technical-specifications.md`, `impact-assessment.md`, `user-testing.md`, and `manual-procedures.md`.
+- Updated delivery methodology so agents ask whether to generate completion artifacts after development and before validation handoff.
+- Updated Claude Code and GitHub Copilot adapters to follow the completion artifact prompt.
+
 ## 0.0.1 - 2026-06-03
 
 Initial public baseline.

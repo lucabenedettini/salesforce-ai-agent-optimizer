@@ -13,6 +13,7 @@ When assisting in this repository on Salesforce work, follow the local `.agent-s
 - For LWC, prefer Lightning base components, LDS/UI API, accessible SLDS-based UI, and efficient data loading.
 - Use Salesforce CLI with JSON and compact filtered output; avoid pasting broad org metadata or noisy command output.
 - After approved implementation, summarize requirements/changes and pass them to a validation subagent when available; if validation or tests fail, replan with a maximum of three unsuccessful cycles.
+- At the end of development, ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files; use `references/completion-artifacts.md` if the user approves.
 - At the end of planning, ask whether the user wants an optional PDF with all configuration/customization tasks, explanations, dependencies, and time estimates.
 - After successful deploys, ensure `.salesforce-agent-knowledge/history/project-history.md` records the requirement and all modified metadata.
 - For approved remote branch pushes, use `scripts/git_knowledge_push.py` so Knowledge history is committed and included on the remote branch.

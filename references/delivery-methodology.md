@@ -72,6 +72,16 @@ After approval:
 - Do not broaden scope because adjacent issues are visible.
 - If a materially better plan appears during implementation, stop and ask for approval on the revised plan.
 
+At the end of development, before validation handoff, read `references/completion-artifacts.md` and ask whether the user wants one or more end-of-development files:
+
+- `release-notes.md`: all metadata added, modified, and removed.
+- `technical-specifications.md`: requirements and how they were satisfied with added, modified, and removed metadata.
+- `impact-assessment.md`: all pre-existing points modified or impacted.
+- `user-testing.md`: Salesforce user tests for the new requirements.
+- `manual-procedures.md`: post-deploy manual steps such as configuration records, custom settings, custom metadata records, users, permission set assignments, permission set group assignments, public groups, queues, licenses, named credential secrets, scheduled jobs, and data loads.
+
+Generate only the files the user approves and save them in the user-approved folder. Default to `release-artifacts/<yyyy-mm-dd>-<short-change-name>/`.
+
 ## Phase 4: Validation Handoff
 
 Create a compact handoff for a validation subagent:

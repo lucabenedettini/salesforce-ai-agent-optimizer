@@ -27,3 +27,7 @@ Salesforce metadata is a graph. Plans must account for permission sets, permissi
 ## Human Approval And Validation
 
 Agents must restate the request, ask focused questions only when needed, plan before changing, ask for approval, validate with tests or a subagent when available, and retry failed plans no more than three times before returning to requirements.
+
+## Handoff Completeness
+
+At the end of development, agents should ask whether the user wants release notes, technical specifications, impact assessment, user testing, and manual procedure files. These artifacts make Salesforce changes easier to review, deploy, test, audit, and operate after release.
