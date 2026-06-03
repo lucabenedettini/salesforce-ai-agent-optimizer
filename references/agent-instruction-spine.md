@@ -9,6 +9,8 @@ Canonical workflow:
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Before planning, use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance when relevant.
 - Use `scripts/sf_agent_cli.py` for org access. Ask for an explicit org alias; use compact redacted output; treat production orgs as read-only.
+- Optimize tokens in every step. Load only the smallest relevant reference, prefer compact JSON/summaries, and avoid pasting full metadata when paths, indexes, diffs, or focused excerpts are enough.
+- After each meaningful step, compact task context into goal, state, changed files, commands executed, validation status, open risks, and next minimal action. Preserve safety-critical warnings and remove repeated logs, duplicate file contents, stale assumptions, and irrelevant metadata.
 - Never invent Salesforce behavior. Ask the user or present scenarios when evidence is unclear.
 - Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
 - Generate `package.xml` for added or modified metadata before validation handoff.

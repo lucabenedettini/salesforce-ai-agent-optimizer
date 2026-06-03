@@ -10,6 +10,9 @@ jobs:
   validate:
     name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -35,6 +38,31 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
 
+      - name: Run sfao core commands
+        run: |
+          sfao version
+          sfao validate
+          sfao doctor
+
+      - name: Exercise install update uninstall
+        run: |
+          mkdir -p "$RUNNER_TEMP/sfao-install-test"
+          cd "$RUNNER_TEMP/sfao-install-test"
+          sfao install --project --platform all
+          sfao update --project --platform all
+          sfao uninstall --project --platform all --yes
+
+      - name: Exercise Knowledge commands
+        run: |
+          sfao knowledge init --project-root tests/fixtures/sfdx-project
+          sfao knowledge refresh --project-root tests/fixtures/sfdx-project
+          sfao knowledge doctor --project-root tests/fixtures/sfdx-project
+
+      - name: Exercise version-context commands
+        run: |
+          sfao version-context scaffold
+          sfao version-context validate
+
       - name: Check generated agent instructions
         run: python scripts/sync_agent_instructions.py --check --json
 
@@ -44,8 +72,11 @@ jobs:
       - name: Run self tests
         run: python scripts/self_test.py --json
 
-      - name: Compile Python files
-        run: python -m compileall -q scripts src tests -x "templates"
+      - name: Compile script files
+        run: python -m py_compile scripts/*.py
+
+      - name: Compile package files
+        run: python -m py_compile src/salesforce_agent_optimizer/*.py
 
       - name: Run pytest
         run: python -m pytest
@@ -53,8 +84,8 @@ jobs:
       - name: Run ruff
         run: python -m ruff check .
 
-      - name: Validate through sfao
-        run: sfao validate
+      - name: Build wheel and sdist
+        run: python -m build
 
-      - name: Run doctor
-        run: sfao doctor
+      - name: Check distributions
+        run: python -m twine check dist/*

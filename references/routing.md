@@ -19,7 +19,7 @@ Read this file before planning. Load only the references needed for the current 
 | Mobile development or Salesforce mobile app behavior | `references/products-packages/products/mobile-development.md`, `references/frontend-lwc.md`, `references/metadata-dependencies.md` |
 | Data delete, metadata delete, source delete, purge, hard delete, package uninstall, destructiveChanges | `references/deletion-guardrails.md`, `references/testing-and-manifest-guardrails.md` |
 | package.xml, deploy manifest, deleted metadata scope, release artifact scope | `references/testing-and-manifest-guardrails.md`, `references/deletion-guardrails.md` when deletes are involved |
-| Release/API/SOAP/Metadata API/LWC API/sourceApiVersion/package version context | `references/salesforce-current-version.md`; run `/sf-version-update-skill` with `references/version-update.md` when stale |
+| Release/API/SOAP/Metadata API/LWC API/sourceApiVersion/package version context | `references/salesforce-current-version.md`; run `sfao version-context update` with `references/version-update.md` when stale |
 | Project Knowledge build or refresh | `references/knowledge-init.md` |
 | Release notes, technical specifications, impact assessment, user testing, manual procedures | `references/completion-artifacts.md` |
 | Installability across Codex, Claude Code, GitHub Copilot | `references/agent-installation.md`, `references/agent-instruction-spine.md` |

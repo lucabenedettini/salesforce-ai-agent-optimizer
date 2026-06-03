@@ -19,6 +19,14 @@ If a report requires reproduction details, provide the smallest safe example:
 ## Salesforce Safety Expectations
 
 - Never include Salesforce secrets in issues, pull requests, logs, screenshots, or Knowledge files.
+- Do not commit `.sf/`, `.sfdx/`, auth files, scratch org credentials, session IDs, refresh tokens, access tokens, private keys, connected app secrets, or local secret files.
 - Production orgs must remain read-only through the CLI facade.
 - Destructive data or metadata operations require separate explicit user approval for the exact target org and scope.
 - When in doubt, stop and ask for clarification instead of guessing access, delete scope, org behavior, or package state.
+
+## Package Publishing Safety
+
+- PyPI publication uses Trusted Publishing through GitHub Actions OIDC.
+- Do not add static PyPI usernames, passwords, or API tokens to the repository.
+- Do not create or require a `PYPI_API_TOKEN` secret for the release workflow.
+- The PyPI publish job should run only when repository variable `PUBLISH_TO_PYPI=true` and the GitHub environment is `pypi`.

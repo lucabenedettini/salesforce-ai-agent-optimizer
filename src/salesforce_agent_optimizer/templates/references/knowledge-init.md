@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use `/sf-init-project-skill` to build or refresh a compact indexed Knowledge layer for a Salesforce project. The Knowledge is inspired by Andrej Karpathy's LLM Wiki pattern: keep raw sources as source of truth, compile a persistent Markdown wiki, maintain an index and log, and query the wiki before re-reading raw sources from scratch.
+Use `sfao knowledge init --project-root .` or the `/sf-init-project-skill` wrapper to build or refresh a compact indexed Knowledge layer for a Salesforce project. The Knowledge is inspired by Andrej Karpathy's LLM Wiki pattern: keep raw sources as source of truth, compile a persistent Markdown wiki, maintain an index and log, and query the wiki before re-reading raw sources from scratch.
 
 ## When To Run
 
@@ -13,17 +13,19 @@ Use `/sf-init-project-skill` to build or refresh a compact indexed Knowledge lay
 
 ## Command
 
-Run from the skill folder or call the script by absolute path:
+Preferred public CLI:
 
 ```bash
-python scripts/sf_knowledge_init.py --project-root <salesforce-project-root> --refresh
+sfao knowledge init --project-root <salesforce-project-root>
+sfao knowledge refresh --project-root <salesforce-project-root>
+sfao knowledge doctor --project-root <salesforce-project-root>
 ```
 
 Optional:
 
 ```bash
-python scripts/sf_knowledge_init.py --project-root <salesforce-project-root> --metadata-types ApexClass,Flow,CustomObject
-python scripts/sf_knowledge_init.py --project-root <salesforce-project-root> --knowledge-dir .my-salesforce-knowledge
+sfao knowledge refresh --project-root <salesforce-project-root> --max-items 200
+sfao knowledge refresh --project-root <salesforce-project-root> --target-org <alias>
 ```
 
 ## Generated Folder

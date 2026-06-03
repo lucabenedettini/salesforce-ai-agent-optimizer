@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 0.6.1
+  version: 1.0.0
 ---
 
 # Salesforce Agent Optimizer
@@ -36,6 +36,7 @@ For every Salesforce task:
 - Never invent Salesforce behavior. Ask the user or present scenarios when product behavior, package version, org state, record scope, or permission scope is unclear.
 - Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
 - Use official Salesforce documentation when local guidance is missing, uncertain, or release-sensitive.
+- Optimize tokens at every step: load only the smallest relevant reference, summarize long logs, prefer diffs and paths over pasted files, and compact task context after each meaningful iteration.
 
 ## Delivery Loop
 
@@ -52,6 +53,8 @@ Use this compact loop unless the user asks for analysis only:
 9. Validate with tests or an independent validation subagent. If validation or approval fails, replan; stop after three unsuccessful cycles and restart from requirements.
 10. After successful validation, record deploy/push history in Knowledge when applicable, then ask whether to push and which branch.
 
+After each meaningful step, compact the current task context with: goal, state, changed files, commands executed, validation status, risks, and next minimal action. Remove repeated explanations, raw logs when summaries are enough, duplicate file contents, stale assumptions, and irrelevant metadata. Preserve safety warnings, validation errors, permission impacts, destructive-operation scope, and package.xml/deployment scope.
+
 ## Salesforce CLI
 
 Use `scripts/sf_agent_cli.py` for org access. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
@@ -67,8 +70,8 @@ python scripts/sf_agent_cli.py deploy-preview --target-org <alias> --source-dir 
 
 ## Slash Commands
 
-- `/sf-init-project-skill`: build or refresh `.salesforce-agent-knowledge/`; read `references/knowledge-init.md`.
-- `/sf-version-update-skill`: refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources; read `references/version-update.md`.
+- `/sf-init-project-skill`: wrapper for `sfao knowledge init --project-root .`; read `references/knowledge-init.md`.
+- `/sf-version-update-skill`: wrapper for `sfao version-context scaffold` and `sfao version-context update`; read `references/version-update.md`.
 
 ## Adapter Maintenance
 

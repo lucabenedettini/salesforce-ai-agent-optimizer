@@ -8,6 +8,44 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.0] - 2026-06-03
+
+### Major Release
+
+- Promoted Salesforce Agent Optimizer to a public, CLI-backed, installable Python package.
+- Stabilized the `sfao` command as the primary interface for installation, update, uninstall, validation, Knowledge generation, and Salesforce version-context maintenance.
+
+### Added
+
+- Added `sfao update`.
+- Added `sfao uninstall`.
+- Added safe generated-file detection.
+- Added non-destructive update and uninstall behavior.
+- Added PyPI Trusted Publishing workflow support.
+- Added public package release documentation.
+- Added major release manifest.
+- Added full cross-platform installer/update/uninstall tests.
+- Added token-efficient command output requirements.
+- Added context compaction rules for agent workflows.
+
+### Changed
+
+- Bumped project version to `1.0.0`.
+- Updated README to document install, update, uninstall, Knowledge generation, version-context update, token optimization, context compaction, and publishing.
+- Marked CLI-backed installation as the preferred installation path.
+- Made compact output the default for CLI diagnostics.
+
+### Preserved
+
+- Existing Salesforce-first methodology.
+- Configuration-first solutioning.
+- Minimal-change approach.
+- Token-efficiency principles.
+- Local Knowledge concept.
+- Safe Salesforce CLI facade.
+- package.xml awareness.
+- Destructive-operation guardrails.
+
 ## [0.6.1] - 2026-06-03
 
 ### Added

@@ -35,11 +35,27 @@ class DoctorReport:
     def has_errors(self) -> bool:
         return any(check.status == "ERROR" for checks in self.sections.values() for check in checks)
 
+    @property
+    def has_warnings(self) -> bool:
+        return any(check.status == "WARN" for checks in self.sections.values() for check in checks)
+
+    @property
+    def status(self) -> str:
+        if self.has_errors:
+            return "ERROR"
+        if self.has_warnings:
+            return "WARN"
+        return "OK"
+
     def to_dict(self) -> dict[str, Any]:
-        return {
-            section: [check.__dict__ for check in checks]
-            for section, checks in self.sections.items()
-        }
+        payload: dict[str, Any] = {"ok": not self.has_errors, "status": self.status}
+        payload.update(
+            {
+                section: [check.__dict__ for check in checks]
+                for section, checks in self.sections.items()
+            }
+        )
+        return payload
 
 
 def run_doctor(root: Path | None = None) -> DoctorReport:
@@ -122,8 +138,25 @@ def windows_path_detail() -> str:
     return f"{scripts} is {'on' if user_scripts_on_path() else 'not on'} PATH"
 
 
-def format_report(report: DoctorReport) -> str:
-    lines = ["Salesforce Agent Optimizer Doctor", ""]
+def format_report(report: DoctorReport, verbose: bool = False) -> str:
+    lines = [f"Salesforce Agent Optimizer Doctor: {report.status}"]
+    if not verbose:
+        issues = [
+            (section, check)
+            for section, checks in report.sections.items()
+            for check in checks
+            if check.status in {"WARN", "ERROR"}
+        ]
+        if issues:
+            lines.append("Warnings and errors:")
+            for section, check in issues:
+                detail = f" {check.detail}" if check.detail else ""
+                lines.append(f"- {section} / {check.name}: {check.status}{detail}")
+        else:
+            lines.append("No warnings or errors.")
+        lines.append("Use --verbose for full diagnostics.")
+        return "\n".join(lines).rstrip() + "\n"
+    lines.append("")
     for section, checks in report.sections.items():
         lines.append(f"{section}:")
         for check in checks:
@@ -136,4 +169,4 @@ def format_report(report: DoctorReport) -> str:
 
 
 def report_to_json(report: DoctorReport) -> str:
-    return json.dumps(report.to_dict(), indent=2, sort_keys=True) + "\n"
+    return json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True) + "\n"

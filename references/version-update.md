@@ -1,6 +1,6 @@
 # Salesforce Version Update Workflow
 
-Read this file when the user invokes `/sf-version-update-skill` or asks to refresh Salesforce release, API, SOAP API, LWC API, Metadata API, or managed package version context.
+Read this file when the user invokes `/sf-version-update-skill`, runs `sfao version-context update`, or asks to refresh Salesforce release, API, SOAP API, LWC API, Metadata API, or managed package version context.
 
 ## Goal
 
@@ -53,10 +53,12 @@ Update at minimum:
 - `README.md` and `docs/wiki/` when user-facing behavior or current public version changes
 - `scripts/generate_package_manifest.py` only if the fallback API version logic changes
 
-Use `scripts/sf_version_update.py` to write `salesforce-version.json` and `salesforce-current-version.md` after collecting official facts:
+Use the public CLI to scaffold, update, and validate version context:
 
 ```bash
-python scripts/sf_version_update.py --skill-root <skill-root> --verified-date <yyyy-mm-dd> --release-name "Summer '26" --api-version 67.0 --source "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
+sfao version-context scaffold
+sfao version-context update
+sfao version-context validate
 ```
 
 ## Validation

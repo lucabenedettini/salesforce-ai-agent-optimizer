@@ -10,7 +10,7 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Token-efficient Salesforce CLI usage.
 - Local project Knowledge generated from metadata.
 - Product and AppExchange package context before planning.
-- Current Salesforce release/API/SOAP/package version context with `/sf-version-update-skill`.
+- Current Salesforce release/API/SOAP/package version context with `sfao version-context`.
 - Metadata dependency planning.
 - Least-privilege planning with current-org access inspection before permission changes.
 - Testing guardrails for Apex, Flow, and other testable metadata.
@@ -26,15 +26,31 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.6.1`
+- Current version: `1.0.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 
-## Core Command
+## Core Commands
 
-Use `/sf-init-project-skill` to build or refresh `.salesforce-agent-knowledge/` for a Salesforce project.
+Install all agent adapters:
 
-Use `/sf-version-update-skill` to refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources.
+```bash
+sfao install --project --platform all
+```
+
+Build or refresh `.salesforce-agent-knowledge/` for a Salesforce project:
+
+```bash
+sfao knowledge init --project-root .
+sfao knowledge refresh --project-root .
+```
+
+Refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources:
+
+```bash
+sfao version-context scaffold
+sfao version-context update
+```
 
 Before planning, an agent should:
 

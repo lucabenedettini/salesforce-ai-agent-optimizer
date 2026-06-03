@@ -45,7 +45,15 @@ def build_manifest(version: str, artifacts: list[Path]) -> Path:
         "supported_installers": ["uv", "pipx", "pip"],
         "supported_agents": ["codex", "claude", "copilot"],
         "supported_platforms": ["windows", "macos", "linux"],
-        "commands": ["sfao install", "sfao doctor", "sfao validate"],
+        "commands": [
+            "sfao install",
+            "sfao update",
+            "sfao uninstall",
+            "sfao doctor",
+            "sfao validate",
+            "sfao knowledge init",
+            "sfao version-context update",
+        ],
         "skill_paths": {
             "codex_repo": ".agents/skills/salesforce-agent-optimizer",
             "codex_user": "$HOME/.agents/skills/salesforce-agent-optimizer",

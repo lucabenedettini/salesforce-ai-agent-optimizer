@@ -105,8 +105,8 @@ For existing Salesforce repositories, place the skill under `.agents/skills/sale
 
 ## `/sf-init-project-skill` Command
 
-Where the agent supports custom slash commands, map `/sf-init-project-skill` to `agents/sf-init-project-skill.md`. Otherwise, treat the user text `/sf-init-project-skill` as an instruction to run `scripts/sf_knowledge_init.py --project-root <project-root> --refresh`.
+Where the agent supports custom slash commands, map `/sf-init-project-skill` to `agents/sf-init-project-skill.md`. Otherwise, treat the user text `/sf-init-project-skill` as an instruction to run `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
 
 ## `/sf-version-update-skill` Command
 
-Where the agent supports custom slash commands, map `/sf-version-update-skill` to `agents/sf-version-update-skill.md`. Otherwise, treat the user text `/sf-version-update-skill` as an instruction to read `references/version-update.md`, search official Salesforce sources for the latest production release/API/SOAP/package guidance, and update the version context resources.
+Where the agent supports custom slash commands, map `/sf-version-update-skill` to `agents/sf-version-update-skill.md`. Otherwise, treat the user text `/sf-version-update-skill` as an instruction to run `sfao version-context scaffold`, read `references/version-update.md`, search official Salesforce sources for the latest production release/API/SOAP/package guidance, and run `sfao version-context update`.

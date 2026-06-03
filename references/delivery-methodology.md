@@ -34,7 +34,7 @@ Consult project Knowledge first:
 - Read the relevant per-metadata Markdown files under `.salesforce-agent-knowledge/metadata/` before opening raw source.
 - Read `.salesforce-agent-knowledge/history/project-history.md` for previous deployed changes to the same artifacts.
 - Read the relevant wiki pages under `.salesforce-agent-knowledge/wiki/` only when a higher-level summary is needed.
-- If the folder is missing, stale, or the user invokes `/sf-init-project-skill`, run `scripts/sf_knowledge_init.py --project-root <project-root> --refresh` before planning, unless the user asked for a quick answer that does not touch the project.
+- If the folder is missing, stale, or the user invokes `/sf-init-project-skill`, run `sfao knowledge init --project-root <project-root>` or `sfao knowledge refresh --project-root <project-root>` before planning, unless the user asked for a quick answer that does not touch the project.
 - Use the Knowledge to decide what to inspect next; verify against source metadata files before making changes.
 
 Inspect the smallest useful surface:

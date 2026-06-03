@@ -60,6 +60,8 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/installer.py",
     "src/salesforce_agent_optimizer/doctor.py",
     "src/salesforce_agent_optimizer/validation.py",
+    "src/salesforce_agent_optimizer/knowledge.py",
+    "src/salesforce_agent_optimizer/version_context.py",
     "src/salesforce_agent_optimizer/templates/SKILL.md",
     "src/salesforce_agent_optimizer/templates/AGENTS.md",
     "src/salesforce_agent_optimizer/templates/agents/openai.yaml",
@@ -414,6 +416,57 @@ def validate_templates(root: Path, result: ValidationResult, expected_version: s
             validate_skill_file(path, result, expected_version, require_all_compatibility=False)
 
 
+def validate_copilot_apply_to(root: Path, result: ValidationResult) -> None:
+    path = root / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md"
+    if not path.exists():
+        return
+    try:
+        data, _, _ = parse_frontmatter(path)
+    except ValueError as exc:
+        result.error(str(exc))
+        return
+    apply_to = data.get("applyTo")
+    if not isinstance(apply_to, str) or "force-app" not in apply_to or "package.xml" not in apply_to:
+        result.error(".github instructions file must include applyTo frontmatter for Salesforce files")
+
+
+def validate_release_workflow(root: Path, result: ValidationResult) -> None:
+    path = root / ".github" / "workflows" / "release.yml"
+    if not path.exists():
+        return
+    text = read_text(path)
+    required_fragments = [
+        "PUBLISH_TO_PYPI",
+        "pypa/gh-action-pypi-publish@release/v1",
+        "python-package-distributions",
+        "environment:",
+        "name: pypi",
+        "id-token: write",
+    ]
+    for fragment in required_fragments:
+        if fragment not in text:
+            result.error(f"release.yml missing required Trusted Publishing fragment: {fragment}")
+    if "PYPI_API_TOKEN" in text or "__token__" in text:
+        result.error("release.yml must not reference static PyPI credentials")
+
+
+def validate_prohibited_references(root: Path, result: ValidationResult) -> None:
+    skill_suffix = "sf" + "-skills"
+    prohibited = ("forcedotcom/" + skill_suffix, skill_suffix)
+    for path in sorted(root.rglob("*")):
+        if any(part in {".git", ".pytest_cache", "__pycache__", "dist", "build"} for part in path.parts):
+            continue
+        if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES | YAML_SUFFIXES:
+            continue
+        try:
+            text = read_text(path)
+        except UnicodeDecodeError:
+            continue
+        for phrase in prohibited:
+            if phrase in text:
+                result.error(f"Prohibited dependency reference found in {path.relative_to(root)}")
+
+
 def validate_source_tree(root: Path) -> ValidationResult:
     root = root.resolve()
     result = ValidationResult()
@@ -436,6 +489,9 @@ def validate_source_tree(root: Path) -> ValidationResult:
     validate_text_shape(root, result)
     validate_trigger_evals(root, result)
     validate_generated_sync(root, result)
+    validate_copilot_apply_to(root, result)
+    validate_release_workflow(root, result)
+    validate_prohibited_references(root, result)
     return result
 
 

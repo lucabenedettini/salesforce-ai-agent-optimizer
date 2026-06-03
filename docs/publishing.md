@@ -1,51 +1,83 @@
 # Publishing
 
-Salesforce AI Agent Optimizer is packaged as `salesforce-agent-optimizer` with the console command `sfao`.
+Salesforce Agent Optimizer is published as the Python package `salesforce-agent-optimizer` with the console command `sfao`.
 
-## Recommended: PyPI Trusted Publishing
+## PyPI Trusted Publishing
 
-Use PyPI Trusted Publishing from GitHub Actions.
+The repository expects PyPI Trusted Publishing from GitHub Actions.
 
-- No long-lived PyPI token is needed.
-- Configure the PyPI project with a trusted publisher for this GitHub repository and release workflow.
-- The release workflow runs only on tags matching `v*`.
-- The workflow validates the skill, runs tests, builds wheel/sdist, checks distributions, creates a skill ZIP, creates SHA256 checksums, creates `release-manifest.json`, uploads GitHub release artifacts, and publishes to PyPI only when trusted publishing is enabled.
+- No PyPI API token is required.
+- No `PYPI_API_TOKEN` secret should be used.
+- Publishing is triggered by pushing a tag matching `v*`.
+- The PyPI job runs only when repository variable `PUBLISH_TO_PYPI=true`.
+- The PyPI job uses GitHub environment `pypi`.
+- The PyPI job uses OIDC through `pypa/gh-action-pypi-publish@release/v1`.
 
-Do not hardcode tokens in GitHub Actions. Do not commit PyPI credentials.
+Tag a release:
 
-## Manual Fallback
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 
-Use manual publishing only from a clean working tree:
+## Required Local Checks
+
+Run these before tagging:
 
 ```bash
 python -m pip install -e ".[dev]"
-python scripts/sync_agent_instructions.py --check --json
-python scripts/validate_skill.py --json
-python scripts/self_test.py --json
-python -m pytest
-python -m ruff check .
 sfao validate
 python -m build
 python -m twine check dist/*
-python -m twine upload dist/*
 ```
 
-Keep credentials out of the repository. Prefer environment variables, keyring-backed auth, or a short-lived token entered interactively.
+The release workflow also runs generated-instruction checks, validation, self tests, pytest, ruff, wheel/sdist build, `twine check`, skill ZIP generation, checksum generation, and release manifest generation.
 
-## Release Artifacts
+## Release Assets
 
-Build GitHub release artifacts with:
-
-```bash
-python scripts/build_release_artifacts.py
-```
-
-The script creates:
+The workflow uploads:
 
 ```text
+dist/*.whl
+dist/*.tar.gz
 dist/salesforce-agent-optimizer-<version>-skill.zip
-dist/release-manifest.json
 dist/SHA256SUMS
+dist/release-manifest.json
 ```
 
-The manifest documents supported installers, agents, platforms, commands, skill paths, artifact sizes, and SHA256 checksums.
+It also uploads a GitHub Actions artifact named `python-package-distributions` containing:
+
+```text
+dist/*.whl
+dist/*.tar.gz
+```
+
+## Troubleshooting
+
+PyPI job skipped:
+
+- Confirm repository variable `PUBLISH_TO_PYPI=true`.
+- Confirm the tag matches `v*`.
+
+Trusted Publishing not configured:
+
+- Configure the PyPI project trusted publisher for this repository, workflow, and environment.
+- Confirm the GitHub environment is named `pypi`.
+
+Environment mismatch:
+
+- The workflow declares environment `pypi`; PyPI Trusted Publishing must match it.
+
+Package name already taken:
+
+- Confirm the PyPI project name is `salesforce-agent-optimizer`.
+
+Wheel or sdist missing:
+
+- Run `python -m build`.
+- Check that `dist/*.whl` and `dist/*.tar.gz` exist.
+
+Twine validation failure:
+
+- Run `python -m twine check dist/*`.
+- Fix README rendering, package metadata, or missing files before tagging again.
