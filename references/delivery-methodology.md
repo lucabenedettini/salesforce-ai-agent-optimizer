@@ -26,6 +26,7 @@ Consult project Knowledge first:
 - Read `references/salesforce-current-version.md` for release-sensitive API, SOAP, Metadata API, LWC API, Apex/Flow version, package, or `sourceApiVersion` planning.
 - Read only the matching product/package files under `references/products-packages/products/` or `references/products-packages/packages/`.
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
+- Read `references/least-privilege-planning.md` and apply least privilege during every planning phase, especially access, sharing, automation, integration, package, or UI exposure decisions.
 - Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, destructive changes, or source delete are possible.
 - Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
@@ -41,6 +42,7 @@ Inspect the smallest useful surface:
 - Changed/touched files, metadata folders, package directories, or manifests.
 - Relevant objects, fields, flows, Apex, LWC, permission sets, named credentials, custom metadata, and package dependencies.
 - Targeted org data through compact CLI output when needed.
+- Current org permissions for affected users/personas before planning access changes, using `scripts/sf_agent_cli.py access-inspect --target-org <alias> --username <user> --sobject <Object>` or a narrow `--where` filter. If the alias or personas are missing, ask before proposing the permission delta.
 
 Verify official guidance when needed:
 
@@ -57,12 +59,13 @@ Then produce a plan with:
 - Custom code only if justified.
 - Exact files/metadata expected to change.
 - Metadata dependency impact: permissions, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, reports, dashboards, and mobile exposure where relevant.
+- Least-privilege access plan: personas/users inspected, current access evidence, exact proposed permission delta, and why broader permissions are not needed.
 - Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
 - Destructive action scope and separate deletion approval needs, if any.
 
-Do not invent missing evidence. If a plan depends on an unknown product behavior, metadata dependency, package version, record set, or org state, ask the user for the missing fact or present multiple scenarios with tradeoffs and ask the user to choose.
+Do not invent missing evidence. If a plan depends on an unknown product behavior, metadata dependency, package version, record set, permission scope, user persona, or org state, ask the user for the missing fact or present multiple scenarios with tradeoffs and ask the user to choose.
 
 At the end of planning, ask whether the user wants an optional PDF containing all planned configuration/customization tasks, task explanations, metadata dependencies, and estimated execution time.
 

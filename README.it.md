@@ -1,12 +1,12 @@
 # Salesforce AI Agent Optimizer
 
-[English](README.md) | Italiano | [简体中文](README.zh-CN.md)
+[English](README.md) | Italiano | [Espanol](README.es.md) | [简体中文](README.zh-CN.md)
 
 Salesforce AI Agent Optimizer e' una skill pubblica con licenza MIT per agenti AI che lavorano su progetti Salesforce. Aiuta Codex, Claude Code, GitHub Copilot e agenti simili a pianificare, implementare, validare, pacchettizzare e documentare modifiche Salesforce usando poco contesto e guardrail di sicurezza forti.
 
 Il repository pubblico si chiama **Salesforce AI Agent Optimizer**. Il nome della skill Codex resta `salesforce-agent-optimizer`.
 
-Versione corrente: `0.4.0`
+Versione corrente: `0.5.0`
 
 ## Principi
 
@@ -14,6 +14,7 @@ Versione corrente: `0.4.0`
 - Efficienza token: usare progressive disclosure, Knowledge locale indicizzata, output CLI compatto, letture mirate e patch minimali.
 - Knowledge locale: `/sf-init-project-skill` crea un indice Markdown compatto dei metadata del progetto, ispirato al pattern LLM wiki.
 - CLI agent-native: `scripts/sf_agent_cli.py` avvolge la Salesforce CLI ufficiale con alias espliciti, JSON compatto, redazione segreti, dry-run, produzione read-only e blocco delete senza approvazione.
+- Least privilege: in pianificazione l'agente deve ispezionare i permessi attuali nella org per user/personas coinvolti e concedere solo l'accesso minimo necessario.
 - Niente invenzioni: se manca evidenza, l'agente deve chiedere allo user o presentare scenari con pro e contro.
 
 ## Guardrail Di Sicurezza
@@ -60,6 +61,12 @@ Leggere i package installati in una org:
 
 ```bash
 python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
+```
+
+Ispezionare l'accesso attuale prima di pianificare permessi:
+
+```bash
+python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
 ```
 
 Cancellare un record solo dopo approvazione esplicita:
@@ -156,6 +163,7 @@ La metodologia richiede:
 - GraphQL delete record: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
 - LWC `deleteRecord`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
 - Salesforce release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
+- Salesforce Well-Architected Secure: https://architect.salesforce.com/docs/architect/well-architected/guide/secure
 
 ## Licenza
 

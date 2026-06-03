@@ -16,6 +16,7 @@ Use this reference before planning any Salesforce change. Treat metadata as a de
 - Permission set groups depend on member permission sets and muting permission sets.
 - Permission sets and profiles can include object permissions, field permissions, Apex class access, Flow access, tab visibility, custom permissions, app visibility, connected app access, and setup entity access.
 - Plan changes to users, permission sets, groups, custom permissions, licenses, profiles, and sharing together.
+- Apply least privilege before planning access changes: inspect current org assignments for affected users/personas, prefer modular permission sets or permission set groups, and ask the user when the correct permission scope is unclear. See `references/least-privilege-planning.md`.
 
 ## Data Model Dependencies
 

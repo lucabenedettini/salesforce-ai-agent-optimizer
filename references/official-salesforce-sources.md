@@ -3,6 +3,9 @@
 Use these official Salesforce sources to refresh guidance when the task needs exact current wording, release-sensitive behavior, or citations. If local knowledge is uncertain or incomplete, search online in official Salesforce sources and prefer the latest available documentation or release guidance:
 
 - Salesforce Well-Architected overview: https://architect.salesforce.com/docs/architect/well-architected/guide/overview.html
+- Salesforce Well-Architected Secure and least privilege: https://architect.salesforce.com/docs/architect/well-architected/guide/secure
+- Configure permissions and access in permission sets: https://help.salesforce.com/s/articleView?id=platform.perm_sets_permissions_access.htm&language=en_US&type=5
+- PermissionSetAssignment profile-backed behavior: https://help.salesforce.com/s/articleView?id=000387815&language=en_US&type=1
 - Salesforce CLI plugin flag and JSON conventions: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/flags.html
 - Salesforce CLI command flags and standard org flags: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/command-flags.html
 - Salesforce CLI migration from `sfdx` to `sf`: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/migrate-sfdx-sf.html

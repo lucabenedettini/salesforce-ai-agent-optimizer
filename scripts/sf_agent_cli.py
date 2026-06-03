@@ -56,6 +56,7 @@ COMMANDS: list[CommandDoc] = [
     CommandDoc("data-record-create", "write", "Create one record. Blocked on production.", "sf data create record", True),
     CommandDoc("data-record-update", "write", "Update one record. Blocked on production.", "sf data update record", True),
     CommandDoc("data-record-delete", "write", "Delete one record. Blocked on production.", "sf data delete record", True),
+    CommandDoc("access-inspect", "read", "Inspect current user access for least-privilege planning.", "sf data query User + PermissionSetAssignment + ObjectPermissions + FieldPermissions", True),
     CommandDoc("apex-test-run", "execute", "Run Apex tests. Blocked on production.", "sf apex run test", True),
     CommandDoc("apex-test-report", "read", "Read an Apex test run report.", "sf apex get test", True),
     CommandDoc("apex-log-list", "read", "List Apex debug logs.", "sf apex list log", True),
@@ -207,6 +208,15 @@ def emit_result(completed: subprocess.CompletedProcess[str], args: argparse.Name
         text = text[: args.max_chars] + f"\n... [truncated to {args.max_chars} chars]"
     print(text)
     return completed.returncode
+
+
+def emit_payload(payload: Any, args: argparse.Namespace, returncode: int = 0) -> int:
+    payload = compact(redact(select_paths(payload, getattr(args, "select", None))), args.max_list)
+    text = json.dumps(payload, indent=2, sort_keys=True)
+    if len(text) > args.max_chars:
+        text = text[: args.max_chars] + f"\n... [truncated to {args.max_chars} chars]"
+    print(text)
+    return returncode
 
 
 def require_alias(args: argparse.Namespace) -> str:
@@ -386,6 +396,141 @@ def with_common_deploy_args(result: list[str], args: argparse.Namespace) -> list
     if getattr(args, "wait", None) is not None:
         result.extend(["--wait", str(args.wait)])
     return result
+
+
+def soql_literal(value: str) -> str:
+    return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+
+def soql_in(values: list[str]) -> str:
+    return "(" + ", ".join(soql_literal(value) for value in values) + ")"
+
+
+def build_user_where(args: argparse.Namespace) -> str:
+    clauses: list[str] = []
+    if getattr(args, "username", None):
+        clauses.append(f"Username IN {soql_in(args.username)}")
+    if getattr(args, "user_id", None):
+        clauses.append(f"Id IN {soql_in(args.user_id)}")
+    if getattr(args, "where", None):
+        clauses.append(f"({args.where})")
+    if not clauses:
+        raise SystemExit("access-inspect requires --username, --user-id, or --where. Ask the user which users/personas to inspect.")
+    return " AND ".join(clauses)
+
+
+def query_result(target_org: str, query: str, args: argparse.Namespace) -> tuple[dict[str, Any], int]:
+    completed = sf_run(["data", "query", "--target-org", target_org, "--query", query], args)
+    output = completed.stdout if completed.stdout.strip() else completed.stderr
+    try:
+        payload = json.loads(output)
+        result = payload.get("result", {})
+    except json.JSONDecodeError:
+        result = {"error": output}
+    return result, completed.returncode
+
+
+def result_records(result: dict[str, Any]) -> list[dict[str, Any]]:
+    records = result.get("records", [])
+    return records if isinstance(records, list) else []
+
+
+def access_inspect(args: argparse.Namespace) -> int:
+    target_org = require_alias(args)
+    user_where = build_user_where(args)
+    user_query = (
+        "SELECT Id, Username, Name, IsActive, UserType, ProfileId, Profile.Name, UserRoleId, UserRole.Name "
+        f"FROM User WHERE {user_where} LIMIT {args.limit}"
+    )
+    if args.dry_run:
+        payload = {
+            "dry_run": True,
+            "access_inspect": [
+                {"name": "users", "sf_command": [sf_binary(), "data", "query", "--target-org", target_org, "--query", user_query, "--json"]},
+                {
+                    "name": "permission_set_assignments",
+                    "query_template": "SELECT Id, AssigneeId, PermissionSetId, PermissionSet.Name, PermissionSet.Label, PermissionSet.IsOwnedByProfile, PermissionSetGroupId FROM PermissionSetAssignment WHERE AssigneeId IN (<User.Id values>)",
+                },
+                {
+                    "name": "permission_set_license_assignments",
+                    "query_template": "SELECT Id, AssigneeId, PermissionSetLicenseId FROM PermissionSetLicenseAssign WHERE AssigneeId IN (<User.Id values>)",
+                },
+                {
+                    "name": "object_and_field_permissions",
+                    "query_template": "Queried only when --sobject is provided; filters ObjectPermissions and FieldPermissions by inspected PermissionSetId values.",
+                },
+            ],
+        }
+        return emit_payload(payload, args)
+
+    users, user_code = query_result(target_org, user_query, args)
+    user_records = result_records(users)
+    user_ids = sorted({record.get("Id") for record in user_records if record.get("Id")})
+    payload: dict[str, Any] = {
+        "least_privilege_note": "Grant only permissions needed for the approved task. Ask the user when permission scope is unclear.",
+        "users": users,
+    }
+    returncode = user_code
+    if not user_ids:
+        payload["notes"] = ["No users matched the access-inspect filter."]
+        return emit_payload(payload, args, returncode)
+
+    user_ids_clause = soql_in(user_ids)
+    psa_query = (
+        "SELECT Id, AssigneeId, PermissionSetId, PermissionSet.Name, PermissionSet.Label, "
+        "PermissionSet.IsOwnedByProfile, PermissionSetGroupId "
+        f"FROM PermissionSetAssignment WHERE AssigneeId IN {user_ids_clause}"
+    )
+    assignments, assignment_code = query_result(target_org, psa_query, args)
+    payload["permission_set_assignments"] = assignments
+    returncode = max(returncode, assignment_code)
+
+    psl_query = f"SELECT Id, AssigneeId, PermissionSetLicenseId FROM PermissionSetLicenseAssign WHERE AssigneeId IN {user_ids_clause}"
+    license_assignments, license_code = query_result(target_org, psl_query, args)
+    payload["permission_set_license_assignments"] = license_assignments
+    returncode = max(returncode, license_code)
+
+    assignment_records = result_records(assignments)
+    permission_set_ids = sorted({record.get("PermissionSetId") for record in assignment_records if record.get("PermissionSetId")})
+    permission_set_group_ids = sorted({record.get("PermissionSetGroupId") for record in assignment_records if record.get("PermissionSetGroupId")})
+
+    if permission_set_group_ids:
+        psg_clause = soql_in(permission_set_group_ids)
+        groups, group_code = query_result(target_org, f"SELECT Id, DeveloperName, MasterLabel, Status FROM PermissionSetGroup WHERE Id IN {psg_clause}", args)
+        payload["permission_set_groups"] = groups
+        returncode = max(returncode, group_code)
+        component_query = (
+            "SELECT PermissionSetGroupId, PermissionSetId, PermissionSet.Name, PermissionSet.Label "
+            f"FROM PermissionSetGroupComponent WHERE PermissionSetGroupId IN {psg_clause}"
+        )
+        components, component_code = query_result(target_org, component_query, args)
+        payload["permission_set_group_components"] = components
+        returncode = max(returncode, component_code)
+
+    if args.sobject and permission_set_ids:
+        parent_clause = soql_in(permission_set_ids)
+        sobject_clause = soql_in(args.sobject)
+        object_query = (
+            "SELECT ParentId, SobjectType, PermissionsRead, PermissionsCreate, PermissionsEdit, PermissionsDelete, "
+            "PermissionsViewAllRecords, PermissionsModifyAllRecords "
+            f"FROM ObjectPermissions WHERE ParentId IN {parent_clause} AND SobjectType IN {sobject_clause} "
+            f"LIMIT {args.permission_limit}"
+        )
+        object_permissions, object_code = query_result(target_org, object_query, args)
+        payload["object_permissions"] = object_permissions
+        returncode = max(returncode, object_code)
+        field_query = (
+            "SELECT ParentId, SobjectType, Field, PermissionsRead, PermissionsEdit "
+            f"FROM FieldPermissions WHERE ParentId IN {parent_clause} AND SobjectType IN {sobject_clause} "
+            f"LIMIT {args.permission_limit}"
+        )
+        field_permissions, field_code = query_result(target_org, field_query, args)
+        payload["field_permissions"] = field_permissions
+        returncode = max(returncode, field_code)
+    elif not args.sobject:
+        payload["notes"] = ["ObjectPermissions and FieldPermissions skipped. Pass --sobject for affected objects to inspect CRUD/FLS."]
+
+    return emit_payload(payload, args, returncode)
 
 
 def flag_values(tokens: list[str], names: set[str]) -> list[str]:
@@ -733,6 +878,16 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--record-id", required=True)
     p.add_argument("--delete-approval", help=f"Required exact phrase: {DELETE_APPROVAL_PHRASE}")
     p.set_defaults(func=lambda a: run_simple("data-record-delete", ["data", "delete", "record", "--target-org", a.target_org, "--sobject", a.sobject, "--record-id", a.record_id, "--no-prompt"], a))
+
+    p = sub.add_parser("access-inspect", help=DOCS["access-inspect"].description)
+    common_org(p)
+    p.add_argument("--username", action="append", help="Username to inspect. Repeat for multiple users.")
+    p.add_argument("--user-id", action="append", help="User Id to inspect. Repeat for multiple users.")
+    p.add_argument("--where", help="SOQL condition for target users, for example IsActive = true AND Profile.Name = 'Sales'.")
+    p.add_argument("--sobject", action="append", help="Affected sObject API name for CRUD/FLS inspection. Repeat for multiple objects.")
+    p.add_argument("--limit", type=int, default=25, help="Maximum users to inspect.")
+    p.add_argument("--permission-limit", type=int, default=200, help="Maximum ObjectPermissions/FieldPermissions rows.")
+    p.set_defaults(func=access_inspect)
 
     p = sub.add_parser("apex-test-run", help=DOCS["apex-test-run"].description)
     common_org(p)

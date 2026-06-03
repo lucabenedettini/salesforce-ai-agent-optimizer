@@ -286,6 +286,25 @@ python scripts/sf_agent_cli.py data-record-delete --target-org dev-sandbox --sob
 
 Requires explicit user approval for the exact record before execution.
 
+### `access-inspect`
+
+Inspect current user access for least-privilege planning. Read-only.
+
+Maps to targeted `sf data query` calls against `User`, `PermissionSetAssignment`, `PermissionSetLicenseAssign`, optional `PermissionSetGroup`, and optional `ObjectPermissions`/`FieldPermissions`.
+
+Rules:
+
+- Ask the user for the target org alias before running it.
+- Require at least one target selector: `--username`, `--user-id`, or a narrow `--where` condition.
+- Pass `--sobject` for every affected object when planning CRUD/FLS changes.
+- Summarize the access delta in the plan; do not dump broad org permission data.
+- If the correct permission is unclear, ask the user or present scoped scenarios.
+
+```bash
+python scripts/sf_agent_cli.py access-inspect --target-org dev-sandbox --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
+python scripts/sf_agent_cli.py access-inspect --target-org dev-sandbox --where "IsActive = true AND Profile.Name = 'Sales User'" --sobject Opportunity --limit 10 --select users.records,permission_set_assignments.records
+```
+
 ### `apex-test-run`
 
 Run Apex tests. Blocked on production.

@@ -252,6 +252,25 @@ def test_agent_cli_guardrails() -> dict[str, object]:
         assert sf_min_delete.returncode != 0
         assert "Blocked destructive command" in (sf_min_delete.stdout + sf_min_delete.stderr)
 
+        access_inspect = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "access-inspect",
+                "--target-org",
+                "dev",
+                "--username",
+                "planner@example.com",
+                "--sobject",
+                "Account",
+                "--dry-run",
+            ],
+            cwd=root,
+        )
+        assert '"dry_run": true' in access_inspect.stdout
+        assert "PermissionSetAssignment" in access_inspect.stdout
+        assert "ObjectPermissions" in access_inspect.stdout
+
         return {
             "missing_history_details_blocked": True,
             "dry_run_no_history": True,
@@ -260,6 +279,7 @@ def test_agent_cli_guardrails() -> dict[str, object]:
             "delete_approval_allows_dry_run": True,
             "safe_run_delete_missing_approval_blocked": True,
             "sf_min_destructive_blocked": True,
+            "access_inspect_dry_run": True,
         }
 
 
@@ -428,6 +448,7 @@ def test_multilingual_readmes() -> dict[str, object]:
     files = {
         "en": ROOT / "README.md",
         "it": ROOT / "README.it.md",
+        "es": ROOT / "README.es.md",
         "zh": ROOT / "README.zh-CN.md",
     }
     checks: dict[str, object] = {}
@@ -436,6 +457,7 @@ def test_multilingual_readmes() -> dict[str, object]:
         checks[f"{language}_exists"] = path.exists()
         checks[f"{language}_version"] = version in text
         checks[f"{language}_delete_guardrail"] = "I explicitly approve this deletion" in text
+        checks[f"{language}_least_privilege"] = "Least privilege" in text or "least privilege" in text
     assert all(checks.values())
     return checks
 

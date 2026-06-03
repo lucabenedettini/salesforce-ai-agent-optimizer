@@ -1,12 +1,12 @@
 # Salesforce AI Agent Optimizer
 
-English | [Italiano](README.it.md) | [简体中文](README.zh-CN.md)
+English | [Italiano](README.it.md) | [Espanol](README.es.md) | [简体中文](README.zh-CN.md)
 
 Salesforce AI Agent Optimizer is a public MIT-licensed skill for AI agents that work on Salesforce projects. It helps Codex, Claude Code, GitHub Copilot, and similar agents plan, implement, validate, package, and document Salesforce changes with compact context usage and strong safety guardrails.
 
 The public repository is **Salesforce AI Agent Optimizer**. The Codex skill name remains `salesforce-agent-optimizer`.
 
-Current version: `0.4.0`
+Current version: `0.5.0`
 
 ## Core Principles
 
@@ -14,6 +14,7 @@ Current version: `0.4.0`
 - Token efficiency: use progressive disclosure, indexed local Knowledge, compact CLI output, targeted source reads, and minimal patches.
 - Local Knowledge: `/sf-init-project-skill` builds a compact Markdown index of project metadata inspired by the LLM wiki pattern.
 - Agent-native CLI: `scripts/sf_agent_cli.py` wraps official Salesforce CLI commands with aliases, compact JSON, redaction, dry-run, production read-only protection, and delete approval enforcement.
+- Least privilege: planning must inspect current org permissions for affected users/personas and grant only the minimum access needed.
 - No invention: when evidence is missing, the agent must ask the user or present scenarios with tradeoffs.
 
 ## Safety Guardrails
@@ -60,6 +61,12 @@ Inspect installed packages in a target org:
 
 ```bash
 python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
+```
+
+Inspect current user access before planning permission changes:
+
+```bash
+python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
 ```
 
 Delete a record only after explicit approval:
@@ -156,6 +163,7 @@ The delivery methodology requires:
 - GraphQL delete record: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
 - LWC `deleteRecord`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
 - Salesforce release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
+- Salesforce Well-Architected Secure: https://architect.salesforce.com/docs/architect/well-architected/guide/secure
 
 ## License
 

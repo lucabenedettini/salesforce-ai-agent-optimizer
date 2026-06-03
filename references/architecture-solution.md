@@ -12,6 +12,7 @@
 
 Trusted:
 - Enforce least privilege with permission sets, permission set groups, sharing, restriction rules, scopes, named credentials, and secure guest access.
+- Inspect current target-org permissions for affected personas/users before proposing access changes; ask the user when the correct permission boundary is unclear.
 - Avoid exposing sensitive fields through Apex, LWC, reports, Experience Cloud, or integration payloads.
 - Include auditability, monitoring, rollback, backup, and data retention.
 

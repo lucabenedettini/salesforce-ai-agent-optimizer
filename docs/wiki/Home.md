@@ -12,6 +12,7 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Product and AppExchange package context before planning.
 - Current Salesforce release/API/SOAP/package version context with `/sf-version-update-skill`.
 - Metadata dependency planning.
+- Least-privilege planning with current-org access inspection before permission changes.
 - Testing guardrails for Apex, Flow, and other testable metadata.
 - Required package.xml generation for added or modified metadata.
 - Destructive-operation approval guardrails for data and metadata deletion.
@@ -24,7 +25,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.4.0`
+- Current version: `0.5.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 
@@ -40,8 +41,9 @@ Before planning, an agent should:
 2. Read `references/salesforce-current-version.md` for release/API/package-sensitive work.
 3. Read only relevant product/package files.
 4. Read `references/metadata-dependencies.md`.
-5. Read the local project Knowledge.
-6. Inspect source metadata before modifying.
+5. Read `references/least-privilege-planning.md` for access, sharing, UI, integration, automation, or package exposure.
+6. Read the local project Knowledge.
+7. Inspect source metadata and targeted org access before modifying.
 
 At the end of development, the agent asks whether to generate delivery artifacts using `references/completion-artifacts.md`.
 

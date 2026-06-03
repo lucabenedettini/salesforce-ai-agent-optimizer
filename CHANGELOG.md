@@ -8,6 +8,19 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.5.0 - 2026-06-03
+
+### Added
+
+- Added mandatory least-privilege planning guardrails for Salesforce access, sharing, integration, package, automation, and UI exposure decisions.
+- Added `references/least-privilege-planning.md` with current-org access inspection, persona-based planning, uncertainty handling, and official Salesforce source links.
+- Added read-only `access-inspect` to `scripts/sf_agent_cli.py` for compact inspection of users, permission set assignments, permission set groups, permission set licenses, and relevant CRUD/FLS.
+- Added Spanish README and self-test coverage for multilingual README least-privilege alignment.
+
+### Changed
+
+- Updated delivery methodology, metadata dependency planning, architecture guidance, agent adapters, README files, wiki sources, and official-source links so access changes are planned from current org evidence.
+
 ## 0.4.0 - 2026-06-03
 
 ### Added

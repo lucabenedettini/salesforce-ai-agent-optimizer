@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`0.5.0` adds least-privilege planning guardrails, Spanish README, and the read-only `access-inspect` command for current-org permission evidence.
+
 `0.4.0` adds destructive-operation approval guardrails, CLI enforcement for delete/uninstall/destructive commands, and English/Italian/Simplified Chinese README files.
 
 `0.3.0` adds `/sf-version-update-skill`, current Salesforce release/API/SOAP/package version context, and repeatable version-resource refresh.

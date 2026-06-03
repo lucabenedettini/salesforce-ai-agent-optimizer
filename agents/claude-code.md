@@ -8,9 +8,10 @@ Follow these rules:
 - Treat `/sf-init-project-skill` as a command to inspect Salesforce metadata and build or refresh `.salesforce-agent-knowledge/` with `scripts/sf_knowledge_init.py`.
 - Treat `/sf-version-update-skill` as a command to search official Salesforce sources for the latest production release/API/SOAP/package guidance and update `references/salesforce-current-version.md` plus related resources.
 - Before every modification, consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages under `metadata/`, and `history/project-history.md`; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
-- Before planning, identify relevant Salesforce products/packages using `references/products-packages/index.md`, read the matching product/package files, and use `references/metadata-dependencies.md` to plan access, field, layout, Lightning page, record type, picklist, automation, code, integration, sharing, analytics, package, and mobile dependencies.
+- Before planning, identify relevant Salesforce products/packages using `references/products-packages/index.md`, read the matching product/package files, and use `references/metadata-dependencies.md` plus `references/least-privilege-planning.md` to plan access, field, layout, Lightning page, record type, picklist, automation, code, integration, sharing, analytics, package, and mobile dependencies.
 - Before release-sensitive API, SOAP, Metadata API, LWC API, Apex/Flow version, or package planning, read `references/salesforce-current-version.md`; refresh it if stale.
 - For Salesforce org access, use `scripts/sf_agent_cli.py`; ask for the org alias, authenticate with `auth-web`, `auth-device`, or `auth-jwt`, use `safe-run` for official commands without a first-class wrapper, and never perform write/execute commands on production.
+- Apply least privilege during every planning phase. Inspect current org permissions for affected users/personas with `access-inspect` before proposing access changes; if unsure which permission to grant, ask the user explicitly.
 - Prefer Salesforce configuration and standard product capabilities before custom code.
 - Make minimal patches and avoid unrelated refactors.
 - Never invent missing Salesforce facts; if evidence is unclear, ask the user or present scenarios with tradeoffs.
