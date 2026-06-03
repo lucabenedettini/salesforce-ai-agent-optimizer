@@ -5,183 +5,371 @@ English | [Italiano](README.it.md) | [Espanol](README.es.md) | [简体中文](RE
 [![Validate Skill](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml/badge.svg)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/lucabenedettini/salesforce-ai-agent-optimizer)](https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/releases)
-[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#installation)
+[![Agents](https://img.shields.io/badge/agents-Codex%20%7C%20Claude%20Code%20%7C%20GitHub%20Copilot-blue)](#what-sfao-installs)
 
-Salesforce AI Agent Optimizer is a public MIT-licensed skill for AI agents that work on Salesforce projects. It helps Codex, Claude Code, GitHub Copilot, and similar agents plan, implement, validate, package, and document Salesforce changes with compact context usage and strong safety guardrails.
+Salesforce AI Agent Optimizer is a public MIT-licensed Salesforce skill and CLI for Codex, Claude Code, GitHub Copilot, and compatible AI coding agents.
 
-The public repository is **Salesforce AI Agent Optimizer**. The Codex skill name remains `salesforce-agent-optimizer`.
+It preserves the existing Salesforce methodology: Salesforce-first solutioning, configuration before custom code, minimal reversible changes, token-efficient progressive disclosure, project Knowledge, safe Salesforce CLI usage, explicit org aliases, least privilege, no invented behavior, destructive-operation guardrails, package.xml generation, and current Salesforce version context from official sources.
 
-Current version: `0.6.0`
+Current version: `0.6.1`
 
-## Core Principles
+## Quick Start
 
-- Salesforce first: prefer standard capabilities, configuration, Flow, permission sets, LDS/UI API, named credentials, and managed package features before custom Apex, LWC, triggers, or integrations.
-- Token efficiency: use progressive disclosure, indexed local Knowledge, compact CLI output, targeted source reads, and minimal patches.
-- Local Knowledge: `/sf-init-project-skill` builds a compact Markdown index of project metadata inspired by the LLM wiki pattern.
-- Agent-native CLI: `scripts/sf_agent_cli.py` wraps official Salesforce CLI commands with aliases, compact JSON, redaction, dry-run, production read-only protection, and delete approval enforcement.
-- Least privilege: planning must inspect current org permissions for affected users/personas and grant only the minimum access needed.
-- No invention: when evidence is missing, the agent must ask the user or present scenarios with tradeoffs.
-
-## Safety Guardrails
-
-- Production orgs are read-only for write, execute, and destructive operations through the facade.
-- Every org/data/metadata command requires an explicit target org alias.
-- Destructive operations are never automatic. Data delete, metadata delete, package uninstall, source delete, purge, hard delete, and `destructiveChanges.xml` deploys require separate user approval for the exact scope.
-- The CLI blocks destructive commands unless this exact flag is provided after user approval:
+Recommended CLI-tool install:
 
 ```bash
---delete-approval "I explicitly approve this deletion"
+uv tool install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
 ```
 
-- Deleted metadata belongs in `destructiveChanges.xml`, not `package.xml`.
-- If a record set, metadata dependency, package version, or org behavior is uncertain, the agent must ask or present options.
-
-## Main Commands
-
-Build or refresh project Knowledge:
-
-```text
-/sf-init-project-skill
-```
-
-Refresh Salesforce release/API/SOAP/package version context from official Salesforce sources:
-
-```text
-/sf-version-update-skill
-```
-
-Run local tests:
+If the PyPI package is not available yet, install from GitHub:
 
 ```bash
-python scripts/sync_agent_instructions.py --check
-python scripts/validate_skill.py
+uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
+
+## Install From PyPI
+
+Use `uv tool install` for the cleanest isolated command install:
+
+```bash
+uv tool install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
+```
+
+Alternative with `pipx`:
+
+```bash
+pipx install salesforce-agent-optimizer
+sfao install --project --platform all
+sfao doctor
+```
+
+Plain `pip install salesforce-agent-optimizer` works, but `uv tool install` or `pipx install` is preferred for CLI tools because it keeps `sfao` in an isolated environment.
+
+## Install From GitHub
+
+Before PyPI publishing, install directly from the public repository:
+
+```bash
+pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
+
+Or with `uv`:
+
+```bash
+uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install --project --platform all
+sfao doctor
+```
+
+## Local Development Install
+
+```bash
+git clone https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+cd salesforce-ai-agent-optimizer
+python -m pip install -e ".[dev]"
+sfao version
+sfao doctor
+sfao install --project --platform all
+sfao validate
+```
+
+## What sfao Installs
+
+`sfao install` copies packaged templates with generated-file markers. It does not use symlinks and does not overwrite user-edited files silently.
+
+Codex project install:
+
+```text
+.agents/skills/salesforce-agent-optimizer/SKILL.md
+.agents/skills/salesforce-agent-optimizer/references/
+.agents/skills/salesforce-agent-optimizer/scripts/
+.agents/skills/salesforce-agent-optimizer/agents/openai.yaml
+```
+
+Claude Code project install:
+
+```text
+.claude/skills/salesforce-agent-optimizer/SKILL.md
+.claude/skills/salesforce-agent-optimizer/references/
+.claude/skills/salesforce-agent-optimizer/scripts/
+```
+
+GitHub Copilot project install:
+
+```text
+AGENTS.md
+.github/copilot-instructions.md
+.github/instructions/salesforce-agent-optimizer.instructions.md
+```
+
+Generated files contain:
+
+```md
+<!-- Generated by salesforce-agent-optimizer. Managed by sfao. -->
+```
+
+If a target file exists without that marker, `sfao install` skips it and prints a warning.
+
+## Install For All Agents
+
+Run from the Salesforce project root:
+
+```bash
+sfao install --project --platform all
+sfao doctor
+sfao validate
+```
+
+## Install Only For Codex
+
+```bash
+sfao install --project --platform codex
+sfao doctor
+```
+
+For user-scoped Codex installation:
+
+```bash
+sfao install --platform codex
+```
+
+## Install Only For Claude Code
+
+```bash
+sfao install --project --platform claude
+sfao doctor
+```
+
+For user-scoped Claude Code installation:
+
+```bash
+sfao install --platform claude
+```
+
+## Install Only For GitHub Copilot
+
+GitHub Copilot instructions are repository-scoped:
+
+```bash
+sfao install --project --platform copilot
+sfao doctor
+```
+
+## Validate Installation
+
+Use:
+
+```bash
+sfao doctor
+sfao validate
+```
+
+`sfao doctor` checks Python, OS, Git, Salesforce CLI `sf`, Git repository state, Salesforce DX project hints, agent adapter files, generated markers, YAML/TOML validity, Python compile status, and version alignment.
+
+`sfao validate` validates either this source repository or a project installation, depending on the current directory.
+
+## Update
+
+Upgrade the CLI package:
+
+```bash
+uv tool upgrade salesforce-agent-optimizer
+sfao update
+sfao doctor
+```
+
+Alternative:
+
+```bash
+pipx upgrade salesforce-agent-optimizer
+sfao update
+sfao doctor
+```
+
+`sfao update` is present in `v0.6.1` but is not fully implemented safely yet. For now, rerun:
+
+```bash
+sfao install --project --platform all
+sfao doctor
+```
+
+Generated files are updated only when they are still marked as managed by `sfao`.
+
+## Uninstall
+
+Planned command:
+
+```bash
+sfao uninstall
+uv tool uninstall salesforce-agent-optimizer
+```
+
+Alternative:
+
+```bash
+sfao uninstall
+pipx uninstall salesforce-agent-optimizer
+```
+
+`sfao uninstall` is present in `v0.6.1` but is not fully implemented safely yet. Remove generated project files manually only after confirming they still contain the generated-file marker.
+
+## Build From Source
+
+```bash
+python -m pip install -e ".[dev]"
+python -m build
+```
+
+Expected artifacts:
+
+```text
+dist/
+├─ salesforce_agent_optimizer-0.6.1-py3-none-any.whl
+└─ salesforce_agent_optimizer-0.6.1.tar.gz
+```
+
+Check package metadata before publishing:
+
+```bash
+python -m twine check dist/*
+```
+
+Build release ZIP, checksum, and manifest:
+
+```bash
+python scripts/build_release_artifacts.py
+```
+
+## Publish And Release
+
+Publishing details are in `docs/publishing.md`.
+
+Recommended release flow:
+
+```bash
+python -m pip install -e ".[dev]"
+python scripts/sync_agent_instructions.py --check --json
+python scripts/validate_skill.py --json
 python scripts/self_test.py --json
 python -m pytest
+python -m ruff check .
+sfao validate
+python -m build
+python -m twine check dist/*
+python scripts/build_release_artifacts.py
 ```
 
-Generate a package manifest for added or modified metadata:
+PyPI publishing should use Trusted Publishing from GitHub Actions. Do not commit PyPI tokens or credentials.
 
-```bash
-python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<date>-<change>/package.xml --from-git-status
-```
+## Manual Installation Fallback
 
-Inspect installed packages in a target org:
-
-```bash
-python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
-```
-
-Inspect current user access before planning permission changes:
-
-```bash
-python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username user@example.com --sobject Account --select users.records,permission_set_assignments.records,object_permissions.records,field_permissions.records
-```
-
-Delete a record only after explicit approval:
-
-```bash
-python scripts/sf_agent_cli.py data-record-delete --target-org <alias> --sobject Account --record-id 001... --delete-approval "I explicitly approve this deletion"
-```
-
-## Installation
-
-Ask Codex:
+If Python packaging tools are unavailable, users can still copy this repository into an agent-specific skill folder:
 
 ```text
-Install the Salesforce AI Agent Optimizer skill from https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
+.agents/skills/salesforce-agent-optimizer
+.claude/skills/salesforce-agent-optimizer
 ```
 
-Codex installer command:
+For GitHub Copilot, copy:
+
+```text
+AGENTS.md
+.github/copilot-instructions.md
+.github/instructions/salesforce-agent-optimizer.instructions.md
+```
+
+The `sfao` installer is preferred because it uses package templates, generated markers, and safe overwrite rules.
+
+## Troubleshooting
+
+`sfao: command not found`: close and reopen the terminal, then verify that the `uv`, `pipx`, or Python user scripts directory is on PATH.
+
+`uv: command not found`: install `uv` first or use `pipx install salesforce-agent-optimizer`.
+
+When to use `pipx`: use `pipx` when you want an isolated CLI install and do not use `uv`.
+
+When plain `pip install` is acceptable: use it in a virtual environment, CI job, or temporary GitHub install test.
+
+Windows PATH issues: Python often installs console scripts under `%APPDATA%\Python\PythonXY\Scripts`; add that directory to PATH if `sfao` is not found.
+
+PowerShell execution policy: `sfao` is a Python console script and normally does not require changing execution policy. If an environment blocks scripts globally, prefer `python -m pipx` or `uv tool run`.
+
+Salesforce CLI `sf` not found: install the official Salesforce CLI and ensure `sf` is on PATH. The skill never replaces the official Salesforce CLI.
+
+PyPI package not found yet: use the GitHub install commands until the first PyPI release is published.
+
+Invalid YAML/frontmatter: run `sfao validate --json` and check `SKILL.md`, generated skill shims, `agents/openai.yaml`, and GitHub Actions workflows.
+
+Skill not visible in Codex: run `sfao install --project --platform codex`, then verify `.agents/skills/salesforce-agent-optimizer/SKILL.md`.
+
+Skill not visible in Claude Code: run `sfao install --project --platform claude`, then verify `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
+
+Copilot instructions not loading: verify `.github/copilot-instructions.md`, `.github/instructions/salesforce-agent-optimizer.instructions.md`, and repository Copilot instruction support.
+
+Stale generated files: run `python scripts/sync_agent_instructions.py --check --json` in this repository, or rerun `sfao install --project --platform all` in a project.
+
+Version mismatch: check `VERSION`, `pyproject.toml`, `SKILL.md`, generated skill shims, `agents/openai.yaml`, and `CHANGELOG.md`.
+
+## Windows And PowerShell Notes
+
+Use quotes around editable installs:
+
+```powershell
+python -m pip install -e ".[dev]"
+```
+
+If `sfao` is installed but not found, run:
+
+```powershell
+python -m site --user-base
+```
+
+Then add the `Scripts` folder under that path to PATH.
+
+## Privacy And Safety
+
+- Do not put Salesforce credentials, tokens, org secrets, customer data, or production record samples in issues, logs, screenshots, or Knowledge files.
+- Every org/data/metadata operation must use an explicit org alias.
+- Production orgs are read-only through the safe Salesforce CLI facade.
+- Destructive operations require separate explicit approval for the exact target org and scope.
+- The CLI facade requires `--delete-approval "I explicitly approve this deletion"` before supported destructive commands can run.
+- When Salesforce behavior, package version, permission scope, or record scope is unclear, the agent must ask the user or present scenarios.
+
+## Backward Compatibility
+
+The CLI packaging does not redesign the Salesforce workflow. Existing files remain valid:
+
+- `SKILL.md`
+- `AGENTS.md`
+- `agents/`
+- `references/`
+- `scripts/`
+- `.agents/skills/salesforce-agent-optimizer/SKILL.md`
+- `.claude/skills/salesforce-agent-optimizer/SKILL.md`
+- `.github/copilot-instructions.md`
+
+The `sfao` CLI adds a frictionless installation and validation layer over the same skill behavior.
+
+## Contributing
+
+Read `CONTRIBUTING.md`, then run:
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
+python -m pip install -e ".[dev]"
+python scripts/sync_agent_instructions.py --check --json
+python scripts/validate_skill.py --json
+python scripts/self_test.py --json
+python -m pytest
+python -m ruff check .
+sfao validate
 ```
-
-Codex native paths:
-
-- Repo skill: `.agents/skills/salesforce-agent-optimizer`
-- User skill: `$HOME/.agents/skills/salesforce-agent-optimizer`
-
-Claude Code:
-
-- Install or keep the skill at `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
-- Optionally merge `agents/claude-code.md` into `CLAUDE.md`.
-- Copy `agents/sf-init-project-skill.md` to `.claude/commands/sf-init-project-skill.md`.
-- Copy `agents/sf-version-update-skill.md` to `.claude/commands/sf-version-update-skill.md`.
-
-GitHub Copilot:
-
-- Use `AGENTS.md`, `.github/copilot-instructions.md`, and `.github/instructions/salesforce-agent-optimizer.instructions.md`.
-
-## Prerequisites
-
-- Python 3.10+.
-- Git.
-- Salesforce DX project for metadata Knowledge, deploy, retrieve, or manifest workflows.
-- Official Salesforce CLI available as `sf` for org operations.
-- Authenticated org aliases. The agent must ask for aliases and must not rely on default orgs.
-- Sandbox org for write/execute operations. Production is read-only.
-
-Optional:
-
-- PyYAML for Codex skill validation.
-- Node.js/npm to install Salesforce CLI with `npm install -g @salesforce/cli`.
-- Go and `cli-printing-press` only for CLI experimentation.
-
-## Version Context
-
-Verified on 2026-06-03:
-
-- Salesforce release: Summer '26.
-- Platform API, Metadata API, SOAP API: `67.0`.
-- SOAP API `login()` is unavailable in API `65.0+`; Salesforce announced retirement of SOAP `login()` for API `31.0-64.0` with Summer '27.
-- Managed package versions are target-org-specific. Inspect installed packages before assuming namespace, object names, or feature availability.
-
-Canonical resources:
-
-- `references/salesforce-current-version.md`
-- `references/salesforce-version.json`
-- `references/version-update.md`
-
-## Validation And Handoff
-
-The delivery methodology requires:
-
-- Restate the request.
-- Ask focused questions only when needed.
-- Identify relevant Salesforce products/packages and metadata dependencies.
-- Plan minimal changes and ask for approval.
-- Ask separately for destructive approval when needed.
-- Implement only approved work.
-- Generate `package.xml` for added/modified metadata.
-- Offer release notes, technical specifications, impact assessment, user testing, and manual procedure files.
-- Validate with tests or a validation subagent.
-- Ask whether to push and which branch after validation passes.
-
-## Key Files
-
-- `SKILL.md`: canonical skill instructions.
-- `agents/`: Codex, Claude Code, GitHub Copilot, and slash-command adapters.
-- `references/`: progressive-disclosure guidance for Salesforce architecture, products, CLI, testing, deletion, versions, and delivery.
-- `references/routing.md`: compact reference-loading map for token-efficient planning.
-- `scripts/sf_agent_cli.py`: safe Salesforce CLI facade.
-- `scripts/sync_agent_instructions.py`: generator for agent-specific instruction adapters.
-- `scripts/sf_knowledge_init.py`: local metadata Knowledge generator.
-- `scripts/generate_package_manifest.py`: `package.xml` generator.
-- `scripts/git_knowledge_push.py`: remote push with Knowledge history.
-- `scripts/self_test.py`: cross-platform local tests.
-- `evals/trigger-evals.json`: trigger examples for when the skill should and should not activate.
-
-## Official Sources
-
-- Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
-- Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
-- Metadata API deploy and destructive changes: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
-- GraphQL delete record: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
-- LWC `deleteRecord`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
-- Salesforce release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
-- Salesforce Well-Architected Secure: https://architect.salesforce.com/docs/architect/well-architected/guide/secure
-
-## License
 
 MIT. Everyone can use, copy, modify, distribute, and fork this repository under the terms in `LICENSE`.

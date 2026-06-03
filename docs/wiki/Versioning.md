@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`0.6.1` is a packaging and installer hotfix for `pip`, `pipx`, `uv`, the `sfao` CLI, packaged templates, release artifacts, and installer validation.
+
 `0.6.0` is an instruction architecture refactor with concise routing, generated agent adapters, trigger evals, pytest coverage, and public maintenance files.
 
 `0.5.1` is a compatibility hotfix for valid skill frontmatter, native agent install targets, local validation, and minimal cross-platform CI.

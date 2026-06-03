@@ -1,0 +1,40 @@
+{
+  "last_verified_date": "2026-06-03",
+  "current_release": "Summer '26",
+  "current_platform_api_version": "67.0",
+  "current_metadata_api_version": "67.0",
+  "current_soap_api_version": "67.0",
+  "production_rollout_note": "Confirm the target org release before changing project sourceApiVersion because Salesforce releases roll out by org and instance.",
+  "package_version_policy": "Do not assume managed package versions from public docs. Inspect installed packages in the target org and use official package release notes only when available.",
+  "soap_login_policy": "SOAP API login() is unavailable in API versions 65.0 and later. Salesforce has announced retirement for login() in SOAP API versions 31.0 through 64.0 with Summer '27.",
+  "sources": [
+    {
+      "label": "Salesforce Summer '26 Release Notes",
+      "url": "https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
+    },
+    {
+      "label": "Salesforce Summer '26 API Release Notes",
+      "url": "https://help.salesforce.com/s/articleView?id=release-notes.rn_api.htm&language=en_US&type=5"
+    },
+    {
+      "label": "Salesforce Summer '26 SOAP API Release Notes",
+      "url": "https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soap.htm&language=en_US&type=5"
+    },
+    {
+      "label": "Platform SOAP API login() Retirement",
+      "url": "https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1"
+    },
+    {
+      "label": "Salesforce API and Data Loader versions",
+      "url": "https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1"
+    },
+    {
+      "label": "Version Lightning Web Components",
+      "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-version-components.html"
+    },
+    {
+      "label": "Metadata Coverage Report",
+      "url": "https://developer.salesforce.com/docs/metadata-coverage"
+    }
+  ]
+}

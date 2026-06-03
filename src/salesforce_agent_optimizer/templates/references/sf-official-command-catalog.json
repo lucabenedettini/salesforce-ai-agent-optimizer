@@ -1,0 +1,2793 @@
+{
+  "commands": [
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:activate",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Activate an agent in an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:create",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Create an agent in your org using a local agent spec file."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:deactivate",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Deactivate an agent in an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:generate:agent-spec",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": "Generate an agent spec, which is a YAML file that captures what an agent can do."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:generate:authoring-bundle",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": "Generate an authoring bundle from an existing agent spec YAML file."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:generate:template",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate an agent template from an existing agent in your DX project so you can then package the template in a second-generation managed package."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:generate:test-spec",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate an agent test spec, which is a YAML file that lists the test cases for testing a specific agent."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:preview",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Interact with an agent to preview how it responds to your statements, questions, and commands (utterances)."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:preview:end",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "End an existing programmatic agent preview session and get trace location."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:preview:send",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Send a message to an existing agent preview session."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:preview:sessions",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "List all known programmatic agent preview sessions."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:preview:start",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Start a programmatic agent preview session."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:publish:authoring-bundle",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Publish an authoring bundle to your org, which results in a new agent or a new version of an existing agent."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:create",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create an agent test in your org using a local test spec YAML file."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:list",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List the available agent tests in your org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:results",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Get the results of a completed agent test run."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:resume",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume an agent test that you previously started in your org so you can view the test results."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:run",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Start an agent test in your org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:test:run-eval",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Run rich evaluation tests against an Agentforce agent."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:trace:delete",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Delete trace files from an agent preview session."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:trace:list",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "List the available trace files that were recorded during all agent preview sessions."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "agent:trace:read",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Read trace files from an agent preview session."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "agent:validate:authoring-bundle",
+      "plugin": "@salesforce/plugin-agent",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": "Validate an authoring bundle to ensure its Agent Script file compiles successfully and can be used to publish an agent."
+    },
+    {
+      "aliases": [
+        "force:alias:list"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "alias:list",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all aliases currently set on your local computer."
+    },
+    {
+      "aliases": [
+        "force:alias:set"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "alias:set",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Set one or more aliases on your local computer."
+    },
+    {
+      "aliases": [
+        "force:alias:unset"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "alias:unset",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Unset one or more aliases that are currently set on your local computer."
+    },
+    {
+      "aliases": [
+        "force:apex:log:get"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:get:log",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Fetch the specified log or given number of most recent logs from the org."
+    },
+    {
+      "aliases": [
+        "force:apex:test:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:get:test",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display test results for a specific asynchronous test run."
+    },
+    {
+      "aliases": [
+        "force:apex:log:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:list:log",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display a list of IDs and general information about debug logs."
+    },
+    {
+      "aliases": [
+        "force:apex:execute"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:run",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Execute anonymous Apex code entered on the command line or from a local file."
+    },
+    {
+      "aliases": [
+        "force:apex:test:run"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:run:test",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Invoke Apex tests in an org."
+    },
+    {
+      "aliases": [
+        "force:apex:log:tail"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "apex:tail:log",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Activate debug logging and display logs in the terminal."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "api:request:graphql",
+      "plugin": "@salesforce/plugin-api",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Execute a GraphQL statement."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "api:request:rest",
+      "plugin": "@salesforce/plugin-api",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Make an authenticated HTTP request using the Salesforce REST API."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "autocomplete",
+      "plugin": "@oclif/plugin-autocomplete",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "force:cmdt:field:create",
+        "cmdt:field:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "cmdt:generate:field",
+      "plugin": "@salesforce/plugin-custom-metadata",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate a field for a custom metadata type based on the provided field type."
+    },
+    {
+      "aliases": [
+        "force:cmdt:generate"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "cmdt:generate:fromorg",
+      "plugin": "@salesforce/plugin-custom-metadata",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": "Generate a custom metadata type and all its records from a Salesforce object."
+    },
+    {
+      "aliases": [
+        "force:cmdt:create",
+        "cmdt:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "cmdt:generate:object",
+      "plugin": "@salesforce/plugin-custom-metadata",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate a new custom metadata type in the current project."
+    },
+    {
+      "aliases": [
+        "force:cmdt:record:create",
+        "cmdt:record:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "cmdt:generate:record",
+      "plugin": "@salesforce/plugin-custom-metadata",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate a new record for a given custom metadata type in the current project."
+    },
+    {
+      "aliases": [
+        "force:cmdt:record:insert",
+        "cmdt:record:insert"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "cmdt:generate:records",
+      "plugin": "@salesforce/plugin-custom-metadata",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate new custom metadata type records from a CSV file."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "code-analyzer:config",
+      "plugin": "@salesforce/plugin-code-analyzer",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Output the current state of configuration for Code Analyzer."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "code-analyzer:rules",
+      "plugin": "@salesforce/plugin-code-analyzer",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List the rules that are available to analyze your code."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "code-analyzer:run",
+      "plugin": "@salesforce/plugin-code-analyzer",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Analyze your code with a selection of rules to ensure good coding practices."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "commands",
+      "plugin": "@oclif/plugin-commands",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "force:community:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "community:create",
+      "plugin": "@salesforce/plugin-community",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create an Experience Cloud site using a template."
+    },
+    {
+      "aliases": [
+        "force:community:template:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "community:list:template",
+      "plugin": "@salesforce/plugin-community",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve the list of templates available in your org."
+    },
+    {
+      "aliases": [
+        "force:community:publish"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "community:publish",
+      "plugin": "@salesforce/plugin-community",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Publish an Experience Builder site to make it live."
+    },
+    {
+      "aliases": [
+        "force:config:get"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "config:get",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Get the value of a configuration variable."
+    },
+    {
+      "aliases": [
+        "force:config:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "config:list",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "List the configuration variables that you've previously set."
+    },
+    {
+      "aliases": [
+        "force:config:set"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "config:set",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Set one or more configuration variables, such as your default org."
+    },
+    {
+      "aliases": [
+        "force:config:unset"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "config:unset",
+      "plugin": "@salesforce/plugin-settings",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Unset local or global configuration variables."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:bulk:results",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Get the results of a bulk ingest job that you previously ran."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:create:file",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Upload a local file to an org."
+    },
+    {
+      "aliases": [
+        "force:data:record:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:create:record",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create and insert a record into a Salesforce or Tooling API object."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:delete:bulk",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Bulk delete records from an org using a CSV file. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [
+        "force:data:record:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:delete:record",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Deletes a single record from a Salesforce or Tooling API object."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:delete:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume a bulk delete job that you previously started. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:export:bulk",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Bulk export records from an org into a file using a SOQL query. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "data:export:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume a bulk export job that you previously started. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [
+        "force:data:tree:export"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:export:tree",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Export data from an org into one or more JSON files."
+    },
+    {
+      "aliases": [
+        "force:data:record:get"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:get:record",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve and display a single record of a Salesforce or Tooling API object."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:import:bulk",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Bulk import records into a Salesforce object from a CSV file. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "data:import:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume a bulk import job that you previously started. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [
+        "force:data:tree:import"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:import:tree",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Import data from one or more JSON files into an org."
+    },
+    {
+      "aliases": [
+        "force:data:soql:query"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:query",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Execute a SOQL query."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "View the status of a bulk data load job or batch."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:search",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Execute a SOSL text-based search query."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:update:bulk",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Bulk update records to an org from a CSV file. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [
+        "force:data:record:update"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:update:record",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Updates a single record of a Salesforce or Tooling API object."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "data:update:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume a bulk update job that you previously started. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:upsert:bulk",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Bulk upsert records to an org from a CSV file. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "data:upsert:resume",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume a bulk upsert job that you previously started. Uses Bulk API 2.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:audit:messages",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Audit messages in a plugin's messages directory to locate unused messages and missing messages that have references in source code."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:convert:messages",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Convert a .json messages file into Markdown."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:convert:script",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Convert a script file that contains deprecated sfdx-style commands to use the new sf-style commands instead."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:generate:command",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a new sf command."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:generate:flag",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a flag for an existing command."
+    },
+    {
+      "aliases": [
+        "plugins:generate"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "dev:generate:plugin",
+      "plugin": "@salesforce/plugin-dev",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a new sf plugin."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "doctor",
+      "plugin": "@salesforce/plugin-info",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Gather CLI configuration data and run diagnostic tests to discover and report potential problems in your environment."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "flow:get:test",
+      "plugin": "@salesforce/plugin-flow",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display test results for a specific asynchronous test run."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "flow:run:test",
+      "plugin": "@salesforce/plugin-flow",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Invoke flow tests in an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "force:data:bulk:delete",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Bulk delete records from an org using a CSV file. Uses Bulk API 1.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "force:data:bulk:status",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "View the status of a bulk data load job or batch. Uses Bulk API 1.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "force:data:bulk:upsert",
+      "plugin": "@salesforce/plugin-data",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Bulk upsert records to an org from a CSV file. Uses Bulk API 1.0."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "force:lightning:lwc:test:create",
+      "plugin": "@salesforce/sfdx-plugin-lwc-test",
+      "requires_project": true,
+      "safety": "write",
+      "summary": ""
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "force:lightning:lwc:test:run",
+      "plugin": "@salesforce/sfdx-plugin-lwc-test",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": ""
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "force:lightning:lwc:test:setup",
+      "plugin": "@salesforce/sfdx-plugin-lwc-test",
+      "requires_project": true,
+      "safety": "execute",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "force:package:push-upgrade:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "force:package:push-upgrade:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Lists the status of push upgrade requests for a given package."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "help",
+      "plugin": "@oclif/plugin-help",
+      "requires_project": false,
+      "safety": "read",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "whatsnew"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "info:releasenotes:display",
+      "plugin": "@salesforce/plugin-info",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display Salesforce CLI release notes on the command line."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "lightning:dev:app",
+      "plugin": "@salesforce/plugin-lightning-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Preview a Lightning Experience app locally and in real-time, without deploying it."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "lightning:dev:component",
+      "plugin": "@salesforce/plugin-lightning-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Preview LWC components in isolation."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "lightning:dev:site",
+      "plugin": "@salesforce/plugin-lightning-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Preview an Experience Builder site locally and in real-time, without deploying it."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "logic:get:test",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Get the results of a test run."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "logic:run:test",
+      "plugin": "@salesforce/plugin-apex",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Invoke tests for Apex and Flows in an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:assign:permset",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Assign a permission set to one or more org users."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:assign:permsetlicense",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Assign a permission set license to one or more org users."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:auth:show-access-token",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Show the current access token for an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:auth:show-sfdx-auth-url",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Show the SFDX Auth URL for an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:auth:show-user-password",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Show the stored password for an org's user."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:create:agent-user",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create the default Salesforce user that is used to run an agent."
+    },
+    {
+      "aliases": [
+        "env:create:sandbox"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:create:sandbox",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create a sandbox org."
+    },
+    {
+      "aliases": [
+        "env:create:scratch"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "org:create:scratch",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create a scratch org."
+    },
+    {
+      "aliases": [
+        "force:org:shape:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:create:shape",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create a scratch org configuration (shape) based on the specified source org."
+    },
+    {
+      "aliases": [
+        "force:org:snapshot:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "org:create:snapshot",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create a snapshot of a scratch org."
+    },
+    {
+      "aliases": [
+        "force:user:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:create:user",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Create a user for a scratch org."
+    },
+    {
+      "aliases": [
+        "env:delete:sandbox"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:delete:sandbox",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Delete a sandbox."
+    },
+    {
+      "aliases": [
+        "env:delete:scratch"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:delete:scratch",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Delete a scratch org."
+    },
+    {
+      "aliases": [
+        "force:org:shape:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:delete:shape",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Delete all org shapes for a target org."
+    },
+    {
+      "aliases": [
+        "force:org:snapshot:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "org:delete:snapshot",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Delete a scratch org snapshot."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:disable:tracking",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Prevent Salesforce CLI from tracking changes in your source files between your project and an org."
+    },
+    {
+      "aliases": [
+        "force:org:display"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:display",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display information about an org."
+    },
+    {
+      "aliases": [
+        "force:user:display"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:display:user",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display information about a Salesforce user."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:enable:tracking",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Allow Salesforce CLI to track changes in your source files between your project and an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:generate:password",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Generate a random password for scratch org users."
+    },
+    {
+      "aliases": [
+        "force:org:snapshot:get"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "org:get:snapshot",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Get details about a scratch org snapshot."
+    },
+    {
+      "aliases": [
+        "force:org:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:list",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all orgs you\u2019ve created or authenticated to."
+    },
+    {
+      "aliases": [
+        "force:auth:list",
+        "auth:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:list:auth",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "List authorization information about the orgs you created or logged into."
+    },
+    {
+      "aliases": [
+        "force:limits:api:display",
+        "limits:api:display"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:list:limits",
+      "plugin": "@salesforce/plugin-limits",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display information about limits in your org."
+    },
+    {
+      "aliases": [
+        "force:mdapi:listmetadata"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:list:metadata",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List the metadata components and properties of a specified type."
+    },
+    {
+      "aliases": [
+        "force:mdapi:describemetadata"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:list:metadata-types",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display details about the metadata types that are enabled for your org."
+    },
+    {
+      "aliases": [
+        "force:org:shape:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:list:shape",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all org shapes you\u2019ve created."
+    },
+    {
+      "aliases": [
+        "force:org:snapshot:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "org:list:snapshot",
+      "plugin": "@salesforce/plugin-signups",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List scratch org snapshots."
+    },
+    {
+      "aliases": [
+        "force:limits:recordcounts:display",
+        "limits:recordcounts:display"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:list:sobject:record-counts",
+      "plugin": "@salesforce/plugin-limits",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display record counts for the specified standard or custom objects."
+    },
+    {
+      "aliases": [
+        "force:user:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:list:users",
+      "plugin": "@salesforce/plugin-user",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all locally-authenticated users of an org."
+    },
+    {
+      "aliases": [
+        "force:auth:accesstoken:store",
+        "auth:accesstoken:store"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:login:access-token",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Authorize an org using an existing Salesforce access token."
+    },
+    {
+      "aliases": [
+        "force:auth:jwt:grant",
+        "auth:jwt:grant"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:login:jwt",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Log in to a Salesforce org using a JSON web token (JWT)."
+    },
+    {
+      "aliases": [
+        "force:auth:sfdxurl:store",
+        "auth:sfdxurl:store"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:login:sfdx-url",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Authorize an org using a Salesforce DX authorization URL stored in a file or through standard input (stdin)."
+    },
+    {
+      "aliases": [
+        "force:auth:web:login",
+        "auth:web:login"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:login:web",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Log in to a Salesforce org using the web server flow."
+    },
+    {
+      "aliases": [
+        "force:auth:logout",
+        "auth:logout"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:logout",
+      "plugin": "@salesforce/plugin-auth",
+      "requires_project": false,
+      "safety": "auth",
+      "summary": "Log out of a Salesforce org."
+    },
+    {
+      "aliases": [
+        "force:org:open",
+        "force:source:open"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:open",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Open your default scratch org, or another specified org, in a browser."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:open:agent",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Open an agent in your org's Agent Builder UI in a browser."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:refresh:sandbox",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Refresh a sandbox org using the sandbox name."
+    },
+    {
+      "aliases": [
+        "env:resume:sandbox"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "org:resume:sandbox",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Check the status of a sandbox creation, and log in to it if it's ready."
+    },
+    {
+      "aliases": [
+        "env:resume:scratch"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "org:resume:scratch",
+      "plugin": "@salesforce/plugin-org",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume the creation of an incomplete scratch org."
+    },
+    {
+      "aliases": [
+        "force:package1:version:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package1:version:create",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Create a first-generation package version in the release org."
+    },
+    {
+      "aliases": [
+        "force:package1:version:create:get"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package1:version:create:get",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve the status of a package version creation request."
+    },
+    {
+      "aliases": [
+        "force:package1:version:display"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package1:version:display",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display details about a first-generation package version."
+    },
+    {
+      "aliases": [
+        "force:package1:version:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package1:version:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List package versions for the specified first-generation package or for the org."
+    },
+    {
+      "aliases": [
+        "force:package:convert"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:convert",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Convert a managed-released first-generation managed package into a second-generation managed package."
+    },
+    {
+      "aliases": [
+        "force:package:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:create",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Create a package."
+    },
+    {
+      "aliases": [
+        "force:package:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:delete",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Delete a package."
+    },
+    {
+      "aliases": [
+        "force:package:install"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package:install",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Install or upgrade a version of a package in the target org."
+    },
+    {
+      "aliases": [
+        "force:package:install:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package:install:report",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve the status of a package installation request."
+    },
+    {
+      "aliases": [
+        "force:package:installed:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package:installed:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List the org\u2019s installed packages."
+    },
+    {
+      "aliases": [
+        "force:package:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all packages in the Dev Hub org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:push-upgrade:abort",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Abort a package push upgrade that has been scheduled. Only push upgrade requests with a status of Created or Pending can be aborted."
+    },
+    {
+      "aliases": [
+        "force:package:push-upgrade:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:push-upgrade:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Lists the status of push upgrade requests for a given package."
+    },
+    {
+      "aliases": [
+        "force:package:push-upgrade:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:push-upgrade:report",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve the status of a package push upgrade."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:push-upgrade:schedule",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Schedule a package push upgrade."
+    },
+    {
+      "aliases": [
+        "force:package:uninstall"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package:uninstall",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Uninstall a second-generation package from the target org."
+    },
+    {
+      "aliases": [
+        "force:package:uninstall:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "package:uninstall:report",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve the status of a package uninstall request."
+    },
+    {
+      "aliases": [
+        "force:package:update"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:update",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Update package details."
+    },
+    {
+      "aliases": [
+        "force:package:version:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:create",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Create a package version in the Dev Hub org."
+    },
+    {
+      "aliases": [
+        "force:package:version:create:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:create:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List package version creation requests."
+    },
+    {
+      "aliases": [
+        "force:package:version:create:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:create:report",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve details about a package version creation request."
+    },
+    {
+      "aliases": [
+        "force:package:version:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:delete",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Delete a package version."
+    },
+    {
+      "aliases": [
+        "force:package:version:displayancestry"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:displayancestry",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display the ancestry tree for a 2GP managed package version."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:displaydependencies",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display the dependency graph for an unlocked or 2GP managed package version."
+    },
+    {
+      "aliases": [
+        "force:package:version:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:list",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all package versions in the Dev Hub org."
+    },
+    {
+      "aliases": [
+        "force:package:version:promote"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:promote",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Promote a package version to released."
+    },
+    {
+      "aliases": [
+        "force:package:version:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:report",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve details about a package version in the Dev Hub org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:retrieve",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Retrieve package metadata for a specified package version. Package metadata can be retrieved for only second-generation managed package versions or unlocked packages."
+    },
+    {
+      "aliases": [
+        "force:package:version:update"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": true,
+      "has_target_org": false,
+      "id": "package:version:update",
+      "plugin": "@salesforce/plugin-packaging",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Update a package version."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "plugins:add"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:add",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Installs a plugin into sf."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:discover",
+      "plugin": "@salesforce/plugin-marketplace",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "See a list of 3rd-party sf plugins you can install."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:inspect",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "plugins:add"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:install",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Installs a plugin into sf."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:link",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Links a plugin into the CLI for development."
+    },
+    {
+      "aliases": [
+        "plugins:unlink",
+        "plugins:remove"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:remove",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:reset",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Remove all user-installed and linked plugins."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:trust:allowlist:add",
+      "plugin": "@salesforce/plugin-trust",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Add plugins to the plugin allowlist."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:trust:allowlist:list",
+      "plugin": "@salesforce/plugin-trust",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "List the plugins on the plugin allowlist."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:trust:allowlist:remove",
+      "plugin": "@salesforce/plugin-trust",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Remove plugins from the plugin allowlist."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:trust:verify",
+      "plugin": "@salesforce/plugin-trust",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Validate a digital signature."
+    },
+    {
+      "aliases": [
+        "plugins:unlink",
+        "plugins:remove"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:uninstall",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "plugins:unlink",
+        "plugins:remove"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:unlink",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "plugins:update",
+      "plugin": "@oclif/plugin-plugins",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "force:mdapi:convert"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:convert:mdapi",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Convert metadata retrieved via Metadata API into the source format used in Salesforce DX projects."
+    },
+    {
+      "aliases": [
+        "force:source:convert"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:convert:source",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Convert source-formatted files into metadata that you can deploy using Metadata API."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:convert:source-behavior",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Enable a behavior of your project source files, and then update your Salesforce DX project to implement the behavior."
+    },
+    {
+      "aliases": [
+        "force:source:delete"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:delete:source",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Delete source from your project and from a non-source-tracked org."
+    },
+    {
+      "aliases": [
+        "force:source:tracking:clear"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:delete:tracking",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Delete all local source tracking information."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:cancel"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:cancel",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Cancel a deploy operation."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:pipeline:quick",
+      "plugin": "@salesforce/plugin-devops-center",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Quickly deploy a validated deployment to an org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:pipeline:report",
+      "plugin": "@salesforce/plugin-devops-center",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Check the status of a pipeline deploy operation."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:pipeline:resume",
+      "plugin": "@salesforce/plugin-devops-center",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume watching a pipeline deploy operation."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:pipeline:start",
+      "plugin": "@salesforce/plugin-devops-center",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Deploy changes from a branch to the pipeline stage\u2019s org."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:pipeline:validate",
+      "plugin": "@salesforce/plugin-devops-center",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Perform a validate-only deployment from a branch to the pipeline stage\u2019s org."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:preview"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:preview",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Preview a deployment to see what will deploy to the org, the potential conflicts, and the ignored files."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:quick"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:quick",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Quickly deploy a validated deployment to an org."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:report"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:report",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Check or poll for the status of a deploy operation."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:resume"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:deploy:resume",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Resume watching a deploy operation and update source tracking when the deploy completes."
+    },
+    {
+      "aliases": [
+        "deploy:metadata"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:start",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "write",
+      "summary": "Deploy metadata to an org from your local project."
+    },
+    {
+      "aliases": [
+        "deploy:metadata:validate"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:deploy:validate",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Validate a metadata deployment without actually executing it."
+    },
+    {
+      "aliases": [
+        "force:source:manifest:create"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:generate:manifest",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Create a project manifest that lists the metadata components you want to deploy or retrieve."
+    },
+    {
+      "aliases": [
+        "force:source:ignored:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "project:list:ignored",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Check your local project package directories for forceignored files."
+    },
+    {
+      "aliases": [
+        "force:source:tracking:reset"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:reset:tracking",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "write",
+      "summary": "Reset local and remote source tracking."
+    },
+    {
+      "aliases": [
+        "retrieve:metadata:preview"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:retrieve:preview",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": true,
+      "safety": "read",
+      "summary": "Preview a retrieval to see what will be retrieved from the org, the potential conflicts, and the ignored files."
+    },
+    {
+      "aliases": [
+        "retrieve:metadata"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "project:retrieve:start",
+      "plugin": "@salesforce/plugin-deploy-retrieve",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Retrieve metadata from an org to your local project."
+    },
+    {
+      "aliases": [
+        "generate:metadata:field"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "schema:generate:field",
+      "plugin": "@salesforce/plugin-sobject",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate metadata source files for a new custom field on a specified object."
+    },
+    {
+      "aliases": [
+        "generate:metadata:platformevent"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "schema:generate:platformevent",
+      "plugin": "@salesforce/plugin-sobject",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate metadata source files for a new platform event."
+    },
+    {
+      "aliases": [
+        "generate:metadata:sobject"
+      ],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "schema:generate:sobject",
+      "plugin": "@salesforce/plugin-sobject",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate metadata source files for a new custom object."
+    },
+    {
+      "aliases": [
+        "generate:metadata:tab"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "schema:generate:tab",
+      "plugin": "@salesforce/plugin-sobject",
+      "requires_project": true,
+      "safety": "local",
+      "summary": "Generate the metadata source files for a new custom tab on a custom object."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "search",
+      "plugin": "@oclif/plugin-search",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Search for a command."
+    },
+    {
+      "aliases": [
+        "force:schema:sobject:describe"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "sobject:describe",
+      "plugin": "@salesforce/plugin-schema",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display the metadata for a standard or custom object or a Tooling API object."
+    },
+    {
+      "aliases": [
+        "force:schema:sobject:list"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "sobject:list",
+      "plugin": "@salesforce/plugin-schema",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "List all Salesforce objects of a specified category."
+    },
+    {
+      "aliases": [
+        "force:analytics:template:create",
+        "analytics:generate:template"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:analytics:template",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a simple Analytics template."
+    },
+    {
+      "aliases": [
+        "force:apex:class:create",
+        "apex:generate:class"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:apex:class",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate an Apex class."
+    },
+    {
+      "aliases": [
+        "force:apex:trigger:create",
+        "apex:generate:trigger"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:apex:trigger",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate an Apex trigger."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "template:generate:digital-experience:site",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Generate an Experience Cloud site."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:flexipage",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a FlexiPage, also known as a Lightning page."
+    },
+    {
+      "aliases": [
+        "force:lightning:app:create",
+        "lightning:generate:app"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:lightning:app",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Lightning App."
+    },
+    {
+      "aliases": [
+        "force:lightning:component:create",
+        "lightning:generate:component"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:lightning:component",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a bundle for an Aura component or a Lightning web component."
+    },
+    {
+      "aliases": [
+        "force:lightning:event:create",
+        "lightning:generate:event"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:lightning:event",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Lightning Event."
+    },
+    {
+      "aliases": [
+        "force:lightning:interface:create",
+        "lightning:generate:interface"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:lightning:interface",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Lightning Interface."
+    },
+    {
+      "aliases": [
+        "force:lightning:test:create",
+        "lightning:generate:test"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:lightning:test",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "execute",
+      "summary": "Generate a Lightning test."
+    },
+    {
+      "aliases": [
+        "force:project:create",
+        "project:generate"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:project",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Salesforce DX project."
+    },
+    {
+      "aliases": [
+        "force:staticresource:create",
+        "static-resource:generate"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:static-resource",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a static resource."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:ui-bundle",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a UI bundle, which contains the code and metadata to build a UI experience that uses non-native Salesforce frameworks, such as React."
+    },
+    {
+      "aliases": [
+        "force:visualforce:component:create",
+        "visualforce:generate:component"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:visualforce:component",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Visualforce Component."
+    },
+    {
+      "aliases": [
+        "force:visualforce:page:create",
+        "visualforce:generate:page"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "template:generate:visualforce:page",
+      "plugin": "@salesforce/plugin-templates",
+      "requires_project": false,
+      "safety": "local",
+      "summary": "Generate a Visualforce Page."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": true,
+      "id": "ui-bundle:dev",
+      "plugin": "@salesforce/plugin-ui-bundle-dev",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Preview a UI bundle locally and in real-time, without deploying it to your org."
+    },
+    {
+      "aliases": [],
+      "enable_json": false,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "update",
+      "plugin": "@oclif/plugin-update",
+      "requires_project": false,
+      "safety": "write",
+      "summary": ""
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "version",
+      "plugin": "@oclif/plugin-version",
+      "requires_project": false,
+      "safety": "local",
+      "summary": ""
+    },
+    {
+      "aliases": [
+        "whatsnew"
+      ],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "whatsnew",
+      "plugin": "@salesforce/plugin-info",
+      "requires_project": false,
+      "safety": "read",
+      "summary": "Display Salesforce CLI release notes on the command line."
+    },
+    {
+      "aliases": [],
+      "enable_json": true,
+      "has_target_dev_hub": false,
+      "has_target_org": false,
+      "id": "which",
+      "plugin": "@oclif/plugin-which",
+      "requires_project": false,
+      "safety": "read",
+      "summary": ""
+    }
+  ],
+  "count": 228,
+  "generated_at": "2026-06-02T18:35:20+00:00",
+  "sf_binary": "C:\\Users\\luca_\\AppData\\Roaming\\npm\\sf.cmd"
+}

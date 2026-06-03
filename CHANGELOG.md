@@ -8,6 +8,35 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [0.6.1] - 2026-06-03
+
+### Added
+
+- Added Python package metadata for installation through `pip`, `pipx`, and `uv`.
+- Added the `sfao` CLI entry point.
+- Added `sfao install`, `sfao doctor`, `sfao validate`, and `sfao version`.
+- Added project-scoped installation for Codex, Claude Code, and GitHub Copilot.
+- Added package templates for installable agent adapters.
+- Added build and release documentation.
+- Added release manifest and checksum generation support.
+
+### Fixed
+
+- Fixed multiline formatting validation for Markdown, YAML, TOML, JSON, and Python files where required.
+- Fixed `SKILL.md` frontmatter validation through reusable package validation code.
+- Fixed generated Codex and Claude skill shims to include managed-file markers.
+- Fixed `agents/openai.yaml` version alignment through generated adapter synchronization.
+- Added validation against collapsed files, missing final newlines, CRLF drift, and stale generated adapters.
+
+### Preserved
+
+- Existing Salesforce delivery methodology.
+- Configuration-first solutioning.
+- Minimal-change approach.
+- Token-efficiency principles.
+- package.xml awareness.
+- Destructive-operation guardrails.
+
 ## 0.6.0 - 2026-06-03
 
 ### Added

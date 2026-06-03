@@ -11,7 +11,7 @@ Salesforce AI Agent Optimizer es una skill publica con licencia MIT para agentes
 
 El repositorio publico se llama **Salesforce AI Agent Optimizer**. El nombre de la skill Codex sigue siendo `salesforce-agent-optimizer`.
 
-Version actual: `0.6.0`
+Version actual: `0.6.1`
 
 ## Principios
 

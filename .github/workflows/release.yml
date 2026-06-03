@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install package with dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Check generated agent instructions
+        run: python scripts/sync_agent_instructions.py --check --json
+
+      - name: Validate skill package
+        run: python scripts/validate_skill.py --json
+
+      - name: Run self tests
+        run: python scripts/self_test.py --json
+
+      - name: Run pytest
+        run: python -m pytest
+
+      - name: Run ruff
+        run: python -m ruff check .
+
+      - name: Validate through sfao
+        run: sfao validate
+
+      - name: Build wheel and sdist
+        run: python -m build
+
+      - name: Check distributions
+        run: python -m twine check dist/*
+
+      - name: Build release artifacts
+        run: python scripts/build_release_artifacts.py
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*
+
+      - name: Publish to PyPI with trusted publishing
+        if: ${{ vars.PYPI_TRUSTED_PUBLISHING == 'true' }}
+        uses: pypa/gh-action-pypi-publish@release/v1

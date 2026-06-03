@@ -1,0 +1,25 @@
+# Agent Instruction Spine
+
+Use this Salesforce Agent Optimizer guidance for Salesforce architecture, metadata, Apex, LWC, Flow, DevOps, package.xml, org inspection, and release tasks.
+
+Canonical workflow:
+
+- Start with `SKILL.md`, then read `references/routing.md` and only the task-relevant references.
+- Prefer Salesforce standard capabilities, configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before custom code.
+- Keep patches minimal, reversible, and scoped to the approved request.
+- Before planning, use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance when relevant.
+- Use `scripts/sf_agent_cli.py` for org access. Ask for an explicit org alias; use compact redacted output; treat production orgs as read-only.
+- Never invent Salesforce behavior. Ask the user or present scenarios when evidence is unclear.
+- Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
+- Generate `package.xml` for added or modified metadata before validation handoff.
+- Validate with tests or an independent validation pass before asking whether to push.
+
+Important references:
+
+- Routing: `references/routing.md`
+- Delivery loop: `references/delivery-methodology.md`
+- Metadata dependencies: `references/metadata-dependencies.md`
+- Least privilege: `references/least-privilege-planning.md`
+- CLI facade: `references/sf-agent-cli-commands.md`
+- Testing and manifests: `references/testing-and-manifest-guardrails.md`
+- Version context: `references/salesforce-current-version.md`
