@@ -46,6 +46,9 @@ jobs:
       - name: Validate through sfao
         run: sfao validate
 
+      - name: Clean distribution workspace
+        run: rm -rf dist build src/*.egg-info
+
       - name: Build wheel and sdist
         run: python -m build
 
