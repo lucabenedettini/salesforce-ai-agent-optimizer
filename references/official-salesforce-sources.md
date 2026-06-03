@@ -7,6 +7,11 @@ Use these official Salesforce sources to refresh guidance when the task needs ex
 - Salesforce CLI command flags and standard org flags: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/command-flags.html
 - Salesforce CLI migration from `sfdx` to `sf`: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/migrate-sfdx-sf.html
 - Salesforce CLI command reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
+- Salesforce current release notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
+- Salesforce API release notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api.htm&language=en_US&type=5
+- Salesforce SOAP API release notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soap.htm&language=en_US&type=5
+- Salesforce API and Data Loader versions: https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1
+- Platform SOAP API login() retirement: https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1
 - Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
 - Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
 - Application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5

@@ -1,6 +1,6 @@
 ---
 name: salesforce-agent-optimizer
-description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, testing, package.xml manifests, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying products/packages before planning, accounting for metadata dependencies, using approval-gated planning, building indexed metadata Knowledge with /sf-init-project-skill, enforcing Apex/Flow/testable metadata guardrails, generating package.xml for added/modified metadata after implementation, offering optional PDF task estimates after planning, offering release notes/specifications/impact/user testing/manual procedure files after development, and reducing token waste.
+description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, testing, package.xml manifests, release/API version updates, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying products/packages before planning, accounting for metadata dependencies, using approval-gated planning, building Knowledge with /sf-init-project-skill, refreshing Salesforce release/API/SOAP/package guidance with /sf-version-update-skill, enforcing test guardrails, generating package.xml for added/modified metadata, offering delivery artifacts after development, and reducing token waste.
 ---
 
 # Salesforce Agent Optimizer
@@ -20,6 +20,8 @@ Before any modification, consult the project Knowledge if it exists. If it is mi
 ## Product, Package, And Dependency Context
 
 Before planning, read `references/products-packages/index.md`. Use the brief descriptions to identify relevant Salesforce products, AppExchange packages, and mobile-development surfaces from the user's request, project metadata, installed packages, object names, namespaces, and app names. Then read only the matching product/package files.
+
+For release-sensitive tasks, API work, SOAP/REST/Metadata/Tooling/UI/GraphQL API work, package planning, LWC `apiVersion`, Apex/Flow version behavior, or `sourceApiVersion` changes, read `references/salesforce-current-version.md` before planning. If it is stale or the user invokes `/sf-version-update-skill`, refresh it.
 
 Before planning, also read `references/metadata-dependencies.md` and account for relationships across permission sets, permission set groups, users, fields, page layouts, Lightning pages, record types, picklist values, Flow, Apex, integrations, sharing, reports, dashboards, and mobile exposure.
 
@@ -43,6 +45,20 @@ The user can update `.salesforce-agent-knowledge/config.json` to add, remove, or
 
 Each indexed metadata artifact gets a same-format Markdown page under `.salesforce-agent-knowledge/metadata/`. The Knowledge also includes `markdown-index.md` for all Markdown files and `history/project-history.md` for compact change, deploy, and remote-branch push history. History entries must include the requirement that caused the change and all modified metadata.
 
+## `/sf-version-update-skill` Version Refresh
+
+Read `references/version-update.md` when the user invokes `/sf-version-update-skill` or asks to refresh Salesforce release, API, SOAP API, Metadata API, LWC API, product, or package version context.
+
+`/sf-version-update-skill` must search online in official Salesforce sources only, identify the latest production Salesforce release and API versions, capture relevant functional/technical changes, update `references/salesforce-version.json` and `references/salesforce-current-version.md`, and update only the other resources whose version-sensitive guidance actually changed.
+
+Use:
+
+```bash
+python scripts/sf_version_update.py --skill-root <skill-root> --verified-date <yyyy-mm-dd> --release-name "Summer '26" --api-version 67.0 --source "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
+```
+
+For managed packages, do not assume a public latest installed version. Ask for the target org alias and inspect installed packages before planning package-specific work.
+
 ## Mandatory Delivery Methodology
 
 Read `references/delivery-methodology.md` for the full loop. Follow it for every Salesforce project task unless the user explicitly asks for analysis only.
@@ -52,7 +68,7 @@ Read `references/delivery-methodology.md` for the full loop. Follow it for every
 3. Identify relevant products/packages from `references/products-packages/index.md`, then read the matching product/package files.
 4. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
 5. Read `references/metadata-dependencies.md` and inspect the minimum repository/org evidence needed to plan dependencies safely.
-6. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version.
+6. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version; invoke `/sf-version-update-skill` when local version guidance is stale.
 7. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, testable metadata coverage, risks, estimates, and rollback.
 8. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
 9. Ask the user to approve the plan before modifying project files or org metadata.
@@ -84,6 +100,8 @@ Do not use a default org for metadata or data access. Ask the user for the org a
 Do not paste full `sf` JSON, describe screens, or retrieve broad metadata unless needed. Prefer facade commands, `--metadata Type:Name`, `--source-dir` for the touched path, narrow SOQL field lists, `--select`, and bounded output.
 
 Read `references/sf-agent-cli-commands.md` before using or extending the facade. Use `references/sf-official-command-catalog.md` only when you need the generated one-by-one catalog of installed official Salesforce CLI commands. Read `references/sf-cli-token-patterns.md` before creating new CLI wrappers or deciding whether to rewrite another Salesforce CLI command.
+
+Read `references/salesforce-current-version.md` before choosing API versions for manifests, integrations, LWC, Apex, Flow, or package-sensitive work.
 
 ## Backend Guidelines
 
@@ -134,8 +152,10 @@ Use `references/agent-installation.md` when packaging this skill for Codex, Clau
 - `agents/claude-code.md`: Claude Code importable instruction block.
 - `agents/github-copilot-instructions.md`: GitHub Copilot repository instruction block.
 - `agents/sf-init-project-skill.md`: portable `/sf-init-project-skill` slash-command definition.
+- `agents/sf-version-update-skill.md`: portable `/sf-version-update-skill` slash-command definition.
 - `references/completion-artifacts.md`: release notes, technical specifications, impact assessment, user testing, and manual procedure artifact rules.
 - `references/testing-and-manifest-guardrails.md`: Apex, Flow, testable metadata, and required `package.xml` rules.
+- `references/salesforce-current-version.md`: current Salesforce release/API/SOAP/package version context.
 
 Keep adapters short. The canonical behavior lives in this `SKILL.md` and the `references/` files.
 

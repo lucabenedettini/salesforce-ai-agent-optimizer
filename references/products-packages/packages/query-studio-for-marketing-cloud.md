@@ -23,3 +23,6 @@ Salesforce Labs tool for quickly running SQL queries in Marketing Cloud.
 - Avoid querying sensitive data unless access and retention are approved.
 - Move production logic into governed automations.
 - Validate query cost and data volume before repeated use.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

@@ -24,3 +24,6 @@ Famiglia Salesforce per orchestrazione marketing, audience, email, journey, camp
 - Verificare limiti, refresh cadence e data retention.
 - Non duplicare logica di segmentazione tra CRM, Data 360 e Marketing Cloud senza ownership chiara.
 - Testare journey entry/exit criteria e rollback delle audience.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

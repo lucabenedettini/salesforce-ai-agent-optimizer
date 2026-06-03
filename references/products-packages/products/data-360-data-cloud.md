@@ -25,3 +25,6 @@ Piattaforma dati Salesforce per unificare, armonizzare, risolvere identita, calc
 - Avoid copying large data into core CRM when activation or zero-copy patterns fit.
 - Validate field mappings, identity rules and activation side effects.
 - Plan privacy, retention and access with security stakeholders.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

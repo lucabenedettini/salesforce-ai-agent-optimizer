@@ -24,3 +24,6 @@ Salesforce solution for field operations: work orders, appointments, resources, 
 - Test schedule/dispatch flows with realistic geography and availability.
 - Plan mobile/offline behavior for technicians early.
 - Validate object access and sharing for dispatchers, technicians and back office.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

@@ -24,3 +24,6 @@ CRM Salesforce per gestire lead, account, contatti, opportunita, pipeline, forec
 - Tenere coerenti stage, forecast category, validation rule e report.
 - Verificare dipendenze tra record type, picklist values, layout e Lightning page.
 - Evitare automazioni duplicate su lead conversion e opportunity update.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

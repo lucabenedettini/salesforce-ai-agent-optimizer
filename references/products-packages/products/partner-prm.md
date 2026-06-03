@@ -24,3 +24,6 @@ Partner relationship management for channel sales, partner onboarding, deal regi
 - Avoid overexposing internal sales data to partners.
 - Test partner persona access end to end.
 - Keep deal registration criteria and duplicate prevention explicit.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

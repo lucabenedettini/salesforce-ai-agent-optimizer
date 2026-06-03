@@ -1,5 +1,7 @@
 # Frontend LWC Guidelines
 
+Before changing an LWC `apiVersion`, read `references/salesforce-current-version.md`, verify current Salesforce release behavior, and run compatibility checks. Salesforce validates LWC API versions when components are saved.
+
 ## Data Access Order
 
 1. Lightning base components and record forms.

@@ -23,3 +23,6 @@ Pacchetto Salesforce Labs gratuito per analizzare login, utilizzo funzionalita e
 - Non modificare direttamente componenti managed se non previsto.
 - Usare i risultati come input per enablement, non come unico indicatore di adozione.
 - Controllare sharing di report e dashboard prima del rilascio.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

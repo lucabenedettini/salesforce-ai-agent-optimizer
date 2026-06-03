@@ -24,3 +24,6 @@ Salesforce platform for customer, partner and public digital experiences built o
 - Align external sharing, role hierarchy and permission sets.
 - Test pages by persona, device and authentication state.
 - Avoid custom UI when standard Experience components meet the need.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

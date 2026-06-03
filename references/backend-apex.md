@@ -4,6 +4,8 @@
 
 Before writing Apex, confirm that Flow, validation rules, formula fields, standard duplicate rules, assignment/escalation rules, approvals, invocable actions, or package features are insufficient. State the gap in one sentence.
 
+Before changing Apex `apiVersion`, read `references/salesforce-current-version.md`, verify current Salesforce release behavior, and include compatibility tests in the plan.
+
 ## Apex Checklist
 
 - Bulkify every entry point. Handle 0, 1, 200, and larger async batches.

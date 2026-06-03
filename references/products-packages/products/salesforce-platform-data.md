@@ -24,3 +24,6 @@ Piattaforma per custom app, metadata, automation, security, integration, APIs, d
 - Keep source metadata and Knowledge synchronized.
 - Plan dependency order before deployment.
 - Test CRUD/FLS, sharing, limits and rollback for every custom change.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

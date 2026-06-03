@@ -22,6 +22,7 @@ Clone or download the repository, then:
 
 - Merge `agents/claude-code.md` into `CLAUDE.md`.
 - Copy `agents/sf-init-project-skill.md` to `.claude/commands/sf-init-project-skill.md`.
+- Copy `agents/sf-version-update-skill.md` to `.claude/commands/sf-version-update-skill.md`.
 
 ## GitHub Copilot
 

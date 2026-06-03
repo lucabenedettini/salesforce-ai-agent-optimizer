@@ -24,6 +24,10 @@ Agents should change the fewest files and metadata artifacts needed to satisfy t
 
 Salesforce metadata is a graph. Plans must account for permission sets, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, analytics, packages, and mobile exposure.
 
+## Version Freshness
+
+Salesforce release, API, SOAP API, Metadata API, LWC API, and managed package versions affect behavior. Agents must use current official Salesforce version context, refresh it with `/sf-version-update-skill` when stale, and verify managed package versions in the target org.
+
 ## Human Approval And Validation
 
 Agents must restate the request, ask focused questions only when needed, plan before changing, ask for approval, validate with tests or a subagent when available, and retry failed plans no more than three times before returning to requirements.

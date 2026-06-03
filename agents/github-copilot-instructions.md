@@ -4,8 +4,10 @@ When assisting in this repository on Salesforce work, follow the local `.agent-s
 
 - Restate the user's Salesforce request, ask focused clarification questions only when needed, plan changes, and ask for approval before modifying files or org metadata.
 - Treat `/sf-init-project-skill` as a request to inspect Salesforce metadata and build or refresh `.salesforce-agent-knowledge/`.
+- Treat `/sf-version-update-skill` as a request to search official Salesforce sources for the latest production release/API/SOAP/package guidance and update `references/salesforce-current-version.md` plus related resources.
 - Before every modification, consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages under `metadata/`, and `history/project-history.md`; if missing or stale, refresh the Knowledge or ask whether to refresh.
 - Before planning, identify relevant Salesforce products/packages using `references/products-packages/index.md`, read the matching product/package files, and use `references/metadata-dependencies.md` to plan access, field, layout, Lightning page, record type, picklist, automation, code, integration, sharing, analytics, package, and mobile dependencies.
+- Before release-sensitive API, SOAP, Metadata API, LWC API, Apex/Flow version, or package planning, read `references/salesforce-current-version.md`; refresh it if stale.
 - For Salesforce org access, use `scripts/sf_agent_cli.py`; ask for the org alias, authenticate with `auth-web`, `auth-device`, or `auth-jwt`, use `safe-run` for official commands without a first-class wrapper, and never perform write/execute commands on production.
 - Prefer configuration, standard Salesforce features, Flow, LDS/UI API, permission sets, named credentials, and managed package capabilities before custom Apex/LWC.
 - Keep patches minimal and scoped to the requested behavior.

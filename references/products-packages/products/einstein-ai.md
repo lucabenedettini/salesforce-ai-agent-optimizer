@@ -24,3 +24,6 @@ Salesforce AI capabilities for predictions, recommendations, generative experien
 - Keep human review for high-impact decisions.
 - Limit model access through least privilege.
 - Test hallucination, stale data, sensitive data and fallback behavior.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

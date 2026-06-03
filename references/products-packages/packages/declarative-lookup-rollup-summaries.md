@@ -24,3 +24,6 @@ Pacchetto per creare rollup declarativi su relazioni lookup e mantenere campi pa
 - Test bulk updates and recalculation before production.
 - Check recursion, trigger order and performance impact.
 - Document which parent fields are DLRS-managed.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

@@ -13,6 +13,7 @@ from xml.sax.saxutils import escape
 
 
 ROOT = Path.cwd()
+SKILL_ROOT = Path(__file__).resolve().parent.parent
 PACKAGE_XMLNS = "http://soap.sforce.com/2006/04/metadata"
 
 FOLDER_TYPES: dict[str, tuple[str, str]] = {
@@ -107,7 +108,16 @@ def source_api_version(project_root: Path, explicit: str | None) -> str:
                 return str(value)
         except json.JSONDecodeError:
             pass
-    return "64.0"
+    version_context = SKILL_ROOT / "references" / "salesforce-version.json"
+    if version_context.exists():
+        try:
+            payload = json.loads(version_context.read_text(encoding="utf-8"))
+            value = payload.get("current_metadata_api_version") or payload.get("current_platform_api_version")
+            if value:
+                return str(value)
+        except json.JSONDecodeError:
+            pass
+    return "67.0"
 
 
 def git_status_paths(project_root: Path) -> list[str]:
@@ -241,7 +251,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Generate package.xml for added or modified Salesforce metadata.")
     parser.add_argument("--project-root", default=".", help="Salesforce project root. Defaults to current directory.")
     parser.add_argument("--output", default="release-artifacts/package.xml", help="Output package.xml path.")
-    parser.add_argument("--api-version", help="Metadata API version. Defaults to sfdx-project.json sourceApiVersion or 64.0.")
+    parser.add_argument("--api-version", help="Metadata API version. Defaults to sfdx-project.json sourceApiVersion or salesforce-version.json.")
     parser.add_argument("--metadata", action="append", default=[], help="Explicit metadata entry in Type:Member format.")
     parser.add_argument("--changed-file", action="append", default=[], help="Changed source path to include.")
     parser.add_argument("--git-ref", help="Include added/modified/renamed paths changed since this git ref.")

@@ -23,6 +23,7 @@ Ask questions only when needed. Prefer 1-3 high-value questions. Do not ask abou
 Consult project Knowledge first:
 
 - Read `references/products-packages/index.md` and identify relevant Salesforce products, AppExchange packages, or mobile-development surfaces by brief description.
+- Read `references/salesforce-current-version.md` for release-sensitive API, SOAP, Metadata API, LWC API, Apex/Flow version, package, or `sourceApiVersion` planning.
 - Read only the matching product/package files under `references/products-packages/products/` or `references/products-packages/packages/`.
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
 - Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.

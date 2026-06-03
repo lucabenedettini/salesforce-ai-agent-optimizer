@@ -25,3 +25,6 @@ Soluzione Salesforce per customer service, gestione case, knowledge, console, en
 - Testare routing, escalation e permission model con utenti reali.
 - Tenere allineati Knowledge visibility, data categories e sharing.
 - Evitare automazioni concorrenti su status, owner e milestone.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

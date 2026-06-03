@@ -25,3 +25,6 @@ Salesforce CPQ managed package capability for advanced quote approval rules, app
 - Keep criteria fields indexed/maintainable and avoid duplicated logic across rules.
 - Test skip paths, rejection, recall, resubmission, parallel chains and delegated approvers.
 - Plan CPQ, permission, email template, layout and automation dependencies together.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

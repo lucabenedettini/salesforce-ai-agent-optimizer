@@ -25,3 +25,6 @@ Piattaforma Salesforce per creare, testare, distribuire e governare agenti AI co
 - Usare azioni deterministiche per operazioni critiche e LLM solo dove serve ragionamento flessibile.
 - Validare permessi, FLS, sharing e audit trail.
 - Testare casi positivi, negativi, escalation e prompt injection.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

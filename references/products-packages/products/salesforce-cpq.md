@@ -24,3 +24,6 @@ Managed package for configure-price-quote processes: product selection, pricing,
 - Plan dependencies across products, price books, fields, field sets, layouts and approval criteria.
 - Test QLE performance, calculation sequence and amendment/renewal scenarios.
 - Never assume package object names; inspect namespace and installed metadata.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

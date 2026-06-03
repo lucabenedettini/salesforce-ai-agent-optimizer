@@ -24,3 +24,6 @@ Salesforce industry solutions with packaged data models, workflows, UI and compl
 - Verify managed-package upgrade constraints before customizing.
 - Map standard, industry and custom objects explicitly.
 - Test with industry personas, permissions and regulatory scenarios.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

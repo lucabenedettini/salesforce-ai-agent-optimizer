@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`0.3.0` adds `/sf-version-update-skill`, current Salesforce release/API/SOAP/package version context, and repeatable version-resource refresh.
+
 `0.2.0` adds testing guardrails for Apex, Flow, and other testable metadata plus required `package.xml` generation for added or modified metadata.
 
 `0.1.0` adds end-of-development handoff artifact guidance.

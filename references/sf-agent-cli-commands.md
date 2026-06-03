@@ -341,6 +341,8 @@ Maps to: `sf package installed list`
 python scripts/sf_agent_cli.py package-installed-list --target-org dev-sandbox
 ```
 
+Use this before package-specific planning when package version, namespace, feature availability, or object API names matter. Package versions are target-org-specific; do not assume the public latest package version is installed.
+
 ### `package-install`
 
 Install a package. Blocked on production.

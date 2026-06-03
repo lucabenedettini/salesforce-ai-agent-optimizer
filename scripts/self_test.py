@@ -274,6 +274,65 @@ def test_package_manifest_generation() -> dict[str, object]:
         return checks
 
 
+def test_package_manifest_uses_version_context_fallback() -> dict[str, object]:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        output = root / "package.xml"
+        run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "generate_package_manifest.py"),
+                "--project-root",
+                str(root),
+                "--output",
+                str(output),
+                "--metadata",
+                "ApexClass:VersionFallback",
+            ]
+        )
+        package_xml = output.read_text(encoding="utf-8")
+        checks = {
+            "exists": output.exists(),
+            "uses_current_version_context": "<version>67.0</version>" in package_xml,
+        }
+        assert all(checks.values())
+        return checks
+
+
+def test_version_update_resources() -> dict[str, object]:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_version_update.py"),
+                "--skill-root",
+                str(root),
+                "--verified-date",
+                "2026-06-03",
+                "--release-name",
+                "Summer '26",
+                "--api-version",
+                "67.0",
+                "--source",
+                "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5",
+            ]
+        )
+        version_json = root / "references" / "salesforce-version.json"
+        version_md = root / "references" / "salesforce-current-version.md"
+        payload = json.loads(version_json.read_text(encoding="utf-8"))
+        markdown = version_md.read_text(encoding="utf-8")
+        checks = {
+            "json_exists": version_json.exists(),
+            "markdown_exists": version_md.exists(),
+            "api_version": payload["current_platform_api_version"] == "67.0",
+            "markdown_mentions_release": "Summer '26" in markdown,
+            "markdown_mentions_package_policy": "managed package" in markdown.lower(),
+        }
+        assert all(checks.values())
+        return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run local cross-platform tests for the Salesforce Agent Optimizer skill.")
     parser.add_argument("--json", action="store_true")
@@ -284,6 +343,8 @@ def main() -> int:
         "agent_cli": test_agent_cli_guardrails(),
         "git_push": test_git_push_records_history(),
         "package_manifest": test_package_manifest_generation(),
+        "package_manifest_version_fallback": test_package_manifest_uses_version_context_fallback(),
+        "version_update_resources": test_version_update_resources(),
     }
     if args.json:
         print(json.dumps(results, indent=2, sort_keys=True))

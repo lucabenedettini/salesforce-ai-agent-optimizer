@@ -25,3 +25,6 @@ Pacchetto per inviare, firmare, tracciare e salvare accordi Docusign direttament
 - Separare template logic da automazioni Salesforce quando possibile.
 - Testare status callback, error handling e retry.
 - Non salvare credenziali o token in metadata o Knowledge.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

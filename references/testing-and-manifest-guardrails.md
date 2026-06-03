@@ -33,7 +33,7 @@ Use the official Metadata API manifest shape:
         <members>ComponentName</members>
         <name>MetadataType</name>
     </types>
-    <version>64.0</version>
+    <version>67.0</version>
 </Package>
 ```
 
@@ -42,7 +42,7 @@ Rules:
 - Include added and modified metadata only.
 - Do not include deleted metadata in `package.xml`; use `destructiveChanges.xml` for deletions and ask for explicit approval before destructive deploy work.
 - Use explicit metadata members such as `ApexClass:AccountService`, `Flow:Account_Onboarding`, `CustomField:Account.Priority__c`, and `PermissionSet:Sales_Manager`.
-- Use the project's `sfdx-project.json` `sourceApiVersion` when available, otherwise specify the API version explicitly.
+- Use the project's `sfdx-project.json` `sourceApiVersion` when available, otherwise use `references/salesforce-current-version.md` for the current Metadata API version.
 - Default output path: `release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml`.
 - Follow an existing project release-manifest convention only when it is clear and safe. Do not overwrite an existing broad `manifest/package.xml` unless the user approved that exact overwrite.
 

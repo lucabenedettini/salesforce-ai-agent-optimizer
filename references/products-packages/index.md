@@ -1,6 +1,8 @@
 # Salesforce Products And Packages Index
 
-Before planning, identify likely products and packages from the user's request, project metadata, installed packages, object names, namespaces, app names, and brief descriptions below. Then read only the matching product/package files plus `references/metadata-dependencies.md`.
+Before planning, identify likely products and packages from the user's request, project metadata, installed packages, object names, namespaces, app names, and brief descriptions below. Then read `references/salesforce-current-version.md`, only the matching product/package files, and `references/metadata-dependencies.md`.
+
+Version rule: current Salesforce API/SOAP/Metadata/LWC guidance lives in `references/salesforce-current-version.md`. Managed package versions are target-org-specific; ask for the org alias and inspect installed packages before assuming package object names, namespace behavior, or feature availability.
 
 ## Product Signals
 

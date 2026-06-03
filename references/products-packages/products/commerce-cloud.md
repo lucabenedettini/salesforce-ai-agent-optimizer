@@ -24,3 +24,6 @@ Soluzione Salesforce per storefront, catalogo, carrello, pricing, checkout, ordi
 - Testare guest access, sharing e performance storefront.
 - Pianificare sincronizzazione product/order con sistemi esterni.
 - Trattare checkout, pagamento e tax come flussi ad alto rischio.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

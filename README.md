@@ -20,6 +20,8 @@ La skill deve:
 - far rileggere e riassumere all'agente la richiesta utente prima di agire;
 - fare domande solo quando servono requisiti, org target, rischio o criteri di accettazione;
 - consultare la Knowledge locale prima di pianificare o modificare;
+- usare `references/salesforce-current-version.md` per le informazioni correnti su release Salesforce, API, SOAP API, Metadata API, LWC API e package;
+- supportare `/sf-version-update-skill` per aggiornare online le risorse version-sensitive usando solo fonti ufficiali Salesforce;
 - identificare prima della pianificazione i prodotti Salesforce, i pacchetti AppExchange e le superfici mobile rilevanti tramite le descrizioni brevi in `references/products-packages/index.md`;
 - leggere i file prodotto/pacchetto rilevanti prima di pianificare;
 - considerare le dipendenze metadata Salesforce tra accessi, campi, layout, Lightning pages, record type, picklist, automazioni, codice, integrazioni, sharing, analytics e mobile;
@@ -67,7 +69,7 @@ Le modifiche nel tempo sono tracciate in `CHANGELOG.md`. Aggiorna quel file a og
 
 ## Versionamento
 
-La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1` ed e' attualmente a `0.2.0`.
+La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1` ed e' attualmente a `0.3.0`.
 
 Regole:
 
@@ -91,6 +93,11 @@ Fonti ufficiali utili, verificate al 2026-06-03:
 
 - Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
 - Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
+- Salesforce Summer '26 Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5
+- Salesforce API Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api.htm&language=en_US&type=5
+- Salesforce SOAP API Release Notes: https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soap.htm&language=en_US&type=5
+- Platform SOAP API login() retirement: https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1
+- Salesforce API and Data Loader versions: https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1
 - Salesforce Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
 - Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
 - Salesforce application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
@@ -208,13 +215,43 @@ Contiene:
 Prima di pianificare o modificare, l'agente deve leggere:
 
 1. `references/products-packages/index.md`
-2. i file prodotto/pacchetto rilevanti sotto `references/products-packages/`
-3. `references/metadata-dependencies.md`
-4. `.salesforce-agent-knowledge/index.md`
-5. `.salesforce-agent-knowledge/markdown-index.md` se serve trovare il file giusto
-6. il file specifico sotto `.salesforce-agent-knowledge/metadata/`
-7. `.salesforce-agent-knowledge/history/project-history.md`
-8. il source file originale prima di scrivere
+2. `references/salesforce-current-version.md` quando la richiesta e' release/API/package-sensitive
+3. i file prodotto/pacchetto rilevanti sotto `references/products-packages/`
+4. `references/metadata-dependencies.md`
+5. `.salesforce-agent-knowledge/index.md`
+6. `.salesforce-agent-knowledge/markdown-index.md` se serve trovare il file giusto
+7. il file specifico sotto `.salesforce-agent-knowledge/metadata/`
+8. `.salesforce-agent-knowledge/history/project-history.md`
+9. il source file originale prima di scrivere
+
+### Aggiornare Versioni Salesforce E Package
+
+Comando agente:
+
+```text
+/sf-version-update-skill
+```
+
+La skill deve cercare online solo su fonti ufficiali Salesforce, individuare l'ultima release production e aggiornare le risorse version-sensitive.
+
+Snapshot corrente verificato al 2026-06-03:
+
+- Salesforce release: Summer '26.
+- Platform API, Metadata API e SOAP API: `67.0`.
+- SOAP API `login()` non e' disponibile nelle API `65.0+`; Salesforce ha annunciato il retirement di `login()` per SOAP API `31.0-64.0` con Summer '27.
+- I managed package non hanno una versione installata globale affidabile: la versione da usare e' quella installata nella target org.
+
+Per aggiornare i file centrali dopo la verifica ufficiale:
+
+```bash
+python scripts/sf_version_update.py --skill-root . --verified-date 2026-06-03 --release-name "Summer '26" --api-version 67.0 --source "Salesforce Summer '26 Release Notes=https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&language=en_US&type=5"
+```
+
+Per package version-sensitive, chiedere alias org e leggere:
+
+```bash
+python scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result
+```
 
 ### Usare Salesforce CLI In Modo Sicuro
 
@@ -335,6 +372,7 @@ Copre:
 - dry-run senza scrittura history;
 - push verso remote Git temporaneo con history inclusa sul ramo remoto.
 - generazione `package.xml` da metadata modificati/aggiunti rilevati da git status.
+- aggiornamento ripetibile di `salesforce-version.json` e `salesforce-current-version.md`.
 
 Validazione Codex skill:
 
@@ -356,15 +394,20 @@ Richiede PyYAML nel Python usato dal validator.
 - `agents/claude-code.md`: adapter Claude Code.
 - `agents/github-copilot-instructions.md`: adapter GitHub Copilot.
 - `agents/sf-init-project-skill.md`: comando `/sf-init-project-skill` portabile.
+- `agents/sf-version-update-skill.md`: comando `/sf-version-update-skill` portabile.
 - `scripts/sf_knowledge_init.py`: crea/aggiorna Knowledge.
 - `scripts/sf_agent_cli.py`: facade sicura Salesforce CLI.
 - `scripts/knowledge_history.py`: registra eventi Knowledge.
 - `scripts/git_knowledge_push.py`: push remoto con history inclusa.
 - `scripts/generate_package_manifest.py`: genera `package.xml` per metadata aggiunti/modificati.
+- `scripts/sf_version_update.py`: aggiorna le risorse con release/API/SOAP/package version context verificato.
 - `scripts/self_test.py`: test locali cross-platform.
 - `references/products-packages/index.md`: indice per identificare prodotti Salesforce e pacchetti AppExchange rilevanti.
 - `references/products-packages/products/`: file Markdown per prodotto Salesforce e sviluppo mobile.
 - `references/products-packages/packages/`: file Markdown per pacchetto AppExchange.
+- `references/salesforce-current-version.md`: contesto corrente Salesforce release/API/SOAP/package.
+- `references/salesforce-version.json`: versione machine-readable per script.
+- `references/version-update.md`: metodologia per `/sf-version-update-skill`.
 - `references/metadata-dependencies.md`: checklist delle relazioni metadata da considerare in pianificazione.
 - `references/completion-artifacts.md`: strutture per release notes, specifiche tecniche, impact assessment, user testing e manual procedures.
 - `references/testing-and-manifest-guardrails.md`: guardrail per test Apex/Flow/metadata testabili e generazione `package.xml`.

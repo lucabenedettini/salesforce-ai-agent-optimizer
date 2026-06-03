@@ -24,3 +24,6 @@ Integration and API platform for connecting Salesforce, external systems, events
 - Use named credentials and integration users with least privilege.
 - Plan idempotency, retries, limits and error queues.
 - Avoid point-to-point integrations when reusable APIs fit.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

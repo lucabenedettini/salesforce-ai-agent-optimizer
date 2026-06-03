@@ -3,9 +3,10 @@
 ## Decision Order
 
 1. Confirm business capability, users, data ownership, volumes, compliance, and release constraints.
-2. Check whether standard Salesforce capability, setup configuration, Flow, OmniStudio, Experience Cloud, Service/Sales Cloud feature, Data Cloud, or a managed package can satisfy the need.
-3. Use custom code only when configuration cannot meet behavior, performance, transactionality, UX, integration, or governance requirements.
-4. Prefer reversible decisions and metadata that admins can reason about.
+2. Read `references/salesforce-current-version.md` when API, SOAP, Metadata API, LWC API, package, or release behavior can affect the design.
+3. Check whether standard Salesforce capability, setup configuration, Flow, OmniStudio, Experience Cloud, Service/Sales Cloud feature, Data Cloud, or a managed package can satisfy the need.
+4. Use custom code only when configuration cannot meet behavior, performance, transactionality, UX, integration, or governance requirements.
+5. Prefer reversible decisions and metadata that admins can reason about.
 
 ## Well-Architected Checks
 

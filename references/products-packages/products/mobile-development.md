@@ -25,3 +25,6 @@ Development and configuration for Salesforce mobile experiences, mobile-ready LW
 - Use mobile-ready LWC patterns and avoid desktop-only UI assumptions.
 - Validate object/field access, offline data scope and conflict behavior.
 - Test on real devices or mobile previews before release.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

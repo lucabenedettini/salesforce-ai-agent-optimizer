@@ -24,3 +24,6 @@ Collaboration platform integrated with Salesforce for channels, workflows, notif
 - Avoid leaking sensitive record data into broad channels.
 - Test user identity mapping, permissions and audit requirements.
 - Keep Slack workflows simple and observable.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. Verificare la release della target org e la disponibilita' effettiva delle funzionalita'; per prodotti distribuiti anche come managed package o add-on, verificare la versione installata nella org quando rilevante.

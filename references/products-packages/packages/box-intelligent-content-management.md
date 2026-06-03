@@ -24,3 +24,6 @@ Box integration for managing content, collaboration, document workflows and file
 - Verify Box permissions and Salesforce sharing do not conflict.
 - Test folder creation and ownership for private records.
 - Avoid storing sensitive files in broadly shared folders.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

@@ -23,3 +23,6 @@ Salesforce package for analyzing, reporting and managing user permissions and as
 - Check permission set groups and muting permission sets together.
 - Validate object and field access with a real user or login-as test.
 - Avoid broad profile changes when permission sets solve the requirement.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

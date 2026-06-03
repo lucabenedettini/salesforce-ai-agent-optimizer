@@ -23,3 +23,6 @@ Package for analyzing field population and usage to support cleanup of unused or
 - Check dependencies in layouts, Lightning pages, Flow, Apex, reports and integrations.
 - Export or archive data before destructive cleanup.
 - Use deprecation phases before deletion.
+
+## Contesto versione
+Prima della pianificazione leggere `references/salesforce-current-version.md`. La versione installata del managed package e' specifica della target org: chiedere l'alias org e usare `scripts/sf_agent_cli.py package-installed-list --target-org <alias> --select result` prima di assumere namespace, oggetti, feature o comportamento disponibili.

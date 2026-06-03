@@ -10,6 +10,7 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Token-efficient Salesforce CLI usage.
 - Local project Knowledge generated from metadata.
 - Product and AppExchange package context before planning.
+- Current Salesforce release/API/SOAP/package version context with `/sf-version-update-skill`.
 - Metadata dependency planning.
 - Testing guardrails for Apex, Flow, and other testable metadata.
 - Required package.xml generation for added or modified metadata.
@@ -22,7 +23,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.2.0`
+- Current version: `0.3.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 
@@ -30,13 +31,16 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 
 Use `/sf-init-project-skill` to build or refresh `.salesforce-agent-knowledge/` for a Salesforce project.
 
+Use `/sf-version-update-skill` to refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources.
+
 Before planning, an agent should:
 
 1. Identify products/packages from `references/products-packages/index.md`.
-2. Read only relevant product/package files.
-3. Read `references/metadata-dependencies.md`.
-4. Read the local project Knowledge.
-5. Inspect source metadata before modifying.
+2. Read `references/salesforce-current-version.md` for release/API/package-sensitive work.
+3. Read only relevant product/package files.
+4. Read `references/metadata-dependencies.md`.
+5. Read the local project Knowledge.
+6. Inspect source metadata before modifying.
 
 At the end of development, the agent asks whether to generate delivery artifacts using `references/completion-artifacts.md`.
 

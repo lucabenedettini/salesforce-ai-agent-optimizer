@@ -8,6 +8,17 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.3.0 - 2026-06-03
+
+### Added
+
+- Added `/sf-version-update-skill` to refresh Salesforce release, API, SOAP API, Metadata API, LWC API, product, and package version context from official Salesforce sources.
+- Added `references/salesforce-version.json` and `references/salesforce-current-version.md` with Summer '26 / API 67.0 version context, SOAP API guardrails, project API version rules, and package version policy.
+- Added `references/version-update.md` and `scripts/sf_version_update.py` to make version context refresh repeatable.
+- Updated product/package planning to read current Salesforce version context and to treat managed package versions as target-org-specific.
+- Updated `generate_package_manifest.py` so fallback manifest API version comes from `references/salesforce-version.json`.
+- Added portable `/sf-version-update-skill` adapter and updated Codex, Claude Code, GitHub Copilot, README, and wiki guidance.
+
 ## 0.2.0 - 2026-06-03
 
 ### Added
