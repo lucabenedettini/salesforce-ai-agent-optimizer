@@ -2,6 +2,13 @@
 
 All notable changes to Salesforce Agent Optimizer are recorded here.
 
+## Unreleased
+
+- Added product/package planning references for core Salesforce products, Salesforce CPQ, Salesforce Field Service, mobile development, popular AppExchange packages, and Advanced Approvals.
+- Added `references/products-packages/index.md` so agents identify relevant products/packages by brief description before planning.
+- Added `references/metadata-dependencies.md` so agents plan across permission sets, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, analytics, packages, and mobile exposure.
+- Updated delivery methodology to ask whether the user wants an optional PDF with configuration/customization tasks, explanations, dependencies, and time estimates after planning.
+
 ## 0.1.0 - 2026-06-02
 
 - Created the `salesforce-agent-optimizer` Codex skill.

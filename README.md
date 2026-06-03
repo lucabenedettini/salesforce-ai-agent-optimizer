@@ -18,6 +18,9 @@ La skill deve:
 - far rileggere e riassumere all'agente la richiesta utente prima di agire;
 - fare domande solo quando servono requisiti, org target, rischio o criteri di accettazione;
 - consultare la Knowledge locale prima di pianificare o modificare;
+- identificare prima della pianificazione i prodotti Salesforce, i pacchetti AppExchange e le superfici mobile rilevanti tramite le descrizioni brevi in `references/products-packages/index.md`;
+- leggere i file prodotto/pacchetto rilevanti prima di pianificare;
+- considerare le dipendenze metadata Salesforce tra accessi, campi, layout, Lightning pages, record type, picklist, automazioni, codice, integrazioni, sharing, analytics e mobile;
 - preferire configurazione, standard Salesforce, Flow, LDS/UI API, permission set, named credential e managed package prima di custom code;
 - pianificare modifiche minimali e chiedere approvazione prima di scrivere file o metadata;
 - bloccare write/execute su org di produzione;
@@ -25,6 +28,7 @@ La skill deve:
 - usare auth sicura: `auth-web`, `auth-device`, `auth-jwt`;
 - validare con test/static check/subagent quando disponibile;
 - ripianificare se approvazione, test o validazione falliscono, con massimo tre cicli falliti;
+- chiedere a fine pianificazione se generare opzionalmente un PDF con task di configurazione/customizzazione, spiegazione e stima tempi;
 - chiedere se fare push e su quale branch solo a validazione completata;
 - registrare nella Knowledge deploy e push remoti con requisito e tutti i metadata modificati.
 
@@ -173,11 +177,14 @@ Contiene:
 
 Prima di pianificare o modificare, l'agente deve leggere:
 
-1. `.salesforce-agent-knowledge/index.md`
-2. `.salesforce-agent-knowledge/markdown-index.md` se serve trovare il file giusto
-3. il file specifico sotto `.salesforce-agent-knowledge/metadata/`
-4. `.salesforce-agent-knowledge/history/project-history.md`
-5. il source file originale prima di scrivere
+1. `references/products-packages/index.md`
+2. i file prodotto/pacchetto rilevanti sotto `references/products-packages/`
+3. `references/metadata-dependencies.md`
+4. `.salesforce-agent-knowledge/index.md`
+5. `.salesforce-agent-knowledge/markdown-index.md` se serve trovare il file giusto
+6. il file specifico sotto `.salesforce-agent-knowledge/metadata/`
+7. `.salesforce-agent-knowledge/history/project-history.md`
+8. il source file originale prima di scrivere
 
 ### Usare Salesforce CLI In Modo Sicuro
 
@@ -284,11 +291,17 @@ Richiede PyYAML nel Python usato dal validator.
 - `scripts/knowledge_history.py`: registra eventi Knowledge.
 - `scripts/git_knowledge_push.py`: push remoto con history inclusa.
 - `scripts/self_test.py`: test locali cross-platform.
+- `references/products-packages/index.md`: indice per identificare prodotti Salesforce e pacchetti AppExchange rilevanti.
+- `references/products-packages/products/`: file Markdown per prodotto Salesforce e sviluppo mobile.
+- `references/products-packages/packages/`: file Markdown per pacchetto AppExchange.
+- `references/metadata-dependencies.md`: checklist delle relazioni metadata da considerare in pianificazione.
 - `references/`: guide dettagliate e catalogo comandi Salesforce CLI.
 
 ## Note Operative Per Agenti
 
 - Leggere meno file possibile: `index.md`, pagina metadata rilevante, history, poi source.
+- Prima della pianificazione, identificare prodotti/pacchetti da `references/products-packages/index.md` e leggere solo i file rilevanti.
+- Usare `references/metadata-dependencies.md` per evitare piani su metadata isolati quando esistono dipendenze con accessi, UI, automazioni, codice o integrazioni.
 - Non usare la Knowledge come fonte unica: il source metadata resta la verita'.
 - Se la Knowledge generata da `/sf-init-project-skill` e' vecchia rispetto ai file modificati, refreshare prima di pianificare.
 - Se una modifica viene deployata o pushata, la history deve spiegare il requisito e tutti i metadata modificati.

@@ -22,6 +22,9 @@ Ask questions only when needed. Prefer 1-3 high-value questions. Do not ask abou
 
 Consult project Knowledge first:
 
+- Read `references/products-packages/index.md` and identify relevant Salesforce products, AppExchange packages, or mobile-development surfaces by brief description.
+- Read only the matching product/package files under `references/products-packages/products/` or `references/products-packages/packages/`.
+- Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
 - Read `.salesforce-agent-knowledge/markdown-index.md` when the exact metadata page is not obvious.
 - Read the relevant per-metadata Markdown files under `.salesforce-agent-knowledge/metadata/` before opening raw source.
@@ -46,11 +49,16 @@ Verify official guidance when needed:
 Then produce a plan with:
 
 - Requirement summary.
+- Products/packages identified and product/package reference files read.
 - Configuration-first solution.
 - Custom code only if justified.
 - Exact files/metadata expected to change.
+- Metadata dependency impact: permissions, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, reports, dashboards, and mobile exposure where relevant.
 - Test/validation plan.
+- Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
+
+At the end of planning, ask whether the user wants an optional PDF containing all planned configuration/customization tasks, task explanations, metadata dependencies, and estimated execution time.
 
 Ask for explicit approval before making file or org metadata changes.
 

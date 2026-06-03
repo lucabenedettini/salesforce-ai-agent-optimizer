@@ -1,6 +1,6 @@
 ---
 name: salesforce-agent-optimizer
-description: Optimize AI-agent work on Salesforce orgs, products, architecture, solution design, configuration, Apex, Lightning Web Components, Flows, integrations, DevOps, and Salesforce CLI usage. Use when Codex, Claude Code, GitHub Copilot, or another coding agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, enforcing backend/frontend best practices, using approval-gated planning, building or refreshing an indexed Salesforce metadata Knowledge with /sf-init-project-skill, consulting that Knowledge before every modification, delegating validation to a subagent when available, managing retries, asking about push branch at the end, and reducing token waste from org discovery or CLI output.
+description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying relevant products/packages before planning, accounting for metadata dependencies, using approval-gated planning, building or refreshing indexed metadata Knowledge with /sf-init-project-skill, consulting Knowledge before changes, delegating validation when available, offering optional PDF task estimates after planning, asking about push branch at the end, and reducing token waste from org discovery or CLI output.
 ---
 
 # Salesforce Agent Optimizer
@@ -16,6 +16,12 @@ Keep patches minimal. Change the fewest metadata/code files that solve the state
 Use org evidence before assumptions. Inspect only the metadata needed for the decision, summarize findings compactly, and avoid dumping raw CLI output into context.
 
 Before any modification, consult the project Knowledge if it exists. If it is missing, stale, or explicitly requested by the user, run `/sf-init-project-skill` to build or refresh it.
+
+## Product, Package, And Dependency Context
+
+Before planning, read `references/products-packages/index.md`. Use the brief descriptions to identify relevant Salesforce products, AppExchange packages, and mobile-development surfaces from the user's request, project metadata, installed packages, object names, namespaces, and app names. Then read only the matching product/package files.
+
+Before planning, also read `references/metadata-dependencies.md` and account for relationships across permission sets, permission set groups, users, fields, page layouts, Lightning pages, record types, picklist values, Flow, Apex, integrations, sharing, reports, dashboards, and mobile exposure.
 
 ## `/sf-init-project-skill` Metadata Knowledge
 
@@ -43,16 +49,18 @@ Read `references/delivery-methodology.md` for the full loop. Follow it for every
 
 1. Restate the user's Salesforce request and project context in concise terms.
 2. Ask focused clarification questions only when requirements, target org, risk, or acceptance criteria are unclear.
-3. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
-4. Inspect the minimum repository/org evidence needed to plan safely.
-5. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version.
-6. Plan the intended changes, including configuration-first options, custom work, tests, risks, and rollback.
-7. Ask the user to approve the plan before modifying project files or org metadata.
-8. After approval, implement only the approved minimal changes.
-9. Summarize requirements, changes, affected artifacts, assumptions, and validation commands.
-10. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
-11. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
-12. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
+3. Identify relevant products/packages from `references/products-packages/index.md`, then read the matching product/package files.
+4. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
+5. Read `references/metadata-dependencies.md` and inspect the minimum repository/org evidence needed to plan dependencies safely.
+6. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version.
+7. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, tests, risks, estimates, and rollback.
+8. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
+9. Ask the user to approve the plan before modifying project files or org metadata.
+10. After approval, implement only the approved minimal changes.
+11. Summarize requirements, changes, affected artifacts, assumptions, and validation commands.
+12. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
+13. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
+14. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
 
 ## Token Discipline
 
@@ -98,6 +106,8 @@ Keep components small, accessible, secure under Lightning Web Security, and effi
 ## Architecture And Solution Design
 
 For architecture or discovery tasks, read `references/architecture-solution.md`.
+
+For product/package or metadata dependency tasks, read `references/products-packages/index.md`, the matching product/package files, and `references/metadata-dependencies.md`.
 
 Produce designs that include:
 

@@ -29,9 +29,11 @@ Adaptable:
 For a design, return:
 
 - Recommendation: concise chosen path.
+- Products/packages: detected products/packages and reference files read.
 - Why configuration first: what standard/declarative features cover.
 - Custom gap: only if custom work remains.
-- Architecture: data, automation, security, integration, deployment.
+- Architecture: data, automation, security, integration, deployment, mobile exposure if relevant.
+- Metadata dependencies: access, data model, UI, automation, code, integrations, sharing, analytics, and package dependencies.
 - Risks and limits: concrete Salesforce constraints.
 - Validation: how to prove it in sandbox and production.
 
@@ -43,3 +45,4 @@ For a design, return:
 - Hard-coded org IDs, record type IDs, queue IDs, pricebook IDs, or endpoints.
 - Large data operations without selectivity, async design, or retry/monitoring plan.
 - Integration authentication without named credentials or external credentials.
+- Planning a field, record type, picklist, layout, Lightning page, permission set, or package change as if it were isolated metadata.
