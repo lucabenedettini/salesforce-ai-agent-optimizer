@@ -31,6 +31,8 @@ La skill deve:
 - validare con test/static check/subagent quando disponibile;
 - ripianificare se approvazione, test o validazione falliscono, con massimo tre cicli falliti;
 - chiedere a fine pianificazione se generare opzionalmente un PDF con task di configurazione/customizzazione, spiegazione e stima tempi;
+- applicare guardrail di test: Apex modificato almeno all'80% e preferibilmente 90%-100%, piu' test per Flow e altri metadata testabili quando supportati dal progetto/Salesforce;
+- generare a fine implementazione un `package.xml` Salesforce Metadata API con tutti i metadata aggiunti o modificati;
 - chiedere a fine sviluppo se generare release notes, specifiche tecniche, impact assessment, user testing e manual procedures;
 - chiedere se fare push e su quale branch solo a validazione completata;
 - registrare nella Knowledge deploy e push remoti con requisito e tutti i metadata modificati.
@@ -65,7 +67,7 @@ Le modifiche nel tempo sono tracciate in `CHANGELOG.md`. Aggiorna quel file a og
 
 ## Versionamento
 
-La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1`.
+La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1` ed e' attualmente a `0.2.0`.
 
 Regole:
 
@@ -85,10 +87,13 @@ La wiki del progetto spiega visione generale, principi, installazione e versiona
 https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/wiki
 ```
 
-Fonti ufficiali utili, verificate al 2026-06-02:
+Fonti ufficiali utili, verificate al 2026-06-03:
 
 - Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
 - Salesforce CLI reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
+- Salesforce Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
+- Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
+- Salesforce application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
 - Claude Code slash commands: https://docs.anthropic.com/en/docs/claude-code/slash-commands
 - Claude Code memory/CLAUDE.md: https://code.claude.com/docs/en/memory
 - GitHub Copilot custom instructions: https://docs.github.com/en/copilot/concepts/prompting/response-customization
@@ -263,6 +268,30 @@ Alla fine della fase di sviluppo, prima della validazione o della consegna final
 
 Regole e template sono in `references/completion-artifacts.md`.
 
+### Test E Manifest Di Deploy
+
+Durante pianificazione e validazione, l'agente deve leggere `references/testing-and-manifest-guardrails.md` quando la modifica tocca Apex, Flow, automazioni, UI metadata, integrazioni, accessi o metadata deployabili.
+
+Guardrail principali:
+
+- Apex modificato: almeno 80% di copertura, preferibilmente 90%-100% per codice nuovo, critico, riusabile, di sicurezza, integrazione, async o trigger handler.
+- Flow e altri metadata testabili: test automatici quando Salesforce/progetto li supportano; in caso contrario, test manuali e motivazione documentata.
+- Coverage non basta: servono assertion e scenari positivi, negativi, bulk, sicurezza e async dove rilevanti.
+
+A fine implementazione deve essere generato un `package.xml` con tutti i metadata aggiunti o modificati. Usa:
+
+```bash
+python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml --from-git-status
+```
+
+Oppure, quando la lista metadata e' gia' nota:
+
+```bash
+python scripts/generate_package_manifest.py --project-root . --output release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml --metadata ApexClass:AccountService --metadata Flow:Account_Onboarding
+```
+
+Il manifest usa la struttura Salesforce Metadata API `Package/types/members/name/version`. I metadata rimossi non vanno in `package.xml`: richiedono `destructiveChanges.xml` con approvazione esplicita.
+
 ## Sicurezza
 
 - Produzione e' read-only per la facade.
@@ -305,6 +334,7 @@ Copre:
 - blocco accesso org senza alias;
 - dry-run senza scrittura history;
 - push verso remote Git temporaneo con history inclusa sul ramo remoto.
+- generazione `package.xml` da metadata modificati/aggiunti rilevati da git status.
 
 Validazione Codex skill:
 
@@ -330,12 +360,14 @@ Richiede PyYAML nel Python usato dal validator.
 - `scripts/sf_agent_cli.py`: facade sicura Salesforce CLI.
 - `scripts/knowledge_history.py`: registra eventi Knowledge.
 - `scripts/git_knowledge_push.py`: push remoto con history inclusa.
+- `scripts/generate_package_manifest.py`: genera `package.xml` per metadata aggiunti/modificati.
 - `scripts/self_test.py`: test locali cross-platform.
 - `references/products-packages/index.md`: indice per identificare prodotti Salesforce e pacchetti AppExchange rilevanti.
 - `references/products-packages/products/`: file Markdown per prodotto Salesforce e sviluppo mobile.
 - `references/products-packages/packages/`: file Markdown per pacchetto AppExchange.
 - `references/metadata-dependencies.md`: checklist delle relazioni metadata da considerare in pianificazione.
 - `references/completion-artifacts.md`: strutture per release notes, specifiche tecniche, impact assessment, user testing e manual procedures.
+- `references/testing-and-manifest-guardrails.md`: guardrail per test Apex/Flow/metadata testabili e generazione `package.xml`.
 - `references/`: guide dettagliate e catalogo comandi Salesforce CLI.
 
 ## Note Operative Per Agenti

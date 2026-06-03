@@ -28,6 +28,14 @@ Salesforce metadata is a graph. Plans must account for permission sets, permissi
 
 Agents must restate the request, ask focused questions only when needed, plan before changing, ask for approval, validate with tests or a subagent when available, and retry failed plans no more than three times before returning to requirements.
 
+## Testable Metadata Discipline
+
+Agents must test what Salesforce and the project make testable. Changed Apex requires at least 80% coverage and should target 90%-100%; Flow and other metadata with supported automated or meaningful manual validation must be covered before final delivery.
+
+## Manifest Discipline
+
+Every implemented request must produce a `package.xml` for added or modified metadata before validation handoff. This makes deployment scope explicit and keeps review focused on the approved change.
+
 ## Handoff Completeness
 
 At the end of development, agents should ask whether the user wants release notes, technical specifications, impact assessment, user testing, and manual procedure files. These artifacts make Salesforce changes easier to review, deploy, test, audit, and operate after release.

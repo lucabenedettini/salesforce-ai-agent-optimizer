@@ -1,6 +1,6 @@
 # Completion Artifacts
 
-At the end of the development phase, before validation handoff or final delivery, ask the user whether to generate optional delivery files. Generate them only after the user confirms which files are wanted and where to place them.
+At the end of the development phase, before validation handoff or final delivery, first generate the required `package.xml` described in `references/testing-and-manifest-guardrails.md`. Then ask the user whether to generate optional delivery files. Generate optional files only after the user confirms which files are wanted and where to place them.
 
 Default folder when the user does not specify one:
 
@@ -10,9 +10,11 @@ release-artifacts/<yyyy-mm-dd>-<short-change-name>/
 
 Use Markdown by default because it is diffable, reviewable, and easy to convert to PDF or DOCX later.
 
+The required `package.xml` should be saved in the same default folder unless the project has an approved release-manifest convention.
+
 ## Required Prompt
 
-Ask:
+After generating `package.xml`, ask:
 
 ```text
 Vuoi generare uno o piu' artefatti di fine sviluppo?
@@ -151,7 +153,7 @@ Never include secrets. For secrets, state where the authorized admin must enter 
 
 ## Quality Rules
 
-- Do not invent metadata. Use repository diff, Knowledge history, deploy manifest, Salesforce CLI output, and user-approved plan.
+- Do not invent metadata. Use repository diff, Knowledge history, generated `package.xml`, deploy manifest, Salesforce CLI output, and user-approved plan.
 - Keep files concise but complete enough for handoff.
 - Mark unknowns explicitly as `To verify`.
 - Include added, modified, removed metadata in every relevant file.

@@ -26,7 +26,8 @@ Tests should prove behavior, not just coverage:
 - Assert security/permission-sensitive behavior where relevant.
 - Use `Test.startTest()` and `Test.stopTest()` around async/limit-sensitive execution.
 - Avoid `SeeAllData=true` 
-- Test at least 80% of code lines, preferred 90%-95%
+- Test changed Apex at least 80% of code lines, with 90%-100% preferred for new, critical, reusable, integration, security, async, invocable, and trigger-handler code.
+- Treat coverage as a gate, not proof. Assertions must prove positive, negative, bulk, security, and async behavior where relevant.
 
 ## Review Heuristics
 

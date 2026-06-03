@@ -25,6 +25,7 @@ Consult project Knowledge first:
 - Read `references/products-packages/index.md` and identify relevant Salesforce products, AppExchange packages, or mobile-development surfaces by brief description.
 - Read only the matching product/package files under `references/products-packages/products/` or `references/products-packages/packages/`.
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
+- Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
 - Read `.salesforce-agent-knowledge/markdown-index.md` when the exact metadata page is not obvious.
 - Read the relevant per-metadata Markdown files under `.salesforce-agent-knowledge/metadata/` before opening raw source.
@@ -54,7 +55,7 @@ Then produce a plan with:
 - Custom code only if justified.
 - Exact files/metadata expected to change.
 - Metadata dependency impact: permissions, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, reports, dashboards, and mobile exposure where relevant.
-- Test/validation plan.
+- Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
 
@@ -71,6 +72,15 @@ After approval:
 - Preserve existing project conventions.
 - Do not broaden scope because adjacent issues are visible.
 - If a materially better plan appears during implementation, stop and ask for approval on the revised plan.
+
+At the end of development, before optional handoff files and before validation handoff, generate a `package.xml` containing every metadata component added or modified for the approved request.
+
+- Read `references/testing-and-manifest-guardrails.md`.
+- Prefer `scripts/generate_package_manifest.py`.
+- Default output: `release-artifacts/<yyyy-mm-dd>-<short-change-name>/package.xml`.
+- Use explicit `--metadata Type:Member` values when git status cannot map all changed metadata.
+- Do not include deleted metadata in `package.xml`; plan `destructiveChanges.xml` separately with explicit approval when deletion deploys are required.
+- Do not overwrite an existing broad `manifest/package.xml` unless the user approved that exact overwrite.
 
 At the end of development, before validation handoff, read `references/completion-artifacts.md` and ask whether the user wants one or more end-of-development files:
 

@@ -11,6 +11,8 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Local project Knowledge generated from metadata.
 - Product and AppExchange package context before planning.
 - Metadata dependency planning.
+- Testing guardrails for Apex, Flow, and other testable metadata.
+- Required package.xml generation for added or modified metadata.
 - Validation handoff and retry discipline.
 - Deploy and remote push history tracking.
 - End-of-development handoff files: release notes, technical specifications, impact assessment, user testing, and manual procedures.
@@ -20,7 +22,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.1.0`
+- Current version: `0.2.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 
@@ -37,3 +39,5 @@ Before planning, an agent should:
 5. Inspect source metadata before modifying.
 
 At the end of development, the agent asks whether to generate delivery artifacts using `references/completion-artifacts.md`.
+
+Before validation handoff, the agent generates `package.xml` using `references/testing-and-manifest-guardrails.md`.

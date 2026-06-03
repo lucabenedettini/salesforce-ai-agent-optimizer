@@ -1,6 +1,6 @@
 ---
 name: salesforce-agent-optimizer
-description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying products/packages before planning, accounting for metadata dependencies, using approval-gated planning, building indexed metadata Knowledge with /sf-init-project-skill, offering optional PDF task estimates after planning, offering release notes/specifications/impact/user testing/manual procedure files after development, and reducing token waste.
+description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, testing, package.xml manifests, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying products/packages before planning, accounting for metadata dependencies, using approval-gated planning, building indexed metadata Knowledge with /sf-init-project-skill, enforcing Apex/Flow/testable metadata guardrails, generating package.xml for added/modified metadata after implementation, offering optional PDF task estimates after planning, offering release notes/specifications/impact/user testing/manual procedure files after development, and reducing token waste.
 ---
 
 # Salesforce Agent Optimizer
@@ -53,15 +53,16 @@ Read `references/delivery-methodology.md` for the full loop. Follow it for every
 4. Consult `.salesforce-agent-knowledge/index.md`, `markdown-index.md`, relevant metadata pages, and project history before planning; if missing or stale, run `/sf-init-project-skill` or ask whether to refresh.
 5. Read `references/metadata-dependencies.md` and inspect the minimum repository/org evidence needed to plan dependencies safely.
 6. If official Salesforce behavior is unknown, missing, release-sensitive, or worth confirming, search online only in official Salesforce documentation and use the latest available version.
-7. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, tests, risks, estimates, and rollback.
+7. Plan the intended changes, including configuration-first options, custom work, metadata dependencies, testable metadata coverage, risks, estimates, and rollback.
 8. At the end of planning, ask whether the user wants an optional PDF with each configuration/customization task, explanation, and estimated execution time.
 9. Ask the user to approve the plan before modifying project files or org metadata.
 10. After approval, implement only the approved minimal changes.
-11. At the end of development, read `references/completion-artifacts.md` and ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
-12. Summarize requirements, changes, affected artifacts, assumptions, and validation commands.
-13. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
-14. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
-15. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
+11. At the end of development, read `references/testing-and-manifest-guardrails.md` and generate a `package.xml` for all added or modified metadata, using `scripts/generate_package_manifest.py` when possible.
+12. Read `references/completion-artifacts.md` and ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files.
+13. Summarize requirements, changes, affected artifacts, generated package manifest, assumptions, and validation commands.
+14. Pass that summary to a validation subagent when the platform supports subagents. If subagents are unavailable, create a standalone validation prompt and run the closest independent validation pass available.
+15. If approval is denied, validation fails, or tests fail, return to planning with the new evidence. Allow at most three unsuccessful planning/validation cycles; after that, stop implementation and restart from a fresh requirements explanation.
+16. When work is validated, ensure Knowledge history records the requirement and all modified metadata for deployed changes, then ask whether to push and which branch to use. If a remote push is approved, push through `scripts/git_knowledge_push.py` so the Knowledge history is committed and included on the remote branch.
 
 ## Token Discipline
 
@@ -88,6 +89,8 @@ Read `references/sf-agent-cli-commands.md` before using or extending the facade.
 
 For Apex, read `references/backend-apex.md` when implementing or reviewing custom backend logic.
 
+Read `references/testing-and-manifest-guardrails.md` during planning and validation when changes touch Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
+
 Always check:
 
 - Bulk safety: no SOQL/DML/callouts in record loops; handlers accept collections.
@@ -95,6 +98,7 @@ Always check:
 - Security: sharing model, CRUD/FLS, user-mode operations where appropriate, guest-user exposure, named credentials.
 - Trigger design: one trigger per object, delegated logic, deterministic recursion control.
 - Tests: meaningful assertions, positive/negative paths, bulk tests, permission-aware tests, no SeeAllData unless justified.
+- Coverage: changed Apex at least 80%, preferably 90%-100%; Flow and other testable metadata must be tested where Salesforce/project capabilities support it.
 
 ## Frontend Guidelines
 
@@ -111,6 +115,8 @@ For architecture or discovery tasks, read `references/architecture-solution.md`.
 For product/package or metadata dependency tasks, read `references/products-packages/index.md`, the matching product/package files, and `references/metadata-dependencies.md`.
 
 For end-of-development handoff files, read `references/completion-artifacts.md`.
+
+For Salesforce testing guardrails and required `package.xml` generation, read `references/testing-and-manifest-guardrails.md`.
 
 Produce designs that include:
 
@@ -129,6 +135,7 @@ Use `references/agent-installation.md` when packaging this skill for Codex, Clau
 - `agents/github-copilot-instructions.md`: GitHub Copilot repository instruction block.
 - `agents/sf-init-project-skill.md`: portable `/sf-init-project-skill` slash-command definition.
 - `references/completion-artifacts.md`: release notes, technical specifications, impact assessment, user testing, and manual procedure artifact rules.
+- `references/testing-and-manifest-guardrails.md`: Apex, Flow, testable metadata, and required `package.xml` rules.
 
 Keep adapters short. The canonical behavior lives in this `SKILL.md` and the `references/` files.
 

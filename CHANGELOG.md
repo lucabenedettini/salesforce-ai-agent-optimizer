@@ -8,6 +8,16 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.2.0 - 2026-06-03
+
+### Added
+
+- Added testing guardrails for changed Apex, Flow, and other testable Salesforce metadata.
+- Added required end-of-implementation `package.xml` generation for all added or modified metadata.
+- Added `scripts/generate_package_manifest.py` to create compact Salesforce Metadata API manifests from explicit metadata, changed files, git status, or git refs.
+- Added `references/testing-and-manifest-guardrails.md` with coverage thresholds, Flow/testable metadata guidance, official Salesforce references, and package.xml rules.
+- Updated delivery methodology, completion artifacts, adapters, README, and wiki source pages for the new testing and manifest workflow.
+
 ## 0.1.0 - 2026-06-03
 
 ### Added

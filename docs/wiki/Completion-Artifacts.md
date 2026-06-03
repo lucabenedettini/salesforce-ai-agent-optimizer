@@ -1,6 +1,6 @@
 # Completion Artifacts
 
-At the end of development, the agent asks whether to generate optional handoff files.
+At the end of development, the agent first generates the required `package.xml`, then asks whether to generate optional handoff files.
 
 ## Files
 
@@ -16,6 +16,9 @@ At the end of development, the agent asks whether to generate optional handoff f
 release-artifacts/<yyyy-mm-dd>-<short-change-name>/
 ```
 
+The required `package.xml` is saved in this folder unless the project has an approved manifest convention.
+
 ## Source Of Truth
 
 The canonical template rules live in `references/completion-artifacts.md`.
+Testing and manifest rules live in `references/testing-and-manifest-guardrails.md`.

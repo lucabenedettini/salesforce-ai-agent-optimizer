@@ -7,6 +7,9 @@ Use these official Salesforce sources to refresh guidance when the task needs ex
 - Salesforce CLI command flags and standard org flags: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/command-flags.html
 - Salesforce CLI migration from `sfdx` to `sf`: https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/migrate-sfdx-sf.html
 - Salesforce CLI command reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
+- Metadata API deploy manifest/package.xml: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
+- Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
+- Application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
 - LWC data access guidelines: https://developer.salesforce.com/docs/platform/lwc/guide/data.html
 - LWC secure Apex classes: https://developer.salesforce.com/docs/platform/lwc/guide/apex-security
 - LWC performance guidance: https://developer.salesforce.com/docs/platform/lwc/guide/perf-intro.html

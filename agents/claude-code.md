@@ -15,6 +15,8 @@ Follow these rules:
 - Use `scripts/sf_min.py` only as read-only compact fallback for official `sf` commands not yet exposed by the facade.
 - Load `references/sf-agent-cli-commands.md`, `references/knowledge-init.md`, `references/delivery-methodology.md`, `references/architecture-solution.md`, `references/backend-apex.md`, `references/frontend-lwc.md`, or `references/sf-cli-token-patterns.md` only when relevant.
 - After approved implementation, summarize requirements/changes and pass them to a validation subagent when available; if validation fails or approval is denied, replan with a maximum of three unsuccessful cycles.
+- Enforce testing guardrails: changed Apex must be at least 80% covered, preferably 90%-100%, and Flow or other testable metadata must be tested where Salesforce/project capabilities support it.
+- At the end of implementation, generate `package.xml` for all added or modified metadata using `scripts/generate_package_manifest.py` when possible.
 - At the end of development, ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedure files; use `references/completion-artifacts.md` if the user approves.
 - At the end of planning, ask whether the user wants an optional PDF with all configuration/customization tasks, explanations, dependencies, and time estimates.
 - After successful deploys, ensure `.salesforce-agent-knowledge/history/project-history.md` records the requirement and all modified metadata.

@@ -217,6 +217,63 @@ def test_git_push_records_history() -> dict[str, object]:
         return checks
 
 
+def test_package_manifest_generation() -> dict[str, object]:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp) / "repo"
+        make_salesforce_project(root)
+        flow_dir = root / "force-app" / "main" / "default" / "flows"
+        flow_dir.mkdir(parents=True)
+        (root / "sfdx-project.json").write_text('{"sourceApiVersion": "64.0"}', encoding="utf-8")
+        run(["git", "init", str(root)])
+        run(["git", "config", "user.email", "agent@example.com"], cwd=root)
+        run(["git", "config", "user.name", "Agent"], cwd=root)
+        run(["git", "add", "."], cwd=root)
+        run(["git", "commit", "-m", "baseline"], cwd=root)
+
+        (root / "force-app" / "main" / "default" / "objects" / "Account" / "fields" / "Priority__c.field-meta.xml").write_text(
+            "<CustomField xmlns='http://soap.sforce.com/2006/04/metadata'>"
+            "<fullName>Priority__c</fullName><label>Priority</label><type>Text</type><length>80</length>"
+            "</CustomField>",
+            encoding="utf-8",
+        )
+        (root / "force-app" / "main" / "default" / "classes" / "AccountPriorityService.cls").write_text(
+            "public with sharing class AccountPriorityService {}",
+            encoding="utf-8",
+        )
+        (root / "force-app" / "main" / "default" / "classes" / "AccountPriorityService.cls-meta.xml").write_text(
+            "<ApexClass xmlns='http://soap.sforce.com/2006/04/metadata'>"
+            "<apiVersion>64.0</apiVersion><status>Active</status></ApexClass>",
+            encoding="utf-8",
+        )
+        (flow_dir / "Account_Onboarding.flow-meta.xml").write_text(
+            "<Flow xmlns='http://soap.sforce.com/2006/04/metadata'><label>Account Onboarding</label></Flow>",
+            encoding="utf-8",
+        )
+
+        output = root / "release-artifacts" / "test-change" / "package.xml"
+        run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "generate_package_manifest.py"),
+                "--project-root",
+                str(root),
+                "--output",
+                str(output),
+                "--from-git-status",
+            ]
+        )
+        package_xml = output.read_text(encoding="utf-8")
+        checks = {
+            "exists": output.exists(),
+            "has_apex_class": "<name>ApexClass</name>" in package_xml and "<members>AccountPriorityService</members>" in package_xml,
+            "has_custom_field": "<name>CustomField</name>" in package_xml and "<members>Account.Priority__c</members>" in package_xml,
+            "has_flow": "<name>Flow</name>" in package_xml and "<members>Account_Onboarding</members>" in package_xml,
+            "uses_project_api_version": "<version>64.0</version>" in package_xml,
+        }
+        assert all(checks.values())
+        return checks
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run local cross-platform tests for the Salesforce Agent Optimizer skill.")
     parser.add_argument("--json", action="store_true")
@@ -226,6 +283,7 @@ def main() -> int:
         "history": test_history_records_requirements_and_metadata(),
         "agent_cli": test_agent_cli_guardrails(),
         "git_push": test_git_push_records_history(),
+        "package_manifest": test_package_manifest_generation(),
     }
     if args.json:
         print(json.dumps(results, indent=2, sort_keys=True))

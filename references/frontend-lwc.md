@@ -26,6 +26,12 @@
 - Prefer pagination, lazy loading, and narrow fields for large datasets.
 - Avoid exposing fields or records the user cannot access.
 
+## Tests
+
+- Run LWC Jest/component tests when the project has them.
+- If no frontend test framework exists, include manual UI, accessibility, permission, and regression checks in the validation handoff.
+- Include changed LWC bundles in the generated `package.xml`.
+
 ## Review Heuristics
 
 Revise components that:
