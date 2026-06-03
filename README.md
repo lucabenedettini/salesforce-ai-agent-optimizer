@@ -1,6 +1,8 @@
-# Salesforce Agent Optimizer
+# Salesforce AI Agent Optimizer
 
 Skill per agenti AI che lavorano su progetti Salesforce. Guida design, architettura, implementazione, verifica, Knowledge locale, Salesforce CLI token-efficient, deploy sicuri e push tracciati.
+
+Il repository pubblico si chiama **Salesforce AI Agent Optimizer** per essere chiaro e ricercabile da persone, motori di ricerca e agenti AI. Il nome tecnico della skill Codex resta `salesforce-agent-optimizer` per compatibilita' con l'installazione e con `$salesforce-agent-optimizer`.
 
 ## Principi Di Progettazione
 
@@ -60,6 +62,28 @@ La skill e' pubblicata con licenza MIT. Chiunque puo' usarla, copiarla, modifica
 
 Le modifiche nel tempo sono tracciate in `CHANGELOG.md`. Aggiorna quel file a ogni release o modifica pubblica rilevante.
 
+## Versionamento
+
+La versione corrente e' indicata in `VERSION`. Il repository parte da `0.0.1`.
+
+Regole:
+
+- Bug fix: incrementa l'ultimo numero (`0.0.x`).
+- Nuova feature o refactor minor: incrementa il secondo numero (`0.x.0`).
+- Refactor esteso o molte funzionalita nuove: incrementa il primo numero (`x.0.0`).
+
+Ogni aggiornamento di versione deve aggiornare `VERSION`, aggiungere le specifiche in `CHANGELOG.md`, creare il tag `v<version>` e pubblicare una GitHub release quando il commit viene pubblicato.
+
+Dettagli: `VERSIONING.md`.
+
+## Wiki
+
+La wiki del progetto spiega visione generale, principi, installazione e versionamento. I sorgenti sono in `docs/wiki/` e vengono pubblicati nella GitHub Wiki del repository:
+
+```text
+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer/wiki
+```
+
 Fonti ufficiali utili, verificate al 2026-06-02:
 
 - Salesforce CLI: https://developer.salesforce.com/tools/salesforcecli
@@ -77,19 +101,19 @@ Fonti ufficiali utili, verificate al 2026-06-02:
 Quando il repository pubblico sara' disponibile, l'utente potra' dare all'agente AI il link del repository e chiedere:
 
 ```text
-Installa la skill Salesforce Agent Optimizer da https://github.com/lucabenedettini/salesforce-agent-optimizer
+Installa la skill Salesforce AI Agent Optimizer da https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
 ```
 
 Per Codex, l'agente deve usare la skill `skill-installer` con il repository come sorgente, path root e nome esplicito:
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-agent-optimizer --path . --name salesforce-agent-optimizer
+python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
 ```
 
 In alternativa, se si usa un URL GitHub con path, l'agente puo' installare dalla root del branch:
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-agent-optimizer --path . --ref main --name salesforce-agent-optimizer
+python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --ref main --name salesforce-agent-optimizer
 ```
 
 Per Claude Code e GitHub Copilot non esiste lo stesso formato di skill nativa Codex: l'agente deve clonare o scaricare il repository, poi applicare gli adapter in `agents/` come indicato sotto.
@@ -280,8 +304,11 @@ Richiede PyYAML nel Python usato dal validator.
 ## File Principali
 
 - `SKILL.md`: istruzioni canoniche della skill.
+- `VERSION`: versione corrente.
+- `VERSIONING.md`: regole di versionamento.
 - `LICENSE`: licenza MIT pubblica.
 - `CHANGELOG.md`: storico delle modifiche e delle release.
+- `docs/wiki/`: sorgenti della GitHub Wiki.
 - `agents/openai.yaml`: metadata Codex.
 - `agents/claude-code.md`: adapter Claude Code.
 - `agents/github-copilot-instructions.md`: adapter GitHub Copilot.

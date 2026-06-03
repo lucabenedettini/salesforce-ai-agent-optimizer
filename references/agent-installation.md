@@ -11,13 +11,13 @@ Use $salesforce-agent-optimizer to review this Salesforce solution and produce a
 For public GitHub installation, ask the agent to install from:
 
 ```text
-https://github.com/lucabenedettini/salesforce-agent-optimizer
+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer
 ```
 
 Codex agents should use:
 
 ```bash
-python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-agent-optimizer --path . --name salesforce-agent-optimizer
+python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
 ```
 
 ## Claude Code
