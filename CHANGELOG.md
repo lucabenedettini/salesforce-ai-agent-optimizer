@@ -8,6 +8,23 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.3] - 2026-06-03
+
+### Fixed
+
+- Strengthened Copilot-facing instructions so the agent must show the current Salesforce Agent Optimizer phase before metadata parsing, org commands, file edits, or implementation.
+- Added an explicit pre-metadata gate requiring `references/routing.md`, task-relevant references, local Knowledge, and project history checks before planning or answering.
+- Clarified that skipped gates must cause the agent to stop and restart from request review instead of continuing implementation.
+- Made post-implementation completion artifact prompts explicit for release notes, technical specifications, impact assessment, user testing, and manual procedures.
+
+### Changed
+
+- Updated generated Copilot, Codex, Claude Code, and shared agent adapters from the canonical instruction spine.
+
+### Tests
+
+- Added regression coverage for Copilot instructions that must block direct metadata-first behavior and require completion artifact prompts.
+
 ## [1.0.2] - 2026-06-03
 
 ### Fixed

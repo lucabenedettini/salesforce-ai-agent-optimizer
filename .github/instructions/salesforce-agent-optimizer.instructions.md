@@ -7,16 +7,26 @@ Generated from references/agent-instruction-spine.md.
 
 # Salesforce Agent Optimizer
 
+Copilot compliance gate: before inspecting metadata or editing files, show the current Salesforce Agent Optimizer phase, the references/Knowledge you will consult, whether implementation is required, and whether approval is needed. Do not skip directly to metadata parsing.
+
 Use this Salesforce Agent Optimizer guidance for Salesforce architecture, metadata, Apex, LWC, Flow, DevOps, package.xml, org inspection, and release tasks.
+
+Non-negotiable operating contract:
+
+- Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show a compact phase-gate response with request review, planned references/Knowledge to consult, implementation status, and approval need.
+- Before planning or answering, read `references/routing.md`, then the smallest relevant reference files, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history when present. If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
+- Every response must make the current phase visible with short labels: `Request review`, `Planning evidence`, `Approval`, `Implementation`, `Validation`, and `Completion`. For information-only requests, write `Implementation: not required`.
+- After implementation, explicitly ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures. Do this even when the user did not ask for those documents.
+- If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning instead of continuing with implementation.
 
 Mandatory phase gates:
 
 - Apply this phase-gated workflow to every Salesforce project request: metadata information, bugfix, new metadata implementation, architecture, review, release, org inspection, or package.xml work. Do not skip phases because the request looks small.
 - Phase 1 request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
-- Phase 2 planning: read routed references, project Knowledge, relevant metadata history, product/package context, metadata dependencies, least-privilege guidance, and release/API context before answering or changing anything. Output a compact configuration-first plan and cite the evidence paths used.
+- Phase 2 planning: read routed references, project Knowledge, relevant metadata history, product/package context, metadata dependencies, least-privilege guidance, and release/API context before answering, parsing raw metadata, or changing anything. Output a compact configuration-first plan and cite the evidence paths used.
 - Phase 3 approval gate: ask for approval before file, metadata, org, deploy, or destructive changes. Ask separately for destructive operations. For information-only requests, state `Implementation: not required` and continue.
 - Phase 4 implementation: implement only approved minimal changes. For information-only requests, do not edit files just to satisfy the workflow.
-- Phase 5 manifest/artifacts: when metadata is added or modified, generate `package.xml` before validation handoff and ask about optional completion artifacts.
+- Phase 5 manifest/artifacts: when metadata is added or modified, generate `package.xml` before validation handoff and ask about optional completion artifacts: release notes, technical specifications, impact assessment, user testing, and manual procedures.
 - Phase 6 validation: validate before final response. For information-only requests, re-check the cited metadata/Knowledge/source evidence. For implementation requests, run tests/static checks or an independent validation pass.
 - Phase 7 failure loop: if approval, tests, or validation fail, return to planning with a revised minimal plan. Stop after three unsuccessful cycles and restart from requirements.
 - Phase 8 completion: summarize requirements, evidence, changes or no-change result, validation, risks, and ask whether to push and which branch when repository changes exist.
@@ -24,6 +34,7 @@ Mandatory phase gates:
 Core rules:
 
 - Start with `SKILL.md`, then read `references/routing.md` and only the task-relevant references.
+- For Copilot and other repository assistants, treat `.github/copilot-instructions.md`, `.github/instructions/salesforce-agent-optimizer.instructions.md`, and `AGENTS.md` as mandatory operational instructions, not background context.
 - Prefer Salesforce standard capabilities, configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before custom code.
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Before planning, use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance when relevant.

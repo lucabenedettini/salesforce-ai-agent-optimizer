@@ -8,6 +8,13 @@ Keep every phase token-efficient. A small metadata-information request can use a
 
 Maximum: 3 unsuccessful cycles. On the fourth unsuccessful cycle, stop implementation and return to requirement explanation before proposing another plan.
 
+Hard stop for repository agents:
+
+- Do not open raw Salesforce metadata, parse project files, edit files, or run org commands as the first action.
+- First show a compact phase-gate response with request review, planned references/Knowledge to consult, whether implementation is required, and whether approval is needed.
+- Read `references/routing.md`, task-relevant references, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history before inspecting raw metadata.
+- If a previous answer skipped these gates, acknowledge the miss and restart from Phase 1 instead of continuing.
+
 ## Phase 1: Request Review
 
 Restate:

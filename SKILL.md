@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.0.2
+  version: 1.0.3
 ---
 
 # Salesforce Agent Optimizer
@@ -41,6 +41,15 @@ For every Salesforce task:
 ## Mandatory Phase Gates
 
 For every Salesforce project request, run the functional phases below. Do not skip them for metadata-information questions, bugfixes, new metadata implementations, architecture work, reviews, or release tasks. Keep each phase compact, but make the phase outcome visible to the user.
+
+Non-negotiable preflight:
+
+- Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show a compact phase-gate response with request review, planned references/Knowledge to consult, implementation status, and approval need.
+- Before planning or answering, read `references/routing.md`, then the smallest relevant references, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history when present.
+- If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
+- Every response must make the current phase visible with short labels: `Request review`, `Planning evidence`, `Approval`, `Implementation`, `Validation`, and `Completion`. For information-only requests, write `Implementation: not required`.
+- After implementation, explicitly ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
+- If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning.
 
 1. Request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
 2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Produce a configuration-first plan, including evidence sources. For information-only requests, plan the answer path and state that no implementation is expected.

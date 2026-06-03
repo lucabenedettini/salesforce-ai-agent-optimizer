@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`1.0.3` is a Copilot compliance bugfix that makes mandatory phase gates visible as an operational response contract before metadata parsing or implementation.
+
 `1.0.2` is an instruction-flow bugfix that makes request review, planning, implementation decision, validation, failure handling, and completion gates mandatory for all Salesforce project requests.
 
 `1.0.1` is a public distribution bugfix that keeps `sfao validate` usable from isolated PyPI, `uv`, and `pipx` installs without requiring development-only dependencies.
