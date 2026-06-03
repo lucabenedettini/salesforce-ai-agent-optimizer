@@ -11,9 +11,16 @@ from pathlib import Path
 
 from conftest import ROOT
 
+import salesforce_agent_optimizer.validation as validation_module
 from salesforce_agent_optimizer import __version__
 from salesforce_agent_optimizer.installer import install, uninstall, update
-from salesforce_agent_optimizer.validation import GENERATED_MARKER, parse_frontmatter, validate_source_tree
+from salesforce_agent_optimizer.validation import (
+    GENERATED_MARKER,
+    ValidationResult,
+    parse_frontmatter,
+    validate_generated_sync,
+    validate_source_tree,
+)
 
 
 def run_cli(args: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -44,7 +51,7 @@ def test_cli_entry_point_declared() -> None:
 def test_sfao_version() -> None:
     completed = run_cli(["version"], ROOT)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "salesforce-agent-optimizer 1.0.0" in completed.stdout
+    assert "salesforce-agent-optimizer 1.0.1" in completed.stdout
 
 
 def test_sfao_validate_and_doctor() -> None:
@@ -55,7 +62,7 @@ def test_sfao_validate_and_doctor() -> None:
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     payload = json.loads(doctor.stdout)
-    assert payload["Core"][0]["detail"].endswith("v1.0.0")
+    assert payload["Core"][0]["detail"].endswith("v1.0.1")
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -140,7 +147,7 @@ def test_uninstall_skips_non_generated_files(tmp_path: Path) -> None:
 def test_versions_align() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'^version = "1\.0\.0"$', pyproject, re.MULTILINE)
+    assert re.search(r'^version = "1\.0\.1"$', pyproject, re.MULTILINE)
     skill_data, _, _ = parse_frontmatter(ROOT / "SKILL.md")
     assert skill_data["metadata"]["version"] == version
     codex_data, _, _ = parse_frontmatter(
@@ -164,6 +171,14 @@ def test_source_generated_files_have_markers() -> None:
 def test_source_validation_catches_text_shape() -> None:
     result = validate_source_tree(ROOT)
     assert result.ok, result.to_dict()
+
+
+def test_generated_sync_validation_without_pyyaml(monkeypatch) -> None:
+    monkeypatch.setattr(validation_module, "yaml", None)
+    result = ValidationResult()
+    validate_generated_sync(ROOT, result)
+    assert result.ok, result.to_dict()
+    assert result.warnings
 
 
 def test_wheel_includes_templates(tmp_path: Path) -> None:
@@ -240,7 +255,7 @@ def test_release_manifest_and_workflow_requirements() -> None:
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     manifest = json.loads((dist / "release-manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "1.0.0"
+    assert manifest["version"] == "1.0.1"
     assert "sfao update" in manifest["commands"]
     assert "sfao uninstall" in manifest["commands"]
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")

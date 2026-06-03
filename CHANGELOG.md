@@ -8,6 +8,18 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.1] - 2026-06-03
+
+### Fixed
+
+- Fixed `sfao validate` for isolated installs from PyPI, `uv`, and `pipx` where development-only dependencies such as `PyYAML` are not installed.
+- Kept strict generated-instruction synchronization active for source and development environments with `PyYAML` available.
+- Added fallback generated-file marker validation so installed CLI validation remains useful without false stale-adapter errors.
+
+### Preserved
+
+- Existing Salesforce delivery methodology, install/update/uninstall behavior, Knowledge generation, version-context commands, and public release workflow.
+
 ## [1.0.0] - 2026-06-03
 
 ### Major Release

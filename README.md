@@ -2,7 +2,7 @@
 
 Salesforce Agent Optimizer is a public, autonomous Salesforce Agent Skill packaged as the `sfao` Python CLI for Codex, Claude Code, and GitHub Copilot.
 
-Current version: `1.0.0`
+Current version: `1.0.1`
 
 It optimizes Salesforce delivery for AI agents through Salesforce-first solutioning, configuration-first planning, minimal reversible changes, compact local Knowledge, safe Salesforce CLI usage, least-privilege planning, destructive-operation guardrails, package.xml awareness, and token-efficient progressive disclosure.
 
@@ -237,8 +237,8 @@ python -m twine check dist/*
 Tag release:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.1
+git push origin v1.0.1
 ```
 
 The release workflow builds wheel, sdist, a versioned skill ZIP, SHA256 checksums, and `release-manifest.json`.

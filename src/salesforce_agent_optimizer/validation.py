@@ -359,6 +359,20 @@ def validate_generated_sync(root: Path, result: ValidationResult) -> None:
     script = root / "scripts" / "sync_agent_instructions.py"
     if not script.exists():
         return
+    if yaml is None:
+        managed_files = [
+            "AGENTS.md",
+            ".agents/skills/salesforce-agent-optimizer/SKILL.md",
+            ".claude/skills/salesforce-agent-optimizer/SKILL.md",
+            ".github/copilot-instructions.md",
+            ".github/instructions/salesforce-agent-optimizer.instructions.md",
+        ]
+        for relative in managed_files:
+            path = root / relative
+            if path.exists() and GENERATED_MARKER not in read_text(path):
+                result.error(f"Managed generated file is missing marker: {relative}")
+        result.warn("Strict generated-file sync check skipped because PyYAML is not installed")
+        return
     completed = subprocess.run(
         [sys.executable, str(script), "--root", str(root), "--check"],
         text=True,

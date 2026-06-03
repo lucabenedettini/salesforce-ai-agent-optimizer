@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`1.0.1` is a public distribution bugfix that keeps `sfao validate` usable from isolated PyPI, `uv`, and `pipx` installs without requiring development-only dependencies.
+
 `1.0.0` is the major public distribution release with stable `sfao` install, update, uninstall, Knowledge, version-context, validation, build, release, and PyPI Trusted Publishing workflows.
 
 `0.6.1` is a packaging and installer hotfix for `pip`, `pipx`, `uv`, the `sfao` CLI, packaged templates, release artifacts, and installer validation.
