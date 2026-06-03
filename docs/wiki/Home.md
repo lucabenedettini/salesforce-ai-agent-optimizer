@@ -16,6 +16,7 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Testing guardrails for Apex, Flow, and other testable metadata.
 - Required package.xml generation for added or modified metadata.
 - Destructive-operation approval guardrails for data and metadata deletion.
+- Native Codex, Claude Code, and GitHub Copilot install targets.
 - Validation handoff and retry discipline.
 - Deploy and remote push history tracking.
 - End-of-development handoff files: release notes, technical specifications, impact assessment, user testing, and manual procedures.
@@ -25,7 +26,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `0.5.0`
+- Current version: `0.5.1`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 

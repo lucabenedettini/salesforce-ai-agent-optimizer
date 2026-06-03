@@ -8,6 +8,20 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## 0.5.1 - 2026-06-03
+
+### Added
+
+- Added compatibility-hotfix validation with `scripts/validate_skill.py` for SKILL frontmatter, YAML, JSON, Python compile checks, required native-agent files, final newlines, and one-line collapse detection.
+- Added native installation targets for Codex (`.agents/skills/salesforce-agent-optimizer/SKILL.md`), Claude Code (`.claude/skills/salesforce-agent-optimizer/SKILL.md`), and GitHub Copilot (`AGENTS.md`, `.github/copilot-instructions.md`, `.github/instructions/salesforce-agent-optimizer.instructions.md`).
+- Added minimal cross-platform GitHub Actions validation on Windows, macOS, and Linux with Python 3.10, 3.11, and 3.12.
+- Added `pyproject.toml` with Python `>=3.10` and optional dev dependencies.
+
+### Changed
+
+- Fixed `SKILL.md` frontmatter to include concise description, `license: MIT`, compatibility metadata, and `metadata.version` matching `VERSION`.
+- Updated `agents/openai.yaml`, `references/agent-installation.md`, README files, VERSIONING, and wiki version notes for installability and version `0.5.1`.
+
 ## 0.5.0 - 2026-06-03
 
 ### Added

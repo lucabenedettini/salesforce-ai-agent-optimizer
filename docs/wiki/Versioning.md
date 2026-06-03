@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`0.5.1` is a compatibility hotfix for valid skill frontmatter, native agent install targets, local validation, and minimal cross-platform CI.
+
 `0.5.0` adds least-privilege planning guardrails, Spanish README, and the read-only `access-inspect` command for current-org permission evidence.
 
 `0.4.0` adds destructive-operation approval guardrails, CLI enforcement for delete/uninstall/destructive commands, and English/Italian/Simplified Chinese README files.

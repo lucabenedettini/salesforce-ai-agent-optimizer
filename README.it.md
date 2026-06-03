@@ -6,7 +6,7 @@ Salesforce AI Agent Optimizer e' una skill pubblica con licenza MIT per agenti A
 
 Il repository pubblico si chiama **Salesforce AI Agent Optimizer**. Il nome della skill Codex resta `salesforce-agent-optimizer`.
 
-Versione corrente: `0.5.0`
+Versione corrente: `0.5.1`
 
 ## Principi
 
@@ -48,6 +48,7 @@ Aggiornare il contesto versione Salesforce release/API/SOAP/package da fonti uff
 Eseguire i test locali:
 
 ```bash
+python scripts/validate_skill.py
 python scripts/self_test.py --json
 ```
 
@@ -89,15 +90,21 @@ Comando installer Codex:
 python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
 ```
 
+Path nativi Codex:
+
+- Skill repo: `.agents/skills/salesforce-agent-optimizer`
+- Skill user: `$HOME/.agents/skills/salesforce-agent-optimizer`
+
 Claude Code:
 
-- Unisci `agents/claude-code.md` in `CLAUDE.md`.
+- Installa o mantieni la skill in `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
+- Opzionalmente unisci `agents/claude-code.md` in `CLAUDE.md`.
 - Copia `agents/sf-init-project-skill.md` in `.claude/commands/sf-init-project-skill.md`.
 - Copia `agents/sf-version-update-skill.md` in `.claude/commands/sf-version-update-skill.md`.
 
 GitHub Copilot:
 
-- Unisci `agents/github-copilot-instructions.md` in `.github/copilot-instructions.md`, oppure usa `.github/instructions/salesforce-agent-optimizer.instructions.md`.
+- Usa `AGENTS.md`, `.github/copilot-instructions.md` e `.github/instructions/salesforce-agent-optimizer.instructions.md`.
 
 ## Prerequisiti
 

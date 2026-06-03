@@ -1,6 +1,22 @@
 ---
 name: salesforce-agent-optimizer
-description: Optimize AI-agent work on Salesforce orgs, products, AppExchange packages, architecture, configuration, Apex, LWC, Flow, integrations, DevOps, mobile development, testing, package.xml manifests, release/API version updates, least-privilege access planning, and Salesforce CLI usage. Use when an agent must design, review, implement, debug, migrate, or inspect Salesforce solutions while following Salesforce Well-Architected guidance, preferring configuration over custom code, making minimal patches, identifying products/packages before planning, accounting for metadata dependencies, inspecting current org permissions, using approval-gated planning, building Knowledge with /sf-init-project-skill, refreshing Salesforce release/API/SOAP/package guidance with /sf-version-update-skill, enforcing test guardrails, generating package.xml for added/modified metadata, offering delivery artifacts after development, and reducing token waste.
+description: Salesforce Agent Skill for Codex, Claude Code, and GitHub Copilot. Use for Salesforce architecture, metadata, Apex, LWC, Flow, DevOps, package.xml, release/API context, org inspection, least-privilege access planning, destructive-operation guardrails, configuration-first solutioning, minimal patches, and token-efficient validation.
+license: MIT
+compatibility:
+  agents:
+    - Codex
+    - Claude Code
+    - GitHub Copilot
+  platforms:
+    - Windows
+    - macOS
+    - Linux
+  prerequisites:
+    - Python 3.10+
+    - Git
+    - Salesforce CLI
+metadata:
+  version: 0.5.1
 ---
 
 # Salesforce Agent Optimizer

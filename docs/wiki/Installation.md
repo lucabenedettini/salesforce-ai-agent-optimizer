@@ -14,13 +14,19 @@ The installer command is:
 python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-github.py --repo lucabenedettini/salesforce-ai-agent-optimizer --path . --name salesforce-agent-optimizer
 ```
 
+Native paths:
+
+- Repo skill: `.agents/skills/salesforce-agent-optimizer`
+- User skill: `$HOME/.agents/skills/salesforce-agent-optimizer`
+
 Restart Codex after installation.
 
 ## Claude Code
 
 Clone or download the repository, then:
 
-- Merge `agents/claude-code.md` into `CLAUDE.md`.
+- Install or keep `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
+- Optionally merge `agents/claude-code.md` into `CLAUDE.md`.
 - Copy `agents/sf-init-project-skill.md` to `.claude/commands/sf-init-project-skill.md`.
 - Copy `agents/sf-version-update-skill.md` to `.claude/commands/sf-version-update-skill.md`.
 
@@ -28,8 +34,9 @@ Clone or download the repository, then:
 
 Clone or download the repository, then:
 
-- Merge `agents/github-copilot-instructions.md` into `.github/copilot-instructions.md`.
-- Or place it at `.github/instructions/salesforce-agent-optimizer.instructions.md` for scoped instructions.
+- Use `AGENTS.md`.
+- Use `.github/copilot-instructions.md`.
+- Use `.github/instructions/salesforce-agent-optimizer.instructions.md` for scoped instructions.
 
 ## Prerequisites
 

@@ -13,6 +13,10 @@ Every version update must include:
 - Git tag `v<version>`.
 - GitHub release `v<version>` when published.
 
+## Current Version
+
+- `0.5.1`: compatibility hotfix for valid skill frontmatter, native Codex/Claude Code/GitHub Copilot install targets, local validation, and minimal cross-platform CI.
+
 ## Examples
 
 - `0.0.2`: fix Windows path handling in one script.

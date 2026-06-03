@@ -1,0 +1,20 @@
+[project]
+name = "salesforce-agent-optimizer"
+version = "0.5.1"
+description = "Lightweight Salesforce Agent Skill for Codex, Claude Code, and GitHub Copilot."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "pyyaml",
+]
+
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
