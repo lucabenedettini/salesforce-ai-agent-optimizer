@@ -28,6 +28,17 @@ Restate:
 
 Ask questions only when needed. Prefer 1-3 high-value questions. Do not ask about details that can be discovered from the repository or safe read-only org inspection.
 
+## Specification Preflight Before Planning
+
+Before Phase 2, pause for a compact specification check when the user asks for new functionality, new metadata, a complex bugfix, or heavy rework and the request does not already state the expected runtime surface:
+
+- Ask whether the solution must cover Salesforce web/desktop, Salesforce mobile, Field Service mobile, or a combination.
+- Ask whether the solution must support online use, offline use, or a reduced offline path.
+- If Field Service Mobile or offline mobile behavior is in scope, read `references/field-service-mobile-flow.md` before planning.
+- If the user cannot decide yet, present the smallest practical scenarios and ask them to choose before implementation planning.
+
+Keep this preflight short. Do not repeat it when the answer is already explicit, when the request is information-only, or when mobile/offline behavior is clearly irrelevant.
+
 ## Phase 2: Evidence And Planning
 
 Consult project Knowledge first:
@@ -38,6 +49,7 @@ Consult project Knowledge first:
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
 - Read `references/least-privilege-planning.md` and apply least privilege during every planning phase, especially access, sharing, automation, integration, package, or UI exposure decisions.
 - Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, destructive changes, or source delete are possible.
+- Read `references/field-service-mobile-flow.md` when Field Service Mobile, Field Service mobile flows, technician mobile execution, briefcases, sync, or online/offline behavior can affect the solution.
 - Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
 - Read `.salesforce-agent-knowledge/markdown-index.md` when the exact metadata page is not obvious.
@@ -77,6 +89,7 @@ Then produce a plan with:
 - Exact files/metadata expected to change.
 - Metadata dependency impact: permissions, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, reports, dashboards, and mobile exposure where relevant.
 - Multi-country/multi-currency impact: org settings and metadata/data behavior that change by country, locale, language, currency, price book, tax, reporting, integration, or compliance scope.
+- Specification coverage: web/desktop, Salesforce mobile, Field Service mobile, online behavior, offline behavior, or degraded offline path, with assumptions called out.
 - Least-privilege access plan: personas/users inspected, current access evidence, exact proposed permission delta, and why broader permissions are not needed.
 - Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.

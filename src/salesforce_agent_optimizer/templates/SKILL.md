@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.1.1
+  version: 1.2.0
 ---
 
 # Salesforce Agent Optimizer
@@ -47,12 +47,13 @@ Non-negotiable preflight:
 - Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show a compact phase-gate response with request review, planned references/Knowledge to consult, implementation status, and approval need.
 - Before planning or answering, read `references/routing.md`, then the smallest relevant references, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history when present.
 - If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
+- Before planning new functionality, new metadata, complex bugfixes, or heavy rework, ask whether the solution must cover Salesforce web/desktop, Salesforce mobile, Field Service mobile, online use, and offline use when the request does not say so.
 - Every response must make the current phase visible with short labels: `Request review`, `Planning evidence`, `Approval`, `Implementation`, `Validation`, and `Completion`. For information-only requests, write `Implementation: not required`.
 - After implementation, explicitly ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
 - If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning.
 
 1. Request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
-2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Always evaluate whether the project or requirement is multi-country or multi-currency and account for locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation when relevant. Produce a configuration-first plan, including evidence sources. For information-only requests, plan the answer path and state that no implementation is expected.
+2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Always evaluate whether the project or requirement is multi-country or multi-currency and account for locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation when relevant. When Field Service Mobile, mobile flows, briefcases, sync, or offline behavior can matter, read `references/field-service-mobile-flow.md`. Produce a configuration-first plan, including evidence sources and web/mobile plus online/offline coverage. For information-only requests, plan the answer path and state that no implementation is expected.
 3. Approval gate: ask for approval before any file, metadata, org, or deployable change. Ask separately for destructive operations. If no implementation is needed, say so and continue to validation.
 4. Implementation: implement only the approved minimal changes. If the request is information-only, mark this phase as `not required`.
 5. Manifest/artifact gate: when metadata is added or modified, generate `package.xml` before validation handoff. Ask about optional release notes, technical specs, impact assessment, user testing, and manual procedures after implementation.

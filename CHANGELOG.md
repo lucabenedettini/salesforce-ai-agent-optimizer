@@ -8,6 +8,19 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.2.0] - 2026-06-04
+
+### Added
+
+- Added `references/field-service-mobile-flow.md` for Field Service Mobile, Field Service mobile flows, briefcases, sync, online/offline planning, best practices, limits, and validation.
+- Added a specification preflight before planning for new functionality, new metadata, complex bugfixes, and heavy rework when web/mobile or online/offline coverage is not specified.
+- Routed Field Service, Field Service Mobile, mobile Flow, and offline mobile requests to the new reference.
+
+### Changed
+
+- Updated generated agent instruction guidance so agents ask compact web/mobile and online/offline coverage questions before planning when required.
+- Kept the new guidance token-efficient by centralizing details in one routed reference instead of duplicating full limits across adapters.
+
 ## [1.1.1] - 2026-06-04
 
 ### Fixed

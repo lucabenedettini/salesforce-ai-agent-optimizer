@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`1.2.0` adds the Field Service Mobile and mobile Flow planning reference plus the mandatory web/mobile and online/offline specification preflight for larger work.
+
 `1.1.1` is an installer bugfix that makes bare `sfao install` project-scoped by default and copies Copilot-local `references/` and `scripts/`.
 
 `1.1.0` adds Copilot project-skill compatibility and lightweight Salesforce metadata micro-validators for Apex, Flow, LWC, permissions, and `package.xml`.
