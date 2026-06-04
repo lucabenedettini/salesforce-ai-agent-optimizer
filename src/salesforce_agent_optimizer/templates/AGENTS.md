@@ -19,7 +19,7 @@ Mandatory phase gates:
 
 - Apply this phase-gated workflow to every Salesforce project request: metadata information, bugfix, new metadata implementation, architecture, review, release, org inspection, or package.xml work. Do not skip phases because the request looks small.
 - Phase 1 request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
-- Phase 2 planning: read routed references, project Knowledge, relevant metadata history, product/package context, metadata dependencies, least-privilege guidance, and release/API context before answering, parsing raw metadata, or changing anything. Output a compact configuration-first plan and cite the evidence paths used.
+- Phase 2 planning: read routed references, project Knowledge, relevant metadata history, product/package context, metadata dependencies, least-privilege guidance, and release/API context before answering, parsing raw metadata, or changing anything. Always evaluate whether the project or requirement is multi-country or multi-currency and account for locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation when relevant. Output a compact configuration-first plan and cite the evidence paths used.
 - Phase 3 approval gate: ask for approval before file, metadata, org, deploy, or destructive changes. Ask separately for destructive operations. For information-only requests, state `Implementation: not required` and continue.
 - Phase 4 implementation: implement only approved minimal changes. For information-only requests, do not edit files just to satisfy the workflow.
 - Phase 5 manifest/artifacts: when metadata is added or modified, generate `package.xml` before validation handoff and ask about optional completion artifacts: release notes, technical specifications, impact assessment, user testing, and manual procedures.
@@ -34,6 +34,7 @@ Core rules:
 - Prefer Salesforce standard capabilities, configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before custom code.
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Before planning, use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance when relevant.
+- In Salesforce DX projects, apply Salesforce Agent Optimizer before other generic agent guidance whenever the request touches Salesforce metadata, org behavior, release work, package.xml, Apex, LWC, Flow, permissions, or Salesforce data.
 - Use `scripts/sf_agent_cli.py` for org access. Ask for an explicit org alias; use compact redacted output; treat production orgs as read-only.
 - Optimize tokens in every step. Load only the smallest relevant reference, prefer compact JSON/summaries, and avoid pasting full metadata when paths, indexes, diffs, or focused excerpts are enough.
 - After each meaningful step, compact task context into goal, state, changed files, commands executed, validation status, open risks, and next minimal action. Preserve safety-critical warnings and remove repeated logs, duplicate file contents, stale assumptions, and irrelevant metadata.

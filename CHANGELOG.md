@@ -8,6 +8,24 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.4] - 2026-06-04
+
+### Fixed
+
+- Changed project-scoped GitHub Copilot installation to merge a managed Salesforce Agent Optimizer section into existing `AGENTS.md`, `AGENT.md`, `agent.md`, `agents.md`, and `.github/copilot-instructions.md` files instead of skipping them.
+- Updated `sfao update` so existing merged Copilot files receive refreshed managed instructions without overwriting user-owned content outside the managed section.
+- Updated `sfao uninstall` so it removes only the managed Salesforce Agent Optimizer section from mixed user-owned files.
+- Added always-installed namespaced trigger evals at `evals/salesforce-agent-optimizer-trigger-evals.json`.
+
+### Changed
+
+- Added mandatory multi-country and multi-currency impact assessment to planning, including locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation.
+- Strengthened agent guidance so Salesforce Agent Optimizer is applied before generic agent guidance for Salesforce DX metadata, org behavior, Apex, LWC, Flow, permissions, release, and package.xml work.
+
+### Tests
+
+- Added coverage for merging into existing Copilot/agent files, uninstalling only managed sections, installing evals, and preserving user-owned content.
+
 ## [1.0.3] - 2026-06-03
 
 ### Fixed

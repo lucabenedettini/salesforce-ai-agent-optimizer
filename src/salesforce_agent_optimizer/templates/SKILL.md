@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.0.3
+  version: 1.0.4
 ---
 
 # Salesforce Agent Optimizer
@@ -52,7 +52,7 @@ Non-negotiable preflight:
 - If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning.
 
 1. Request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
-2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Produce a configuration-first plan, including evidence sources. For information-only requests, plan the answer path and state that no implementation is expected.
+2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Always evaluate whether the project or requirement is multi-country or multi-currency and account for locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation when relevant. Produce a configuration-first plan, including evidence sources. For information-only requests, plan the answer path and state that no implementation is expected.
 3. Approval gate: ask for approval before any file, metadata, org, or deployable change. Ask separately for destructive operations. If no implementation is needed, say so and continue to validation.
 4. Implementation: implement only the approved minimal changes. If the request is information-only, mark this phase as `not required`.
 5. Manifest/artifact gate: when metadata is added or modified, generate `package.xml` before validation handoff. Ask about optional release notes, technical specs, impact assessment, user testing, and manual procedures after implementation.

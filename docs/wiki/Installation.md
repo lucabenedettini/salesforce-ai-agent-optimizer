@@ -81,6 +81,17 @@ AGENTS.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```
 
+Trigger evals:
+
+```text
+evals/salesforce-agent-optimizer-trigger-evals.json
+```
+
+When `AGENTS.md`, `AGENT.md`, `agent.md`, `agents.md`, or
+`.github/copilot-instructions.md` already exists, `sfao` inserts or updates a
+managed Salesforce Agent Optimizer section instead of overwriting the file.
+User-owned content outside the managed section is preserved.
+
 ## Update
 
 ```bash

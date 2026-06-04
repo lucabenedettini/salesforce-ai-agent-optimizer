@@ -67,6 +67,7 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/templates/agents/openai.yaml",
     "src/salesforce_agent_optimizer/templates/codex/SKILL.md",
     "src/salesforce_agent_optimizer/templates/claude/SKILL.md",
+    "src/salesforce_agent_optimizer/templates/evals/trigger-evals.json",
     "src/salesforce_agent_optimizer/templates/github/copilot-instructions.md",
     "src/salesforce_agent_optimizer/templates/github/instructions/salesforce-agent-optimizer.instructions.md",
     "evals/trigger-evals.json",
@@ -83,6 +84,7 @@ INSTALL_REQUIRED_FILES = [
     "AGENTS.md",
     ".github/copilot-instructions.md",
     ".github/instructions/salesforce-agent-optimizer.instructions.md",
+    "evals/salesforce-agent-optimizer-trigger-evals.json",
 ]
 
 
@@ -371,7 +373,6 @@ def validate_generated_sync(root: Path, result: ValidationResult) -> None:
             path = root / relative
             if path.exists() and GENERATED_MARKER not in read_text(path):
                 result.error(f"Managed generated file is missing marker: {relative}")
-        result.warn("Strict generated-file sync check skipped because PyYAML is not installed")
         return
     completed = subprocess.run(
         [sys.executable, str(script), "--root", str(root), "--check"],
@@ -417,6 +418,7 @@ def validate_templates(root: Path, result: ValidationResult, expected_version: s
         "scripts/sf_agent_cli.py",
         "codex/SKILL.md",
         "claude/SKILL.md",
+        "evals/trigger-evals.json",
         "github/copilot-instructions.md",
         "github/instructions/salesforce-agent-optimizer.instructions.md",
     ]

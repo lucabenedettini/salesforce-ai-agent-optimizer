@@ -47,6 +47,13 @@ Consult project Knowledge first:
 - If the folder is missing, stale, or the user invokes `/sf-init-project-skill`, run `sfao knowledge init --project-root <project-root>` or `sfao knowledge refresh --project-root <project-root>` before planning, unless the user asked for a quick answer that does not touch the project.
 - Use the Knowledge to decide what to inspect next; verify against source metadata files before making changes.
 
+Always assess multi-country and multi-currency impact before proposing the solution:
+
+- Check whether the org, metadata, package, or requirement spans countries, legal entities, locales, languages, currencies, or region-specific processes.
+- For currency-sensitive work, consider CurrencyIsoCode, corporate currency, dated exchange rates, Advanced Currency Management, CPQ price books, quotes, opportunities, reports, integrations, and data loads.
+- For country-sensitive work, consider translations, address formats, tax/VAT, compliance, sharing, record types, picklist values, automation branches, validation rules, page layouts, Lightning pages, mobile exposure, and support/sales processes.
+- If the project context is unclear, include a multi-country/multi-currency assumption in the plan and ask the user to confirm before implementation.
+
 Inspect the smallest useful surface:
 
 - Changed/touched files, metadata folders, package directories, or manifests.
@@ -69,6 +76,7 @@ Then produce a plan with:
 - Custom code only if justified.
 - Exact files/metadata expected to change.
 - Metadata dependency impact: permissions, permission set groups, users, fields, layouts, Lightning pages, record types, picklist values, automation, code, integrations, sharing, reports, dashboards, and mobile exposure where relevant.
+- Multi-country/multi-currency impact: org settings and metadata/data behavior that change by country, locale, language, currency, price book, tax, reporting, integration, or compliance scope.
 - Least-privilege access plan: personas/users inspected, current access evidence, exact proposed permission delta, and why broader permissions are not needed.
 - Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.

@@ -17,6 +17,8 @@ from .validation import GENERATED_MARKER, SKILL_NAME
 MANIFEST_NAME = ".sfao-install.json"
 MARKER_MD = f"<!-- {GENERATED_MARKER} -->"
 MARKER_COMMENT = f"# {GENERATED_MARKER}"
+SECTION_BEGIN = "<!-- BEGIN salesforce-agent-optimizer managed section -->"
+SECTION_END = "<!-- END salesforce-agent-optimizer managed section -->"
 SUPPORTED_PLATFORMS = {"codex", "claude", "copilot", "all"}
 
 
@@ -52,6 +54,7 @@ class InstallReport:
 class TemplateTarget(NamedTuple):
     source: object
     target: Path
+    merge: bool = False
 
 
 def template_root():
@@ -69,7 +72,14 @@ def install(
     root = template_root()
     manifest = load_manifest(destination)
     for target in template_targets(root, destination, project, selected, report):
-        copy_template_file(target.source, target.target, report, allow_create=True, manifest=manifest)
+        copy_template_file(
+            target.source,
+            target.target,
+            report,
+            allow_create=True,
+            manifest=manifest,
+            merge=target.merge,
+        )
     write_manifest(destination, selected, project, report)
     return report
 
@@ -88,6 +98,16 @@ def update(
     for target in template_targets(root, destination, project, selected, report):
         if not target.target.exists():
             report.stale.append(display_path(target.target))
+            continue
+        if target.merge:
+            copy_template_file(
+                target.source,
+                target.target,
+                report,
+                allow_create=False,
+                manifest=manifest,
+                merge=True,
+            )
             continue
         if user_edited_generated(target.target, manifest):
             relative = display_path(target.target)
@@ -122,6 +142,8 @@ def uninstall(
     manifest = load_manifest(destination)
     targets = template_targets(root, destination, project, selected, report)
     for target in targets:
+        if target.merge and remove_managed_section(target.target, report):
+            continue
         remove_generated_file(target.target, manifest, report)
     remove_manifest_if_safe(destination, report)
     clean_empty_generated_dirs(destination, selected, project, report)
@@ -139,6 +161,13 @@ def expand_platforms(platform: str) -> list[str]:
 
 def template_targets(root, destination: Path, project: bool, platforms: Iterable[str], report: InstallReport) -> list[TemplateTarget]:
     targets: list[TemplateTarget] = []
+    if project:
+        targets.append(
+            TemplateTarget(
+                root / "evals" / "trigger-evals.json",
+                destination / "evals" / "salesforce-agent-optimizer-trigger-evals.json",
+            )
+        )
     for item in platforms:
         if item == "codex":
             base = destination / ".agents" / "skills" / SKILL_NAME
@@ -157,11 +186,13 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
             if not project:
                 report.warnings.append("GitHub Copilot instructions are repository-scoped; rerun with --project.")
                 continue
-            targets.append(TemplateTarget(root / "AGENTS.md", destination / "AGENTS.md"))
+            targets.append(TemplateTarget(root / "AGENTS.md", destination / "AGENTS.md", merge=True))
+            targets.extend(existing_agent_alias_targets(root, destination))
             targets.append(
                 TemplateTarget(
                     root / "github" / "copilot-instructions.md",
                     destination / ".github" / "copilot-instructions.md",
+                    merge=True,
                 )
             )
             targets.append(
@@ -173,6 +204,17 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
                     / "salesforce-agent-optimizer.instructions.md",
                 )
             )
+    return targets
+
+
+def existing_agent_alias_targets(root, destination: Path) -> list[TemplateTarget]:
+    """Merge into common existing agent files without creating duplicate aliases."""
+    targets: list[TemplateTarget] = []
+    canonical = (destination / "AGENTS.md").resolve()
+    for name in ("AGENT.md", "agent.md", "agents.md"):
+        path = destination / name
+        if path.exists() and path.resolve() != canonical:
+            targets.append(TemplateTarget(root / "AGENTS.md", path, merge=True))
     return targets
 
 
@@ -195,12 +237,29 @@ def copy_template_file(
     report: InstallReport,
     allow_create: bool,
     manifest: dict[str, object] | None = None,
+    merge: bool = False,
 ) -> None:
     content = source.read_bytes()
     generated = generated_bytes(content, target.suffix.lower())
     existed = target.exists()
     if not existed and not allow_create:
         report.stale.append(display_path(target))
+        return
+    if existed and merge and has_managed_section(target):
+        merge_template_file(
+            generated,
+            target,
+            report,
+            local_edits=user_edited_generated(target, manifest or {}),
+        )
+        return
+    if existed and merge and is_managed_file(target) and user_edited_generated(target, manifest or {}):
+        relative = display_path(target)
+        report.skipped.append(relative)
+        report.warnings.append(f"Skipped generated file with local edits: {relative}")
+        return
+    if existed and merge and not is_managed_file(target) and not is_tracked_unchanged(target, manifest or {}):
+        merge_template_file(generated, target, report)
         return
     if existed and not is_managed_file(target) and not is_tracked_unchanged(target, manifest or {}):
         relative = display_path(target)
@@ -213,6 +272,59 @@ def copy_template_file(
         report.updated.append(display_path(target))
     else:
         report.installed.append(display_path(target))
+
+
+def merge_template_file(
+    generated: bytes,
+    target: Path,
+    report: InstallReport,
+    local_edits: bool = False,
+) -> None:
+    try:
+        generated_text = generated.decode("utf-8")
+        existing = target.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        relative = display_path(target)
+        report.skipped.append(relative)
+        report.warnings.append(f"Skipped non-UTF-8 file that cannot be merged: {relative}")
+        return
+    merged = merge_managed_section(existing, generated_text)
+    target.write_text(merged, encoding="utf-8", newline="\n")
+    relative = display_path(target)
+    report.updated.append(relative)
+    report.warnings.append(f"Merged Salesforce Agent Optimizer managed section into existing file: {relative}")
+    if local_edits:
+        report.warnings.append(f"Preserved local edits while updating managed section: {relative}")
+
+
+def merge_managed_section(existing: str, generated_text: str) -> str:
+    existing = existing.replace("\r\n", "\n").replace("\r", "\n")
+    section = managed_section(generated_text)
+    if SECTION_BEGIN in existing and SECTION_END in existing:
+        prefix, _, remainder = existing.partition(SECTION_BEGIN)
+        _, _, suffix = remainder.partition(SECTION_END)
+        return ensure_final_newline(prefix.rstrip() + "\n\n" + section + suffix.lstrip("\n"))
+    insert_at = markdown_frontmatter_end(existing)
+    if insert_at > 0:
+        head = existing[:insert_at].rstrip()
+        tail = existing[insert_at:].lstrip("\n")
+        return ensure_final_newline(head + "\n\n" + section + ("\n" + tail if tail else ""))
+    return ensure_final_newline(section + ("\n" + existing.lstrip("\n") if existing else ""))
+
+
+def managed_section(generated_text: str) -> str:
+    body = generated_text.strip()
+    return f"{SECTION_BEGIN}\n{body}\n{SECTION_END}\n"
+
+
+def markdown_frontmatter_end(text: str) -> int:
+    if not text.startswith("---\n"):
+        return 0
+    lines = text.splitlines(keepends=True)
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            return sum(len(item) for item in lines[: index + 1])
+    return 0
 
 
 def generated_bytes(content: bytes, suffix: str) -> bytes:
@@ -264,6 +376,14 @@ def is_managed_file(path: Path) -> bool:
     except UnicodeDecodeError:
         return False
     return GENERATED_MARKER in text
+
+
+def has_managed_section(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return False
+    return SECTION_BEGIN in text and SECTION_END in text
 
 
 def managed_hash(path: Path) -> str | None:
@@ -325,6 +445,32 @@ def remove_generated_file(path: Path, manifest: dict[str, object], report: Insta
         return
     path.unlink()
     report.removed.append(relative)
+
+
+def remove_managed_section(path: Path, report: InstallReport) -> bool:
+    if not path.exists():
+        return False
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return False
+    if SECTION_BEGIN not in text or SECTION_END not in text:
+        return False
+    prefix, _, remainder = text.partition(SECTION_BEGIN)
+    _, _, suffix = remainder.partition(SECTION_END)
+    prefix = prefix.rstrip()
+    suffix = suffix.lstrip("\n")
+    if prefix and suffix.strip():
+        cleaned = f"{prefix}\n\n{suffix}"
+    else:
+        cleaned = prefix or suffix
+    cleaned = ensure_final_newline(cleaned) if cleaned else ""
+    if cleaned.strip():
+        path.write_text(cleaned, encoding="utf-8", newline="\n")
+    else:
+        path.unlink()
+    report.removed.append(display_path(path))
+    return True
 
 
 def remove_manifest_if_safe(destination: Path, report: InstallReport) -> None:
