@@ -8,6 +8,19 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.1.1] - 2026-06-04
+
+### Fixed
+
+- Changed bare `sfao install`, `sfao update`, and `sfao uninstall` to operate on the current project by default, with `--user` available for explicit HOME-scoped operations.
+- Fixed GitHub Copilot project installs so `.github/skills/salesforce-agent-optimizer/` includes local `references/` and `scripts/`, not only `SKILL.md`.
+- Updated validation and tests so missing Copilot-local references are detected.
+
+### Preserved
+
+- Existing explicit `--project --platform all` behavior remains supported.
+- User-owned files are still merged or skipped safely rather than overwritten silently.
+
 ## [1.1.0] - 2026-06-04
 
 ### Added

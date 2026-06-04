@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer e' una skill Salesforce con licenza MIT distribuita
 come comando `sfao` per Codex, Claude Code e GitHub Copilot.
 
-Versione corrente: `1.1.0`
+Versione corrente: `1.1.1`
 
 Installa istruzioni per agenti che applicano solutioning Salesforce-first,
 configurazione prima del codice custom, modifiche minime e reversibili,
@@ -16,13 +16,15 @@ consapevolezza di `package.xml` e guardrail per operazioni distruttive.
 
 ```bash
 uv tool install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao knowledge init --project-root .
 sfao doctor
 ```
 
 Usa `uv tool install` o `pipx install` per isolare la CLI. `pip install`
 funziona, ma gli installer isolati riducono problemi di PATH e dipendenze.
+`sfao install` senza flag installa nel progetto corrente; usa `--user` solo
+quando vuoi intenzionalmente un'installazione HOME-scoped.
 
 ## Installazione
 
@@ -30,7 +32,7 @@ Consigliato:
 
 ```bash
 uv tool install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -38,7 +40,7 @@ Alternativa:
 
 ```bash
 pipx install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -46,7 +48,7 @@ Installazione diretta da GitHub prima o fuori dalla pubblicazione PyPI:
 
 ```bash
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -54,7 +56,7 @@ sfao doctor
 
 ```bash
 pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -63,7 +65,9 @@ sfao doctor
 | Comando | A cosa serve |
 | --- | --- |
 | `sfao version` | Mostra la versione installata. |
+| `sfao install` | Installa tutti gli adapter project-scoped e le risorse locali nel progetto corrente. |
 | `sfao install --project --platform all` | Installa gli adapter Codex, Claude Code e GitHub Copilot nel progetto corrente. |
+| `sfao install --user --platform all` | Installa file user-scoped Codex e Claude Code sotto HOME. |
 | `sfao install --project --platform codex` | Installa solo la skill Codex in `.agents/skills/`. |
 | `sfao install --project --platform claude` | Installa solo la skill Claude Code in `.claude/skills/`. |
 | `sfao install --project --platform copilot` | Installa skill project-scoped GitHub Copilot, istruzioni repository, istruzioni path-specific e `AGENTS.md`. |
@@ -107,6 +111,8 @@ GitHub Copilot:
 ```text
 AGENTS.md
 .github/skills/salesforce-agent-optimizer/SKILL.md
+.github/skills/salesforce-agent-optimizer/references/
+.github/skills/salesforce-agent-optimizer/scripts/
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```

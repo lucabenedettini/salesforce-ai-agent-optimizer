@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`1.1.1` is an installer bugfix that makes bare `sfao install` project-scoped by default and copies Copilot-local `references/` and `scripts/`.
+
 `1.1.0` adds Copilot project-skill compatibility and lightweight Salesforce metadata micro-validators for Apex, Flow, LWC, permissions, and `package.xml`.
 
 `1.0.5` is an installer update bugfix that lets `sfao update` add newly introduced managed templates, including evals, to existing project installs.

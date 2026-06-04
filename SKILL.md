@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.1.0
+  version: 1.1.1
 ---
 
 # Salesforce Agent Optimizer

@@ -58,7 +58,9 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
     ]
     required_commands = [
         "sfao version",
+        "sfao install",
         "sfao install --project --platform all",
+        "sfao install --user --platform all",
         "sfao install --project --platform codex",
         "sfao install --project --platform claude",
         "sfao install --project --platform copilot",
@@ -97,7 +99,7 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
 def test_sfao_version() -> None:
     completed = run_cli(["version"], ROOT)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "salesforce-agent-optimizer 1.1.0" in completed.stdout
+    assert "salesforce-agent-optimizer 1.1.1" in completed.stdout
 
 
 def test_sfao_validate_and_doctor() -> None:
@@ -108,7 +110,7 @@ def test_sfao_validate_and_doctor() -> None:
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     payload = json.loads(doctor.stdout)
-    assert payload["Core"][0]["detail"].endswith("v1.1.0")
+    assert payload["Core"][0]["detail"].endswith("v1.1.1")
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -123,6 +125,8 @@ def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
         tmp_path / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / "AGENTS.md",
         tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
+        tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
+        tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "scripts" / "sf_agent_cli.py",
         tmp_path / ".github" / "copilot-instructions.md",
         tmp_path / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md",
         tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json",
@@ -149,7 +153,30 @@ def test_sfao_install_individual_platforms(tmp_path: Path) -> None:
     assert (claude / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md").exists()
     assert run_cli(["install", "--project", "--platform", "copilot"], copilot).returncode == 0
     assert (copilot / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md").exists()
+    assert (
+        copilot / ".github" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md"
+    ).exists()
+    assert (
+        copilot / ".github" / "skills" / "salesforce-agent-optimizer" / "scripts" / "sf_agent_cli.py"
+    ).exists()
     assert (copilot / ".github" / "copilot-instructions.md").exists()
+
+
+def test_sfao_install_defaults_to_project_all(tmp_path: Path) -> None:
+    completed = run_cli(["install"], tmp_path)
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    expected = [
+        tmp_path / ".agents" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
+        tmp_path / ".claude" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
+        tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
+        tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "scripts" / "sf_agent_cli.py",
+        tmp_path / ".github" / "copilot-instructions.md",
+        tmp_path / "AGENTS.md",
+    ]
+    for path in expected:
+        assert path.exists(), path
+    validate = run_cli(["validate", "--json"], tmp_path)
+    assert validate.returncode == 0, validate.stdout + validate.stderr
 
 
 def test_existing_non_generated_files_are_not_overwritten(tmp_path: Path) -> None:
@@ -244,7 +271,7 @@ def test_uninstall_skips_non_generated_files(tmp_path: Path) -> None:
 def test_versions_align() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'^version = "1\.1\.0"$', pyproject, re.MULTILINE)
+    assert re.search(r'^version = "1\.1\.1"$', pyproject, re.MULTILINE)
     skill_data, _, _ = parse_frontmatter(ROOT / "SKILL.md")
     assert skill_data["metadata"]["version"] == version
     codex_data, _, _ = parse_frontmatter(
@@ -476,7 +503,7 @@ def test_release_manifest_and_workflow_requirements() -> None:
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     manifest = json.loads((dist / "release-manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "1.1.0"
+    assert manifest["version"] == "1.1.1"
     assert "sfao update" in manifest["commands"]
     assert "sfao uninstall" in manifest["commands"]
     assert manifest["skill_paths"]["copilot_repo_skill"] == ".github/skills/salesforce-agent-optimizer"

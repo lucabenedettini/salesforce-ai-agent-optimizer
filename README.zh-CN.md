@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer 是一个 MIT 许可的 Salesforce Agent Skill，以
 `sfao` 命令形式分发，适用于 Codex、Claude Code 和 GitHub Copilot。
 
-当前版本：`1.1.0`
+当前版本：`1.1.1`
 
 它安装面向 Agent 的指令，用于执行 Salesforce-first 方案设计、优先配置而非
 自定义代码、最小且可回滚的变更、节省 token 的 Knowledge、least privilege、
@@ -15,13 +15,15 @@ Salesforce Agent Optimizer 是一个 MIT 许可的 Salesforce Agent Skill，以
 
 ```bash
 uv tool install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao knowledge init --project-root .
 sfao doctor
 ```
 
 推荐用 `uv tool install` 或 `pipx install` 隔离 CLI。`pip install` 也能用，
 但隔离安装通常能减少 PATH 和依赖冲突。
+不带参数的 `sfao install` 会安装到当前项目；只有在明确需要 HOME 级安装时
+才使用 `--user`。
 
 ## 安装
 
@@ -29,7 +31,7 @@ sfao doctor
 
 ```bash
 uv tool install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -37,7 +39,7 @@ sfao doctor
 
 ```bash
 pipx install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -45,7 +47,7 @@ sfao doctor
 
 ```bash
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -53,7 +55,7 @@ sfao doctor
 
 ```bash
 pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -62,7 +64,9 @@ sfao doctor
 | 命令 | 用途 |
 | --- | --- |
 | `sfao version` | 输出已安装版本。 |
+| `sfao install` | 在当前项目安装全部 project-scoped adapters 和本地资源。 |
 | `sfao install --project --platform all` | 在当前项目安装 Codex、Claude Code 和 GitHub Copilot adapters。 |
+| `sfao install --user --platform all` | 在 HOME 下安装 user-scoped Codex 和 Claude Code 文件。 |
 | `sfao install --project --platform codex` | 只在 `.agents/skills/` 安装 Codex skill。 |
 | `sfao install --project --platform claude` | 只在 `.claude/skills/` 安装 Claude Code skill。 |
 | `sfao install --project --platform copilot` | 安装 GitHub Copilot 项目级 skill、仓库指令、路径指令和 `AGENTS.md`。 |
@@ -106,6 +110,8 @@ GitHub Copilot:
 ```text
 AGENTS.md
 .github/skills/salesforce-agent-optimizer/SKILL.md
+.github/skills/salesforce-agent-optimizer/references/
+.github/skills/salesforce-agent-optimizer/scripts/
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```

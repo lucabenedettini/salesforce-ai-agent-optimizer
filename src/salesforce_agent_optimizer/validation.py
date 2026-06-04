@@ -95,6 +95,8 @@ INSTALL_REQUIRED_FILES = [
     ".claude/skills/salesforce-agent-optimizer/scripts/sf_agent_cli.py",
     "AGENTS.md",
     ".github/skills/salesforce-agent-optimizer/SKILL.md",
+    ".github/skills/salesforce-agent-optimizer/references/routing.md",
+    ".github/skills/salesforce-agent-optimizer/scripts/sf_agent_cli.py",
     ".github/copilot-instructions.md",
     ".github/instructions/salesforce-agent-optimizer.instructions.md",
     "evals/salesforce-agent-optimizer-trigger-evals.json",

@@ -109,7 +109,7 @@ def generated_files(root: Path) -> dict[Path, str]:
             "This is the GitHub Copilot project skill. Treat it as primary for Salesforce work; "
             "then read `.github/copilot-instructions.md`, "
             "`.github/instructions/salesforce-agent-optimizer.instructions.md`, `AGENTS.md`, "
-            "`references/routing.md`, and project Knowledge before metadata parsing."
+            "this skill's local `references/routing.md`, and project Knowledge before metadata parsing."
         ),
         spine,
     )

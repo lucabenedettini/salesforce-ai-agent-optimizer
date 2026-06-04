@@ -199,6 +199,9 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
                     destination / ".github" / "skills" / SKILL_NAME / "SKILL.md",
                 )
             )
+            copilot_skill = destination / ".github" / "skills" / SKILL_NAME
+            targets.extend(tree_targets(root / "references", copilot_skill / "references"))
+            targets.extend(tree_targets(root / "scripts", copilot_skill / "scripts"))
             targets.append(TemplateTarget(root / "AGENTS.md", destination / "AGENTS.md", merge=True))
             targets.extend(existing_agent_alias_targets(root, destination))
             targets.append(

@@ -4,11 +4,11 @@ Use `sfao` as the primary installation path. It copies packaged templates into
 the current project without symlinks and without silently overwriting user-owned
 files.
 
-## Recommended User Install
+## Recommended Project Install
 
 ```bash
 uv tool install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -16,7 +16,7 @@ Alternative:
 
 ```bash
 pipx install salesforce-agent-optimizer
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -24,7 +24,7 @@ Before PyPI publication, install from GitHub:
 
 ```bash
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install --project --platform all
+sfao install
 sfao doctor
 ```
 
@@ -33,7 +33,19 @@ sfao doctor
 All supported agents:
 
 ```bash
+sfao install
+```
+
+Equivalent explicit command:
+
+```bash
 sfao install --project --platform all
+```
+
+User-scoped Codex and Claude Code files:
+
+```bash
+sfao install --user --platform all
 ```
 
 Only Codex:
@@ -78,6 +90,8 @@ GitHub Copilot:
 ```text
 AGENTS.md
 .github/skills/salesforce-agent-optimizer/SKILL.md
+.github/skills/salesforce-agent-optimizer/references/
+.github/skills/salesforce-agent-optimizer/scripts/
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```

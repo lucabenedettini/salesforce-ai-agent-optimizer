@@ -25,7 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     install_parser = subparsers.add_parser("install", help="Install agent skill files")
-    install_parser.add_argument("--project", action="store_true", help="Install into the current repository")
+    add_scope_arguments(install_parser, "Install")
     install_parser.add_argument(
         "--platform",
         choices=["codex", "claude", "copilot", "all"],
@@ -36,7 +36,7 @@ def build_parser() -> argparse.ArgumentParser:
     install_parser.add_argument("--json", action="store_true", help="Emit compact JSON")
 
     update_parser = subparsers.add_parser("update", help="Update generated installed files")
-    update_parser.add_argument("--project", action="store_true", help="Update files in the current repository")
+    add_scope_arguments(update_parser, "Update")
     update_parser.add_argument(
         "--platform",
         choices=["codex", "claude", "copilot", "all"],
@@ -47,7 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     update_parser.add_argument("--json", action="store_true", help="Emit compact JSON")
 
     uninstall_parser = subparsers.add_parser("uninstall", help="Remove generated installed files")
-    uninstall_parser.add_argument("--project", action="store_true", help="Remove files in the current repository")
+    add_scope_arguments(uninstall_parser, "Remove")
     uninstall_parser.add_argument(
         "--platform",
         choices=["codex", "claude", "copilot", "all"],
@@ -113,6 +113,22 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def add_scope_arguments(parser: argparse.ArgumentParser, verb: str) -> None:
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument(
+        "--project",
+        action="store_true",
+        help=f"{verb} files in the current repository. This is the default.",
+    )
+    scope.add_argument("--user", action="store_true", help=f"{verb} user-scoped files under HOME.")
+
+
+def resolve_target(args) -> tuple[Path, bool]:
+    project_scope = args.project or not args.user
+    target = args.target or (project_destination() if project_scope else user_destination())
+    return target, project_scope
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -120,18 +136,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"salesforce-agent-optimizer {__version__}")
         return 0
     if args.command == "install":
-        target = args.target or (project_destination() if args.project else user_destination())
-        report = install(target, project=args.project, platform=args.platform)
+        target, project_scope = resolve_target(args)
+        report = install(target, project=project_scope, platform=args.platform)
         print_operation_summary("install", report, json_output=args.json)
         return 0 if report.ok else 1
     if args.command == "update":
-        target = args.target or (project_destination() if args.project else user_destination())
-        report = update(target, project=args.project, platform=args.platform)
+        target, project_scope = resolve_target(args)
+        report = update(target, project=project_scope, platform=args.platform)
         print_operation_summary("update", report, json_output=args.json)
         return 0 if report.ok else 1
     if args.command == "uninstall":
-        target = args.target or (project_destination() if args.project else user_destination())
-        report = uninstall(target, project=args.project, platform=args.platform, yes=args.yes)
+        target, project_scope = resolve_target(args)
+        report = uninstall(target, project=project_scope, platform=args.platform, yes=args.yes)
         print_operation_summary("uninstall", report, json_output=args.json)
         return 0 if report.ok else 1
     if args.command == "doctor":
