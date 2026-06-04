@@ -100,6 +100,19 @@ def generated_files(root: Path) -> dict[Path, str]:
         + "\n---\n\n"
         + managed_markdown("Salesforce Agent Optimizer", spine, prefix=COPILOT_PREFIX)
     )
+    files[root / ".github" / "skills" / SKILL_NAME / "SKILL.md"] = shim_skill(
+        version,
+        "GitHub Copilot",
+        "Salesforce Agent Optimizer For GitHub Copilot",
+        "GitHub Copilot project skill for Salesforce Agent Optimizer mandatory phase gates.",
+        (
+            "This is the GitHub Copilot project skill. Treat it as primary for Salesforce work; "
+            "then read `.github/copilot-instructions.md`, "
+            "`.github/instructions/salesforce-agent-optimizer.instructions.md`, `AGENTS.md`, "
+            "`references/routing.md`, and project Knowledge before metadata parsing."
+        ),
+        spine,
+    )
     files[root / ".agents" / "skills" / SKILL_NAME / "SKILL.md"] = shim_skill(
         version,
         "Codex",

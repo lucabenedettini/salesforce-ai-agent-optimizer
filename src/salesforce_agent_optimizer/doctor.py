@@ -96,6 +96,12 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         "OK" if (root / ".claude" / "skills" / SKILL_NAME / "SKILL.md").exists() else "WARN",
         ".claude/skills/salesforce-agent-optimizer",
     )
+    report.add(
+        "Agent adapters",
+        "GitHub Copilot project skill",
+        "OK" if (root / ".github" / "skills" / SKILL_NAME / "SKILL.md").exists() else "WARN",
+        ".github/skills/salesforce-agent-optimizer",
+    )
     copilot_ok = (root / ".github" / "copilot-instructions.md").exists() and (
         root / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md"
     ).exists()

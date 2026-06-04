@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.0.5
+  version: 1.1.0
 ---
 
 # Salesforce Agent Optimizer
@@ -57,6 +57,7 @@ Non-negotiable preflight:
 4. Implementation: implement only the approved minimal changes. If the request is information-only, mark this phase as `not required`.
 5. Manifest/artifact gate: when metadata is added or modified, generate `package.xml` before validation handoff. Ask about optional release notes, technical specs, impact assessment, user testing, and manual procedures after implementation.
 6. Validation: validate the result before final answer. For information-only requests, re-check the cited metadata/Knowledge/source evidence. For implementation requests, run tests/static checks or an independent validation pass.
+   Use `sfao validate` when available to run lightweight checks for Apex, Flow, LWC, permissions, and `package.xml` in Salesforce DX projects.
 7. Failure loop: if approval, tests, or validation fail, return to planning with a smaller revised plan. Stop after three unsuccessful cycles and restart from requirements.
 8. Completion: summarize final requirements, evidence, changes or no-change result, validation, risks, and ask whether to push and which branch when repository changes exist.
 

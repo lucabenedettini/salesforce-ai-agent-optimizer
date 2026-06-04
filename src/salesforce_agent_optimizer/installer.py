@@ -193,6 +193,12 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
             if not project:
                 report.warnings.append("GitHub Copilot instructions are repository-scoped; rerun with --project.")
                 continue
+            targets.append(
+                TemplateTarget(
+                    root / "github" / "skills" / SKILL_NAME / "SKILL.md",
+                    destination / ".github" / "skills" / SKILL_NAME / "SKILL.md",
+                )
+            )
             targets.append(TemplateTarget(root / "AGENTS.md", destination / "AGENTS.md", merge=True))
             targets.extend(existing_agent_alias_targets(root, destination))
             targets.append(
@@ -501,6 +507,7 @@ def clean_empty_generated_dirs(
     if "claude" in selected:
         candidates.append(destination / ".claude" / "skills" / SKILL_NAME)
     if "copilot" in selected and project:
+        candidates.append(destination / ".github" / "skills" / SKILL_NAME)
         candidates.append(destination / ".github" / "instructions")
     for root in candidates:
         remove_empty_dirs_up_to(root, protected, report)

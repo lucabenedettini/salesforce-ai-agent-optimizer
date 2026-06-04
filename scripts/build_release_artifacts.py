@@ -59,6 +59,7 @@ def build_manifest(version: str, artifacts: list[Path]) -> Path:
             "codex_user": "$HOME/.agents/skills/salesforce-agent-optimizer",
             "claude_repo": ".claude/skills/salesforce-agent-optimizer",
             "copilot_repo": ".github",
+            "copilot_repo_skill": ".github/skills/salesforce-agent-optimizer",
         },
         "artifacts": [
             {

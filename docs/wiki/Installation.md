@@ -77,6 +77,7 @@ GitHub Copilot:
 
 ```text
 AGENTS.md
+.github/skills/salesforce-agent-optimizer/SKILL.md
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```
@@ -131,8 +132,9 @@ python <codex-home>/skills/.system/skill-installer/scripts/install-skill-from-gi
 
 Claude Code can use `.claude/skills/salesforce-agent-optimizer/SKILL.md`.
 
-GitHub Copilot can use `AGENTS.md`, `.github/copilot-instructions.md`, and
-`.github/instructions/salesforce-agent-optimizer.instructions.md`.
+GitHub Copilot can use `AGENTS.md`, `.github/copilot-instructions.md`,
+`.github/instructions/salesforce-agent-optimizer.instructions.md`, and the
+project-scoped `.github/skills/salesforce-agent-optimizer/SKILL.md`.
 
 ## Prerequisites
 

@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer is an MIT-licensed Salesforce Agent Skill packaged as the
 `sfao` command for Codex, Claude Code, and GitHub Copilot.
 
-Current version: `1.0.5`
+Current version: `1.1.0`
 
 It installs agent instructions that enforce Salesforce-first solutioning,
 configuration before custom code, minimal reversible changes, token-efficient
@@ -67,13 +67,13 @@ sfao doctor
 | `sfao install --project --platform all` | Installs Codex, Claude Code, and GitHub Copilot adapters in the current project. |
 | `sfao install --project --platform codex` | Installs only the Codex project skill under `.agents/skills/`. |
 | `sfao install --project --platform claude` | Installs only the Claude Code project skill under `.claude/skills/`. |
-| `sfao install --project --platform copilot` | Installs only `AGENTS.md` and GitHub Copilot instruction files. |
+| `sfao install --project --platform copilot` | Installs GitHub Copilot project skill, repository instructions, path instructions, and `AGENTS.md`. |
 | `sfao update --project --platform all` | Updates generated/managed files and adds newly introduced managed templates; user-edited fully generated files are skipped. |
 | `sfao uninstall --project --platform all --yes` | Removes only generated adapter files; project folders and user-owned files are kept. |
 | `sfao doctor` | Checks the local environment, installed adapters, Salesforce CLI availability, and common PATH issues. |
 | `sfao doctor --verbose` | Prints full diagnostic details. |
 | `sfao doctor --json` | Prints compact machine-readable diagnostics. |
-| `sfao validate` | Validates installed files or the source tree, including frontmatter, YAML, TOML, JSON, Python, versions, and newline shape. |
+| `sfao validate` | Validates installed files or the source tree, including frontmatter, YAML, TOML, JSON, Python, versions, newline shape, and lightweight Salesforce metadata checks. |
 | `sfao validate --verbose` | Prints validation details useful for troubleshooting. |
 | `sfao validate --json` | Prints compact machine-readable validation results. |
 | `sfao knowledge init --project-root .` | Creates `.salesforce-agent-knowledge/` for a Salesforce project. |
@@ -107,6 +107,7 @@ For GitHub Copilot:
 
 ```text
 AGENTS.md
+.github/skills/salesforce-agent-optimizer/SKILL.md
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```
@@ -227,6 +228,7 @@ Skill not visible in Codex, Claude Code, or GitHub Copilot
 - Run the matching `sfao install --project --platform ...` command again.
 - Restart the agent surface if it caches instructions.
 - Run `sfao doctor` and `sfao validate`.
+- For Copilot, verify `.github/skills/salesforce-agent-optimizer/SKILL.md` exists.
 
 Stale generated files or version mismatch
 

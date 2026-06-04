@@ -5,4 +5,4 @@ interface:
     planning, approval, implementation decision, validation, least-privilege org inspection, explicit delete approval, and
     package.xml generation.
 metadata:
-  version: 1.0.5
+  version: 1.1.0

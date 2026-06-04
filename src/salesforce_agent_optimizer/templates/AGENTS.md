@@ -15,6 +15,15 @@ Non-negotiable operating contract:
 - After implementation, explicitly ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures. Do this even when the user did not ask for those documents.
 - If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning instead of continuing with implementation.
 
+Minimum visible response skeleton:
+
+- `Request review`: one sentence with requirement, scope, target org/environment if known, and acceptance criteria.
+- `Planning evidence`: list only the references, Knowledge index/history, product/package file, metadata dependency, least-privilege, and version/API evidence to read or already read.
+- `Approval`: `required before changes`, `not required because information-only`, or `separate destructive approval required`.
+- `Implementation`: `not required`, `pending approval`, or one-line summary of approved minimal change.
+- `Validation`: evidence re-check, `sfao validate`, tests, micro-validator result, or pending validation.
+- `Completion`: requirement outcome, changed/no-change result, risks, optional artifact prompt, and push/branch question when repository changes exist.
+
 Mandatory phase gates:
 
 - Apply this phase-gated workflow to every Salesforce project request: metadata information, bugfix, new metadata implementation, architecture, review, release, org inspection, or package.xml work. Do not skip phases because the request looks small.

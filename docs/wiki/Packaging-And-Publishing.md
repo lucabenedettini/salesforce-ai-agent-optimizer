@@ -10,7 +10,7 @@ details outside the end-user README.
 - CLI command: `sfao`
 - Source layout: `src/salesforce_agent_optimizer/`
 - Packaged templates: `src/salesforce_agent_optimizer/templates/`
-- Current version: `1.0.5`
+- Current version: `1.1.0`
 
 ## Local Development Install
 
@@ -39,8 +39,8 @@ sfao doctor
 
 The checks validate generated adapters, skill frontmatter, YAML, TOML, JSON,
 Python compilation, text shape, final newlines, version alignment, Knowledge
-generation, destructive-operation guardrails, manifest generation, and package
-templates.
+generation, destructive-operation guardrails, manifest generation, package
+templates, and lightweight Salesforce metadata micro-validators.
 
 ## Build From Source
 
@@ -119,8 +119,8 @@ Recommended publishing uses PyPI Trusted Publishing from GitHub Actions.
 Release tag example:
 
 ```bash
-git tag v1.0.5
-git push origin v1.0.5
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 The release workflow runs validation, tests, ruff, `sfao validate`, build,

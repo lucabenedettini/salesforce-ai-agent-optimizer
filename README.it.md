@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer e' una skill Salesforce con licenza MIT distribuita
 come comando `sfao` per Codex, Claude Code e GitHub Copilot.
 
-Versione corrente: `1.0.5`
+Versione corrente: `1.1.0`
 
 Installa istruzioni per agenti che applicano solutioning Salesforce-first,
 configurazione prima del codice custom, modifiche minime e reversibili,
@@ -66,13 +66,13 @@ sfao doctor
 | `sfao install --project --platform all` | Installa gli adapter Codex, Claude Code e GitHub Copilot nel progetto corrente. |
 | `sfao install --project --platform codex` | Installa solo la skill Codex in `.agents/skills/`. |
 | `sfao install --project --platform claude` | Installa solo la skill Claude Code in `.claude/skills/`. |
-| `sfao install --project --platform copilot` | Installa solo `AGENTS.md` e le istruzioni GitHub Copilot. |
+| `sfao install --project --platform copilot` | Installa skill project-scoped GitHub Copilot, istruzioni repository, istruzioni path-specific e `AGENTS.md`. |
 | `sfao update --project --platform all` | Aggiorna file generati/gestiti e aggiunge nuovi template gestiti; i file generati ma modificati dall'utente vengono saltati. |
 | `sfao uninstall --project --platform all --yes` | Rimuove solo gli adapter generati; mantiene cartelle di progetto e file utente. |
 | `sfao doctor` | Controlla ambiente locale, adapter installati, Salesforce CLI e problemi PATH comuni. |
 | `sfao doctor --verbose` | Mostra diagnostica completa. |
 | `sfao doctor --json` | Mostra diagnostica compatta in JSON. |
-| `sfao validate` | Valida installazione o sorgenti: frontmatter, YAML, TOML, JSON, Python, versioni e newline. |
+| `sfao validate` | Valida installazione o sorgenti: frontmatter, YAML, TOML, JSON, Python, versioni, newline e controlli Salesforce metadata leggeri. |
 | `sfao validate --verbose` | Mostra dettagli utili per troubleshooting. |
 | `sfao validate --json` | Mostra risultati di validazione compatti in JSON. |
 | `sfao knowledge init --project-root .` | Crea `.salesforce-agent-knowledge/` per un progetto Salesforce. |
@@ -106,6 +106,7 @@ GitHub Copilot:
 
 ```text
 AGENTS.md
+.github/skills/salesforce-agent-optimizer/SKILL.md
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```
@@ -226,6 +227,7 @@ Skill non visibile in Codex, Claude Code o GitHub Copilot
 - Riesegui il comando `sfao install --project --platform ...` corretto.
 - Riavvia la superficie agente se mantiene istruzioni in cache.
 - Esegui `sfao doctor` e `sfao validate`.
+- Per Copilot, verifica che `.github/skills/salesforce-agent-optimizer/SKILL.md` esista.
 
 File generati obsoleti o mismatch versione
 

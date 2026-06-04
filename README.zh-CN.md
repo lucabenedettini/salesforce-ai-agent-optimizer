@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer 是一个 MIT 许可的 Salesforce Agent Skill，以
 `sfao` 命令形式分发，适用于 Codex、Claude Code 和 GitHub Copilot。
 
-当前版本：`1.0.5`
+当前版本：`1.1.0`
 
 它安装面向 Agent 的指令，用于执行 Salesforce-first 方案设计、优先配置而非
 自定义代码、最小且可回滚的变更、节省 token 的 Knowledge、least privilege、
@@ -65,13 +65,13 @@ sfao doctor
 | `sfao install --project --platform all` | 在当前项目安装 Codex、Claude Code 和 GitHub Copilot adapters。 |
 | `sfao install --project --platform codex` | 只在 `.agents/skills/` 安装 Codex skill。 |
 | `sfao install --project --platform claude` | 只在 `.claude/skills/` 安装 Claude Code skill。 |
-| `sfao install --project --platform copilot` | 只安装 `AGENTS.md` 和 GitHub Copilot 指令。 |
+| `sfao install --project --platform copilot` | 安装 GitHub Copilot 项目级 skill、仓库指令、路径指令和 `AGENTS.md`。 |
 | `sfao update --project --platform all` | 更新生成/托管文件，并添加新引入的托管模板；用户编辑过的完整生成文件会被跳过。 |
 | `sfao uninstall --project --platform all --yes` | 只删除生成的 adapters；保留项目目录和用户文件。 |
 | `sfao doctor` | 检查本地环境、已安装 adapters、Salesforce CLI 和常见 PATH 问题。 |
 | `sfao doctor --verbose` | 输出完整诊断信息。 |
 | `sfao doctor --json` | 输出紧凑 JSON 诊断。 |
-| `sfao validate` | 校验安装或源码：frontmatter、YAML、TOML、JSON、Python、版本和换行格式。 |
+| `sfao validate` | 校验安装或源码：frontmatter、YAML、TOML、JSON、Python、版本、换行格式和轻量 Salesforce metadata 检查。 |
 | `sfao validate --verbose` | 输出用于排查问题的详细校验信息。 |
 | `sfao validate --json` | 输出紧凑 JSON 校验结果。 |
 | `sfao knowledge init --project-root .` | 为 Salesforce 项目创建 `.salesforce-agent-knowledge/`。 |
@@ -105,6 +105,7 @@ GitHub Copilot:
 
 ```text
 AGENTS.md
+.github/skills/salesforce-agent-optimizer/SKILL.md
 .github/copilot-instructions.md
 .github/instructions/salesforce-agent-optimizer.instructions.md
 ```
@@ -222,6 +223,7 @@ Codex、Claude Code 或 GitHub Copilot 看不到 skill
 - 重新运行匹配的 `sfao install --project --platform ...` 命令。
 - 如果 Agent surface 缓存指令，请重启。
 - 运行 `sfao doctor` 和 `sfao validate`。
+- 对于 Copilot，确认 `.github/skills/salesforce-agent-optimizer/SKILL.md` 存在。
 
 生成文件过期或版本不匹配
 

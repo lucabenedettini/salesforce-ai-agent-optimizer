@@ -15,6 +15,7 @@ Every version update must include:
 
 ## Current Version
 
+- `1.1.0`: Copilot project-skill compatibility and lightweight Salesforce metadata micro-validators for Apex, Flow, LWC, permissions, and `package.xml`.
 - `1.0.5`: installer update bugfix that lets `sfao update` add newly introduced managed templates, including evals, to existing project installs.
 - `1.0.4`: installer and planning bugfix that merges Copilot guidance into existing agent files, installs evals, and adds mandatory multi-country/multi-currency planning checks.
 - `1.0.3`: Copilot compliance bugfix that makes mandatory phase gates visible as an operational response contract before metadata parsing or implementation.

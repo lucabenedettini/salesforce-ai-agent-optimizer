@@ -19,6 +19,7 @@ from salesforce_agent_optimizer.validation import (
     ValidationResult,
     parse_frontmatter,
     validate_generated_sync,
+    validate_salesforce_metadata,
     validate_source_tree,
 )
 
@@ -96,7 +97,7 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
 def test_sfao_version() -> None:
     completed = run_cli(["version"], ROOT)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "salesforce-agent-optimizer 1.0.5" in completed.stdout
+    assert "salesforce-agent-optimizer 1.1.0" in completed.stdout
 
 
 def test_sfao_validate_and_doctor() -> None:
@@ -107,7 +108,7 @@ def test_sfao_validate_and_doctor() -> None:
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     payload = json.loads(doctor.stdout)
-    assert payload["Core"][0]["detail"].endswith("v1.0.5")
+    assert payload["Core"][0]["detail"].endswith("v1.1.0")
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -121,6 +122,7 @@ def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
         tmp_path / ".agents" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / "AGENTS.md",
+        tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / ".github" / "copilot-instructions.md",
         tmp_path / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md",
         tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json",
@@ -146,6 +148,7 @@ def test_sfao_install_individual_platforms(tmp_path: Path) -> None:
     assert run_cli(["install", "--project", "--platform", "claude"], claude).returncode == 0
     assert (claude / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md").exists()
     assert run_cli(["install", "--project", "--platform", "copilot"], copilot).returncode == 0
+    assert (copilot / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md").exists()
     assert (copilot / ".github" / "copilot-instructions.md").exists()
 
 
@@ -191,13 +194,17 @@ def test_update_installs_new_missing_managed_templates(tmp_path: Path) -> None:
     report = install(tmp_path, project=True, platform="copilot")
     assert report.ok, report.to_dict()
     eval_file = tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json"
+    copilot_skill = tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md"
     eval_file.unlink()
+    copilot_skill.unlink()
 
     update_report = update(tmp_path, project=True, platform="copilot")
 
     assert update_report.ok, update_report.to_dict()
     assert eval_file.exists()
+    assert copilot_skill.exists()
     assert any(path.endswith("salesforce-agent-optimizer-trigger-evals.json") for path in update_report.installed)
+    assert any(path.endswith(".github/skills/salesforce-agent-optimizer/SKILL.md") for path in update_report.installed)
 
 
 def test_update_updates_generated_files_and_skips_user_edits(tmp_path: Path) -> None:
@@ -237,13 +244,17 @@ def test_uninstall_skips_non_generated_files(tmp_path: Path) -> None:
 def test_versions_align() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'^version = "1\.0\.5"$', pyproject, re.MULTILINE)
+    assert re.search(r'^version = "1\.1\.0"$', pyproject, re.MULTILINE)
     skill_data, _, _ = parse_frontmatter(ROOT / "SKILL.md")
     assert skill_data["metadata"]["version"] == version
     codex_data, _, _ = parse_frontmatter(
         ROOT / ".agents" / "skills" / "salesforce-agent-optimizer" / "SKILL.md"
     )
     assert codex_data["metadata"]["version"] == version
+    copilot_data, _, _ = parse_frontmatter(
+        ROOT / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md"
+    )
+    assert copilot_data["metadata"]["version"] == version
 
 
 def test_source_generated_files_have_markers() -> None:
@@ -251,6 +262,7 @@ def test_source_generated_files_have_markers() -> None:
         ROOT / "AGENTS.md",
         ROOT / ".agents" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         ROOT / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
+        ROOT / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         ROOT / ".github" / "copilot-instructions.md",
         ROOT / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md",
     ]
@@ -259,7 +271,14 @@ def test_source_generated_files_have_markers() -> None:
 
 
 def test_copilot_instructions_enforce_mandatory_phase_gates() -> None:
-    text = (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8")
+    text = "\n".join(
+        [
+            (ROOT / ".github" / "copilot-instructions.md").read_text(encoding="utf-8"),
+            (
+                ROOT / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md"
+            ).read_text(encoding="utf-8"),
+        ]
+    )
     required = [
         "Copilot compliance gate",
         "Do not inspect raw Salesforce metadata",
@@ -285,9 +304,87 @@ def test_copilot_instructions_enforce_mandatory_phase_gates() -> None:
         "multi-country",
         "multi-currency",
         "Advanced Currency Management",
+        "Minimum visible response skeleton",
+        "Approval",
+        "Completion",
     ]
     for phrase in required:
         assert phrase in text
+
+
+def test_salesforce_micro_validators_warn_on_risky_metadata(tmp_path: Path) -> None:
+    (tmp_path / "sfdx-project.json").write_text('{"packageDirectories":[]}\n', encoding="utf-8")
+    classes = tmp_path / "force-app" / "main" / "default" / "classes"
+    flows = tmp_path / "force-app" / "main" / "default" / "flows"
+    permissions = tmp_path / "force-app" / "main" / "default" / "permissionsets"
+    manifest = tmp_path / "manifest"
+    for directory in (classes, flows, permissions, manifest):
+        directory.mkdir(parents=True)
+    (classes / "InvoiceService.cls").write_text(
+        "public without sharing class InvoiceService { public void run(){ System.debug('x'); } }\n",
+        encoding="utf-8",
+    )
+    (classes / "InvoiceService.cls-meta.xml").write_text(
+        "<ApexClass><apiVersion>67.0</apiVersion><status>Active</status></ApexClass>\n",
+        encoding="utf-8",
+    )
+    (flows / "Invoice.flow-meta.xml").write_text(
+        "<Flow><status>Active</status></Flow>\n",
+        encoding="utf-8",
+    )
+    (permissions / "Risk.permissionset-meta.xml").write_text(
+        (
+            "<PermissionSet>"
+            "<userPermissions><name>ModifyAllData</name><enabled>true</enabled></userPermissions>"
+            "<objectPermissions><object>Invoice__c</object><allowDelete>true</allowDelete>"
+            "</objectPermissions></PermissionSet>\n"
+        ),
+        encoding="utf-8",
+    )
+    (manifest / "package.xml").write_text(
+        "<Package><types><members>*</members><name>ApexClass</name></types></Package>\n",
+        encoding="utf-8",
+    )
+    (manifest / "destructiveChanges.xml").write_text("<Package></Package>\n", encoding="utf-8")
+
+    result = ValidationResult()
+    validate_salesforce_metadata(tmp_path, result)
+
+    assert result.ok, result.to_dict()
+    warnings = "\n".join(result.warnings)
+    assert "without sharing" in warnings
+    assert "System.debug" in warnings
+    assert "no obvious matching test class" in warnings
+    assert "Flow is Active" in warnings
+    assert "High-risk user permission enabled (ModifyAllData)" in warnings
+    assert "allowDelete" in warnings
+    assert "wildcard member" in warnings
+    assert "Destructive metadata file requires separate explicit user approval" in warnings
+
+
+def test_salesforce_micro_validators_error_on_broken_metadata(tmp_path: Path) -> None:
+    (tmp_path / "sfdx-project.json").write_text('{"packageDirectories":[]}\n', encoding="utf-8")
+    trigger_dir = tmp_path / "force-app" / "main" / "default" / "triggers"
+    lwc_dir = tmp_path / "force-app" / "main" / "default" / "lwc" / "brokenCard"
+    manifest = tmp_path / "manifest"
+    trigger_dir.mkdir(parents=True)
+    lwc_dir.mkdir(parents=True)
+    manifest.mkdir()
+    (trigger_dir / "InvoiceTrigger.trigger").write_text(
+        "trigger InvoiceTrigger on Invoice__c (before insert) {}\n",
+        encoding="utf-8",
+    )
+    (lwc_dir / "brokenCard.js").write_text("export default class BrokenCard {}\n", encoding="utf-8")
+    (manifest / "package.xml").write_text("<Package>\n", encoding="utf-8")
+
+    result = ValidationResult()
+    validate_salesforce_metadata(tmp_path, result)
+
+    assert not result.ok
+    errors = "\n".join(result.errors)
+    assert "Apex trigger missing metadata file" in errors
+    assert "LWC component missing js-meta.xml" in errors
+    assert "Invalid package.xml XML" in errors
 
 
 def test_source_validation_catches_text_shape() -> None:
@@ -328,6 +425,7 @@ def test_wheel_includes_templates(tmp_path: Path) -> None:
         "salesforce_agent_optimizer/templates/scripts/sf_agent_cli.py",
         "salesforce_agent_optimizer/templates/codex/SKILL.md",
         "salesforce_agent_optimizer/templates/claude/SKILL.md",
+        "salesforce_agent_optimizer/templates/github/skills/salesforce-agent-optimizer/SKILL.md",
         "salesforce_agent_optimizer/templates/github/copilot-instructions.md",
         "salesforce_agent_optimizer/templates/github/instructions/salesforce-agent-optimizer.instructions.md",
     }
@@ -378,9 +476,10 @@ def test_release_manifest_and_workflow_requirements() -> None:
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     manifest = json.loads((dist / "release-manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "1.0.5"
+    assert manifest["version"] == "1.1.0"
     assert "sfao update" in manifest["commands"]
     assert "sfao uninstall" in manifest["commands"]
+    assert manifest["skill_paths"]["copilot_repo_skill"] == ".github/skills/salesforce-agent-optimizer"
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
     assert "PUBLISH_TO_PYPI" in workflow
     assert "PYPI_API_TOKEN" not in workflow

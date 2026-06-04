@@ -8,6 +8,23 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.1.0] - 2026-06-04
+
+### Added
+
+- Added lightweight Salesforce metadata micro-validators for Apex, Flow, LWC, permissions, and `package.xml`.
+- Added GitHub Copilot project-scoped skill installation at `.github/skills/salesforce-agent-optimizer/SKILL.md`.
+- Added mandatory compact response skeleton labels for Copilot and compatible agents: Request review, Planning evidence, Approval, Implementation, Validation, and Completion.
+
+### Changed
+
+- Updated `sfao install`, `sfao update`, `sfao uninstall`, `sfao doctor`, and `sfao validate` to recognize the GitHub Copilot project skill path.
+- Updated packaged templates, release manifest paths, README files, and wiki version notes for the new Copilot compatibility target.
+
+### Preserved
+
+- Salesforce-first delivery, configuration-first planning, token-efficient Knowledge use, explicit approval gates, destructive-operation guardrails, and autonomous packaging.
+
 ## [1.0.5] - 2026-06-04
 
 ### Fixed
