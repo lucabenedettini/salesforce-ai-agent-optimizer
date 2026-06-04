@@ -8,6 +8,18 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.0.5] - 2026-06-04
+
+### Fixed
+
+- Updated `sfao update` so package upgrades also install newly introduced managed templates that are missing from an existing project install.
+- Ensured existing projects receive the Salesforce Agent Optimizer eval template during update, not only during fresh install.
+
+### Preserved
+
+- Existing user-owned agent and Copilot files are still merged through managed sections instead of overwritten.
+- User-edited fully generated files are still skipped with a warning to avoid data loss.
+
 ## [1.0.4] - 2026-06-04
 
 ### Fixed

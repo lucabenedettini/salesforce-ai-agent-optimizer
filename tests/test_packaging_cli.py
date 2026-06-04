@@ -96,7 +96,7 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
 def test_sfao_version() -> None:
     completed = run_cli(["version"], ROOT)
     assert completed.returncode == 0, completed.stdout + completed.stderr
-    assert "salesforce-agent-optimizer 1.0.4" in completed.stdout
+    assert "salesforce-agent-optimizer 1.0.5" in completed.stdout
 
 
 def test_sfao_validate_and_doctor() -> None:
@@ -107,7 +107,7 @@ def test_sfao_validate_and_doctor() -> None:
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     payload = json.loads(doctor.stdout)
-    assert payload["Core"][0]["detail"].endswith("v1.0.4")
+    assert payload["Core"][0]["detail"].endswith("v1.0.5")
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -187,6 +187,19 @@ def test_existing_copilot_files_are_merged_and_updated(tmp_path: Path) -> None:
     assert "existing copilot guidance" in copilot.read_text(encoding="utf-8")
 
 
+def test_update_installs_new_missing_managed_templates(tmp_path: Path) -> None:
+    report = install(tmp_path, project=True, platform="copilot")
+    assert report.ok, report.to_dict()
+    eval_file = tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json"
+    eval_file.unlink()
+
+    update_report = update(tmp_path, project=True, platform="copilot")
+
+    assert update_report.ok, update_report.to_dict()
+    assert eval_file.exists()
+    assert any(path.endswith("salesforce-agent-optimizer-trigger-evals.json") for path in update_report.installed)
+
+
 def test_update_updates_generated_files_and_skips_user_edits(tmp_path: Path) -> None:
     report = install(tmp_path, project=True, platform="copilot")
     assert report.ok
@@ -224,7 +237,7 @@ def test_uninstall_skips_non_generated_files(tmp_path: Path) -> None:
 def test_versions_align() -> None:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert re.search(r'^version = "1\.0\.4"$', pyproject, re.MULTILINE)
+    assert re.search(r'^version = "1\.0\.5"$', pyproject, re.MULTILINE)
     skill_data, _, _ = parse_frontmatter(ROOT / "SKILL.md")
     assert skill_data["metadata"]["version"] == version
     codex_data, _, _ = parse_frontmatter(
@@ -365,7 +378,7 @@ def test_release_manifest_and_workflow_requirements() -> None:
     )
     assert completed.returncode == 0, completed.stdout + completed.stderr
     manifest = json.loads((dist / "release-manifest.json").read_text(encoding="utf-8"))
-    assert manifest["version"] == "1.0.4"
+    assert manifest["version"] == "1.0.5"
     assert "sfao update" in manifest["commands"]
     assert "sfao uninstall" in manifest["commands"]
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")

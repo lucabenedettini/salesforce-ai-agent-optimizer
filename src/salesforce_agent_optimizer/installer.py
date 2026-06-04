@@ -97,7 +97,14 @@ def update(
     manifest = load_manifest(destination)
     for target in template_targets(root, destination, project, selected, report):
         if not target.target.exists():
-            report.stale.append(display_path(target.target))
+            copy_template_file(
+                target.source,
+                target.target,
+                report,
+                allow_create=True,
+                manifest=manifest,
+                merge=target.merge,
+            )
             continue
         if target.merge:
             copy_template_file(

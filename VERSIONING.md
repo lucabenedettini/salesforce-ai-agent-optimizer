@@ -15,6 +15,7 @@ Every version update must include:
 
 ## Current Version
 
+- `1.0.5`: installer update bugfix that lets `sfao update` add newly introduced managed templates, including evals, to existing project installs.
 - `1.0.4`: installer and planning bugfix that merges Copilot guidance into existing agent files, installs evals, and adds mandatory multi-country/multi-currency planning checks.
 - `1.0.3`: Copilot compliance bugfix that makes mandatory phase gates visible as an operational response contract before metadata parsing or implementation.
 - `1.0.2`: instruction-flow bugfix that makes request review, planning, implementation decision, validation, failure handling, and completion gates mandatory for all Salesforce project requests.

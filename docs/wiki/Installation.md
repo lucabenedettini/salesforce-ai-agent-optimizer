@@ -100,6 +100,8 @@ sfao update --project --platform all
 sfao doctor
 ```
 
+`sfao update` refreshes generated or managed sections and installs newly introduced managed templates, such as eval files, when they are missing from an existing project install.
+
 `sfao update` updates only generated files that still contain the managed-file
 marker. User-edited files are skipped and reported.
 

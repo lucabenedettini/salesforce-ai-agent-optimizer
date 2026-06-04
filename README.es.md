@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer es una skill Salesforce con licencia MIT distribuida
 como comando `sfao` para Codex, Claude Code y GitHub Copilot.
 
-Version actual: `1.0.4`
+Version actual: `1.0.5`
 
 Instala instrucciones para agentes que aplican solutioning Salesforce-first,
 configuracion antes de codigo custom, cambios minimos y reversibles, Knowledge
@@ -68,7 +68,7 @@ sfao doctor
 | `sfao install --project --platform codex` | Instala solo la skill Codex en `.agents/skills/`. |
 | `sfao install --project --platform claude` | Instala solo la skill Claude Code en `.claude/skills/`. |
 | `sfao install --project --platform copilot` | Instala solo `AGENTS.md` y las instrucciones GitHub Copilot. |
-| `sfao update --project --platform all` | Actualiza solo archivos generados por `sfao`; los archivos editados por el usuario se omiten. |
+| `sfao update --project --platform all` | Actualiza archivos generados/gestionados y agrega nuevos templates gestionados; los archivos generados pero editados por el usuario se omiten. |
 | `sfao uninstall --project --platform all --yes` | Elimina solo adapters generados; conserva carpetas del proyecto y archivos de usuario. |
 | `sfao doctor` | Revisa entorno local, adapters instalados, Salesforce CLI y problemas comunes de PATH. |
 | `sfao doctor --verbose` | Muestra diagnostico completo. |
