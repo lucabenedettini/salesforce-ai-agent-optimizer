@@ -15,7 +15,7 @@ sfao doctor
 Alternative:
 
 ```bash
-pipx install salesforce-agent-optimizer
+python -m pipx install salesforce-agent-optimizer
 sfao install
 sfao doctor
 ```
@@ -24,6 +24,14 @@ Before PyPI publication, install from GitHub:
 
 ```bash
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+sfao install
+sfao doctor
+```
+
+Plain `pip` is acceptable when the active Python environment is intentional:
+
+```bash
+python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 sfao install
 sfao doctor
 ```
@@ -115,6 +123,22 @@ sfao update --project --platform all
 sfao doctor
 ```
 
+PATH-safe `pipx` update:
+
+```bash
+python -m pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+Plain `pip` update:
+
+```bash
+python -m pip install --upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
 `sfao update` refreshes generated or managed sections and installs newly introduced managed templates, such as eval files, when they are missing from an existing project install.
 
 `sfao update` updates only generated files that still contain the managed-file
@@ -125,6 +149,13 @@ marker. User-edited files are skipped and reported.
 ```bash
 sfao uninstall --project --platform all --yes
 uv tool uninstall salesforce-agent-optimizer
+```
+
+PATH-safe `pipx` uninstall:
+
+```bash
+sfao uninstall --project --platform all --yes
+python -m pipx uninstall salesforce-agent-optimizer
 ```
 
 `sfao uninstall` removes only generated files. It keeps user-owned files and
@@ -158,3 +189,10 @@ project-scoped `.github/skills/salesforce-agent-optimizer/SKILL.md`.
 - Explicit authenticated org aliases for Salesforce access.
 - Sandbox org for write or execute operations; production orgs are read-only
   through the skill guardrails.
+
+## Command Notes
+
+- `pip upgrade` is not a valid command. Use `python -m pip install --upgrade salesforce-agent-optimizer`.
+- If `pipx` is installed but not on PATH, use `python -m pipx ...`.
+- If the `pipx` module is missing, run `python -m pip install --user pipx` and then `python -m pipx ensurepath`.
+- `sfao knowledge init`, `sfao knowledge refresh`, and `sfao version-context update` print progress in non-JSON mode. Use `--json` for compact automation output.

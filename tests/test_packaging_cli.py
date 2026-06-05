@@ -11,6 +11,7 @@ from pathlib import Path
 
 from conftest import ROOT
 
+import salesforce_agent_optimizer.doctor as doctor_module
 import salesforce_agent_optimizer.validation as validation_module
 from salesforce_agent_optimizer import __version__
 from salesforce_agent_optimizer.installer import SECTION_BEGIN, SECTION_END, install, uninstall, update
@@ -78,6 +79,11 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
         "sfao version-context scaffold",
         "sfao version-context update",
         "sfao version-context validate",
+        "python -m pipx install salesforce-agent-optimizer",
+        "python -m pipx upgrade salesforce-agent-optimizer",
+        "python -m pipx uninstall salesforce-agent-optimizer",
+        "python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git",
+        "python -m pip install --upgrade salesforce-agent-optimizer",
     ]
     maintainer_only_fragments = [
         "python -m build",
@@ -117,6 +123,22 @@ def test_sfao_validate_and_doctor() -> None:
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
     assert "Use --verbose" in compact.stdout
+
+
+def test_windows_path_check_uses_versioned_user_scripts(monkeypatch, tmp_path: Path) -> None:
+    scripts = tmp_path / "Python314" / "Scripts"
+    scripts.mkdir(parents=True)
+
+    def fake_get_path(name: str, scheme: str | None = None) -> str:
+        assert name == "scripts"
+        assert scheme == "nt_user"
+        return str(scripts)
+
+    monkeypatch.setattr(doctor_module.sysconfig, "get_path", fake_get_path)
+    monkeypatch.setenv("PATH", str(scripts))
+
+    assert doctor_module.user_scripts_on_path()
+    assert f"{scripts} is on PATH" in doctor_module.windows_path_detail()
 
 
 def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
@@ -496,28 +518,53 @@ def test_knowledge_commands(tmp_path: Path) -> None:
     source = ROOT / "tests" / "fixtures" / "sfdx-project"
     project = tmp_path / "sfdx-project"
     shutil.copytree(source, project)
-    init = run_cli(["knowledge", "init", "--project-root", str(project), "--json"], ROOT)
+    init = run_cli(["knowledge", "init", "--project-root", str(project)], ROOT)
     assert init.returncode == 0, init.stdout + init.stderr
-    payload = json.loads(init.stdout)
+    assert "Salesforce Agent Knowledge: OK" in init.stdout
+    assert "sfao knowledge:" in init.stderr
+    assert "scanning project files" in init.stderr
+    assert "%" in init.stderr
+
+    refresh_json = run_cli(["knowledge", "refresh", "--project-root", str(project), "--json"], ROOT)
+    assert refresh_json.returncode == 0, refresh_json.stdout + refresh_json.stderr
+    assert refresh_json.stderr == ""
+    payload = json.loads(refresh_json.stdout)
     assert payload["entry_count"] >= 3
     assert (project / ".salesforce-agent-knowledge" / "index.json").exists()
     refresh = run_cli(["knowledge", "refresh", "--project-root", str(project)], ROOT)
     assert refresh.returncode == 0, refresh.stdout + refresh.stderr
+    assert "sfao knowledge:" in refresh.stderr
     doctor = run_cli(["knowledge", "doctor", "--project-root", str(project), "--json"], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
+    assert doctor.stderr == ""
     assert json.loads(doctor.stdout)["ok"]
 
 
 def test_version_context_commands(tmp_path: Path) -> None:
-    scaffold = run_cli(["version-context", "scaffold", "--root", str(tmp_path), "--json"], ROOT)
+    scaffold = run_cli(["version-context", "scaffold", "--root", str(tmp_path)], ROOT)
     assert scaffold.returncode == 0, scaffold.stdout + scaffold.stderr
+    assert "Salesforce Version Context: OK" in scaffold.stdout
+    assert "sfao version-context:" in scaffold.stderr
+    assert "writing references/" in scaffold.stderr
+
     update_result = run_cli(
-        ["version-context", "update", "--root", str(tmp_path), "--offline", "--json"],
+        ["version-context", "update", "--root", str(tmp_path), "--offline"],
         ROOT,
     )
     assert update_result.returncode == 0, update_result.stdout + update_result.stderr
+    assert "sfao version-context:" in update_result.stderr
+    assert "offline mode" in update_result.stderr
+
+    update_json = run_cli(
+        ["version-context", "update", "--root", str(tmp_path), "--offline", "--json"],
+        ROOT,
+    )
+    assert update_json.returncode == 0, update_json.stdout + update_json.stderr
+    assert update_json.stderr == ""
+    assert json.loads(update_json.stdout)["ok"]
     validate = run_cli(["version-context", "validate", "--root", str(tmp_path), "--json"], ROOT)
     assert validate.returncode == 0, validate.stdout + validate.stderr
+    assert validate.stderr == ""
     assert json.loads(validate.stdout)["ok"]
 
 

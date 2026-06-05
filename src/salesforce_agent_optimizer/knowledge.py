@@ -10,7 +10,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from xml.etree import ElementTree
 
 
@@ -100,6 +100,7 @@ REQUIRED_KNOWLEDGE_FILES = [
     "wiki/security.md",
     "wiki/integrations.md",
 ]
+ProgressCallback = Callable[[str], None]
 
 
 @dataclass
@@ -131,6 +132,11 @@ class KnowledgeReport:
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def progress_line(progress: ProgressCallback | None, message: str) -> None:
+    if progress:
+        progress(f"sfao knowledge: {message}")
 
 
 def posix(path: Path) -> str:
@@ -238,21 +244,47 @@ def summarize_file(path: Path) -> dict[str, Any]:
     return summary
 
 
-def build_entries(root: Path, knowledge_dir: Path, config: dict[str, Any]) -> list[dict[str, Any]]:
+def should_report_step(index: int, total: int) -> bool:
+    if total <= 0:
+        return False
+    interval = max(total // 10, 1)
+    return index == 1 or index == total or index % interval == 0
+
+
+def build_entries(
+    root: Path,
+    knowledge_dir: Path,
+    config: dict[str, Any],
+    progress: ProgressCallback | None = None,
+) -> list[dict[str, Any]]:
     metadata_types = config.get("metadata_types", DEFAULT_METADATA_TYPES)
     exclude_patterns = config.get("exclude_patterns", DEFAULT_CONFIG["exclude_patterns"])
     if not isinstance(metadata_types, dict) or not isinstance(exclude_patterns, list):
         metadata_types = DEFAULT_METADATA_TYPES
         exclude_patterns = DEFAULT_CONFIG["exclude_patterns"]
-    entries: list[dict[str, Any]] = []
-    for path in sorted(root.rglob("*")):
-        if not path.is_file() or is_skipped(path, root, knowledge_dir, exclude_patterns):
+    all_files = sorted(path for path in root.rglob("*") if path.is_file())
+    total_files = len(all_files)
+    progress_line(progress, f"scanning project files 0/{total_files} (0%)")
+    candidates: list[tuple[Path, str, str, str]] = []
+    for index, path in enumerate(all_files, start=1):
+        if is_skipped(path, root, knowledge_dir, exclude_patterns):
+            if should_report_step(index, total_files):
+                percent = round(index * 100 / total_files) if total_files else 100
+                progress_line(progress, f"scanning project files {index}/{total_files} ({percent}%)")
             continue
         rel = posix(path.relative_to(root))
         metadata_type = classify(rel, metadata_types)
-        if metadata_type is None:
-            continue
-        name = infer_name(path, metadata_type)
+        if metadata_type is not None:
+            name = infer_name(path, metadata_type)
+            candidates.append((path, rel, metadata_type, name))
+        if should_report_step(index, total_files):
+            percent = round(index * 100 / total_files) if total_files else 100
+            progress_line(progress, f"scanning project files {index}/{total_files} ({percent}%)")
+
+    entries: list[dict[str, Any]] = []
+    total_candidates = len(candidates)
+    progress_line(progress, f"summarizing metadata 0/{total_candidates} (0%)")
+    for index, (path, rel, metadata_type, name) in enumerate(candidates, start=1):
         doc_path = f"metadata/{metadata_type}/{slug(name)}.md"
         entries.append(
             {
@@ -263,6 +295,9 @@ def build_entries(root: Path, knowledge_dir: Path, config: dict[str, Any]) -> li
                 "summary": summarize_file(path),
             }
         )
+        if should_report_step(index, total_candidates):
+            percent = round(index * 100 / total_candidates) if total_candidates else 100
+            progress_line(progress, f"summarizing metadata {index}/{total_candidates} ({percent}%)")
     return entries
 
 
@@ -293,10 +328,16 @@ def render_entry(entry: dict[str, Any], generated_at: str) -> str:
     )
 
 
-def write_knowledge(root: Path, knowledge_dir: Path, entries: list[dict[str, Any]]) -> list[str]:
+def write_knowledge(
+    root: Path,
+    knowledge_dir: Path,
+    entries: list[dict[str, Any]],
+    progress: ProgressCallback | None = None,
+) -> list[str]:
     generated_at = now_iso()
     changed: list[str] = []
     knowledge_dir.mkdir(parents=True, exist_ok=True)
+    progress_line(progress, "writing config and history")
     if not (knowledge_dir / "config.json").exists():
         write_text(
             knowledge_dir / "config.json",
@@ -305,17 +346,25 @@ def write_knowledge(root: Path, knowledge_dir: Path, entries: list[dict[str, Any
             root,
         )
     ensure_history(root, knowledge_dir, changed)
+    progress_line(progress, "writing indexes")
     write_indexes(root, knowledge_dir, entries, generated_at, changed)
+    progress_line(progress, "writing wiki summaries")
     write_wiki(root, knowledge_dir, entries, generated_at, changed)
-    for entry in entries:
+    total_entries = len(entries)
+    for index, entry in enumerate(entries, start=1):
         write_text(
             knowledge_dir / entry["doc_path"],
             render_entry(entry, generated_at),
             changed,
             root,
         )
+        if should_report_step(index, total_entries):
+            percent = round(index * 100 / total_entries) if total_entries else 100
+            progress_line(progress, f"writing metadata pages {index}/{total_entries} ({percent}%)")
+    progress_line(progress, "writing markdown index and log")
     write_markdown_index(root, knowledge_dir, generated_at, changed)
     append_log(root, knowledge_dir, generated_at, len(entries), changed)
+    progress_line(progress, "done")
     return changed
 
 
@@ -447,21 +496,26 @@ def run_knowledge(
     project_root: Path,
     target_org: str | None = None,
     max_items: int | None = None,
+    progress: ProgressCallback | None = None,
 ) -> KnowledgeReport:
     root = project_root.resolve()
     knowledge_dir = root / KNOWLEDGE_DIR
     report = KnowledgeReport(action=action, project_root=str(root), knowledge_dir=str(knowledge_dir))
+    progress_line(progress, f"{action} started for {root}")
     if target_org:
         report.warnings.append("Org enrichment is not performed by default; alias was recorded only.")
     if action in {"init", "refresh"}:
+        progress_line(progress, "loading configuration")
         config = load_config(knowledge_dir)
-        entries = build_entries(root, knowledge_dir, config)
+        entries = build_entries(root, knowledge_dir, config, progress=progress)
         if max_items is not None:
+            progress_line(progress, f"limiting entries to {max_items}")
             entries = entries[:max_items]
         report.entry_count = len(entries)
-        report.changed = write_knowledge(root, knowledge_dir, entries)
+        report.changed = write_knowledge(root, knowledge_dir, entries, progress=progress)
         return report
     if action == "doctor":
+        progress_line(progress, "checking required Knowledge files")
         missing = [relative for relative in REQUIRED_KNOWLEDGE_FILES if not (knowledge_dir / relative).exists()]
         if missing:
             report.errors.extend(f"Missing Knowledge file: {item}" for item in missing)

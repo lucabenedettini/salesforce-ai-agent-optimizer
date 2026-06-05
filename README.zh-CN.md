@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer 是一个 MIT 许可的 Salesforce Agent Skill，以
 `sfao` 命令形式分发，适用于 Codex、Claude Code 和 GitHub Copilot。
 
-当前版本：`1.2.0`
+当前版本：`1.2.1`
 
 它安装面向 Agent 的指令，用于执行 Salesforce-first 方案设计、优先配置而非
 自定义代码、最小且可回滚的变更、节省 token 的 Knowledge、least privilege、
@@ -38,7 +38,7 @@ sfao doctor
 替代方式：
 
 ```bash
-pipx install salesforce-agent-optimizer
+python -m pipx install salesforce-agent-optimizer
 sfao install
 sfao doctor
 ```
@@ -54,7 +54,7 @@ sfao doctor
 如果你明确希望把命令安装到当前 Python 环境，也可以使用普通 `pip`：
 
 ```bash
-pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 sfao install
 sfao doctor
 ```
@@ -79,11 +79,11 @@ sfao doctor
 | `sfao validate --verbose` | 输出用于排查问题的详细校验信息。 |
 | `sfao validate --json` | 输出紧凑 JSON 校验结果。 |
 | `sfao knowledge init --project-root .` | 为 Salesforce 项目创建 `.salesforce-agent-knowledge/`。 |
-| `sfao knowledge refresh --project-root .` | metadata 变更后刷新本地 Knowledge。 |
+| `sfao knowledge refresh --project-root .` | metadata 变更后刷新本地 Knowledge；未使用 `--json` 时会显示进度。 |
 | `sfao knowledge doctor --project-root .` | 检查本地 Knowledge 是否存在且可用。 |
 | `sfao knowledge refresh --project-root . --target-org <alias>` | 可选地从 org 丰富 Knowledge。必须显式提供 alias。 |
 | `sfao version-context scaffold` | 缺失时创建本地 Salesforce release/API context 文件。 |
-| `sfao version-context update` | 从 Salesforce 官方来源刷新 release/API/package guidance。 |
+| `sfao version-context update` | 从 Salesforce 官方来源刷新 release/API/package guidance；未使用 `--json` 时会显示进度。 |
 | `sfao version-context validate` | 检查 version-context 文件。 |
 
 ## 安装内容
@@ -156,6 +156,9 @@ sfao knowledge refresh --project-root .
 sfao knowledge doctor --project-root .
 ```
 
+不带 `--json` 的 Knowledge 命令会在扫描、摘要和写入 metadata 页面时显示进度。
+自动化场景请使用 `--json` 获取紧凑输出。
+
 刷新 Salesforce release/API/package 上下文：
 
 ```bash
@@ -163,6 +166,9 @@ sfao version-context scaffold
 sfao version-context update
 sfao version-context validate
 ```
+
+不带 `--json` 的 version-context 命令会在写入文件和检查 Salesforce 官方来源时显示进度。
+使用 `sfao version-context update --offline` 可以跳过网络检查。
 
 Org 访问绝不能是隐式的。命令需要 Salesforce org metadata 或 data 时，Agent 必须
 询问显式 alias。通过 skill guardrails，生产 org 为只读。
@@ -178,7 +184,15 @@ sfao doctor
 替代方式：
 
 ```bash
-pipx upgrade salesforce-agent-optimizer
+python -m pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+普通 `pip`：
+
+```bash
+python -m pip install --upgrade salesforce-agent-optimizer
 sfao update --project --platform all
 sfao doctor
 ```
@@ -194,7 +208,7 @@ uv tool uninstall salesforce-agent-optimizer
 
 ```bash
 sfao uninstall --project --platform all --yes
-pipx uninstall salesforce-agent-optimizer
+python -m pipx uninstall salesforce-agent-optimizer
 ```
 
 ## 隐私与安全
@@ -214,7 +228,16 @@ pipx uninstall salesforce-agent-optimizer
 
 `uv: command not found`
 
-- 安装 `uv`，或使用 `pipx install salesforce-agent-optimizer`。
+- 安装 `uv`，或使用 `python -m pipx install salesforce-agent-optimizer`。
+
+`pipx: command not found`
+
+- 使用 `python -m pipx ...`。
+- 如果模块不存在，先运行 `python -m pip install --user pipx`，再运行 `python -m pipx ensurepath`。
+
+`pip upgrade` 不是有效命令
+
+- 使用 `python -m pip install --upgrade salesforce-agent-optimizer`。
 
 PyPI 找不到 package
 

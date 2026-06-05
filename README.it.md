@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer e' una skill Salesforce con licenza MIT distribuita
 come comando `sfao` per Codex, Claude Code e GitHub Copilot.
 
-Versione corrente: `1.2.0`
+Versione corrente: `1.2.1`
 
 Installa istruzioni per agenti che applicano solutioning Salesforce-first,
 configurazione prima del codice custom, modifiche minime e reversibili,
@@ -39,7 +39,7 @@ sfao doctor
 Alternativa:
 
 ```bash
-pipx install salesforce-agent-optimizer
+python -m pipx install salesforce-agent-optimizer
 sfao install
 sfao doctor
 ```
@@ -55,7 +55,7 @@ sfao doctor
 `pip` semplice va bene quando vuoi il comando nell'ambiente Python attivo:
 
 ```bash
-pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 sfao install
 sfao doctor
 ```
@@ -80,11 +80,11 @@ sfao doctor
 | `sfao validate --verbose` | Mostra dettagli utili per troubleshooting. |
 | `sfao validate --json` | Mostra risultati di validazione compatti in JSON. |
 | `sfao knowledge init --project-root .` | Crea `.salesforce-agent-knowledge/` per un progetto Salesforce. |
-| `sfao knowledge refresh --project-root .` | Aggiorna la Knowledge locale dopo modifiche metadata. |
+| `sfao knowledge refresh --project-root .` | Aggiorna la Knowledge locale dopo modifiche metadata e mostra avanzamento se non usi `--json`. |
 | `sfao knowledge doctor --project-root .` | Controlla se la Knowledge locale esiste ed e' usabile. |
 | `sfao knowledge refresh --project-root . --target-org <alias>` | Arricchisce opzionalmente la Knowledge da una org. L'alias deve essere esplicito. |
 | `sfao version-context scaffold` | Crea i file locali di contesto release/API Salesforce se mancano. |
-| `sfao version-context update` | Aggiorna guidance Salesforce release/API/package da fonti ufficiali. |
+| `sfao version-context update` | Aggiorna guidance Salesforce release/API/package da fonti ufficiali e mostra avanzamento se non usi `--json`. |
 | `sfao version-context validate` | Controlla i file di version-context. |
 
 ## Cosa Viene Installato
@@ -159,6 +159,10 @@ sfao knowledge refresh --project-root .
 sfao knowledge doctor --project-root .
 ```
 
+I comandi Knowledge senza `--json` mostrano avanzamento durante scansione,
+riassunto e scrittura delle pagine metadata. Usa `--json` per output compatto
+da automazione.
+
 Aggiornare il contesto Salesforce release/API/package:
 
 ```bash
@@ -166,6 +170,10 @@ sfao version-context scaffold
 sfao version-context update
 sfao version-context validate
 ```
+
+I comandi version-context senza `--json` mostrano avanzamento durante scrittura
+file e controllo fonti Salesforce ufficiali. Usa `sfao version-context update --offline`
+per saltare i controlli di rete.
 
 L'accesso org non e' mai implicito. Quando un comando richiede metadata o dati
 Salesforce, l'agente deve chiedere un alias esplicito. Le org di produzione sono
@@ -182,7 +190,15 @@ sfao doctor
 Alternativa:
 
 ```bash
-pipx upgrade salesforce-agent-optimizer
+python -m pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+`pip` semplice:
+
+```bash
+python -m pip install --upgrade salesforce-agent-optimizer
 sfao update --project --platform all
 sfao doctor
 ```
@@ -198,7 +214,7 @@ Alternativa:
 
 ```bash
 sfao uninstall --project --platform all --yes
-pipx uninstall salesforce-agent-optimizer
+python -m pipx uninstall salesforce-agent-optimizer
 ```
 
 ## Privacy E Sicurezza
@@ -218,7 +234,16 @@ pipx uninstall salesforce-agent-optimizer
 
 `uv: command not found`
 
-- Installa `uv`, oppure usa `pipx install salesforce-agent-optimizer`.
+- Installa `uv`, oppure usa `python -m pipx install salesforce-agent-optimizer`.
+
+`pipx: command not found`
+
+- Usa `python -m pipx ...`.
+- Se il modulo manca, installalo con `python -m pip install --user pipx`, poi esegui `python -m pipx ensurepath`.
+
+`pip upgrade` non e' un comando
+
+- Usa `python -m pip install --upgrade salesforce-agent-optimizer`.
 
 Pacchetto non trovato su PyPI
 

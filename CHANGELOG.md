@@ -8,6 +8,13 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.2.1] - 2026-06-05
+
+### Fixed
+
+- Clarified update commands for Windows and PATH-sensitive terminals by documenting `python -m pipx ...` and `python -m pip install --upgrade ...` instead of relying on `pipx` or unsupported `pip upgrade` shell commands.
+- Added visible progress output for `sfao knowledge init`, `sfao knowledge refresh`, and `sfao version-context` commands while preserving compact JSON output for automation.
+
 ## [1.2.0] - 2026-06-04
 
 ### Added

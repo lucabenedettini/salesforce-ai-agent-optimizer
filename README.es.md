@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer es una skill Salesforce con licencia MIT distribuida
 como comando `sfao` para Codex, Claude Code y GitHub Copilot.
 
-Version actual: `1.2.0`
+Version actual: `1.2.1`
 
 Instala instrucciones para agentes que aplican solutioning Salesforce-first,
 configuracion antes de codigo custom, cambios minimos y reversibles, Knowledge
@@ -40,7 +40,7 @@ sfao doctor
 Alternativa:
 
 ```bash
-pipx install salesforce-agent-optimizer
+python -m pipx install salesforce-agent-optimizer
 sfao install
 sfao doctor
 ```
@@ -56,7 +56,7 @@ sfao doctor
 `pip` simple es aceptable cuando quieres el comando en el entorno Python activo:
 
 ```bash
-pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 sfao install
 sfao doctor
 ```
@@ -81,11 +81,11 @@ sfao doctor
 | `sfao validate --verbose` | Muestra detalles utiles para troubleshooting. |
 | `sfao validate --json` | Muestra resultados de validacion compactos en JSON. |
 | `sfao knowledge init --project-root .` | Crea `.salesforce-agent-knowledge/` para un proyecto Salesforce. |
-| `sfao knowledge refresh --project-root .` | Actualiza Knowledge local despues de cambios metadata. |
+| `sfao knowledge refresh --project-root .` | Actualiza Knowledge local despues de cambios metadata y muestra avance si no usas `--json`. |
 | `sfao knowledge doctor --project-root .` | Revisa si la Knowledge local existe y es usable. |
 | `sfao knowledge refresh --project-root . --target-org <alias>` | Enriquece opcionalmente la Knowledge desde una org. El alias debe ser explicito. |
 | `sfao version-context scaffold` | Crea archivos locales de contexto release/API Salesforce si faltan. |
-| `sfao version-context update` | Actualiza guidance Salesforce release/API/package desde fuentes oficiales. |
+| `sfao version-context update` | Actualiza guidance Salesforce release/API/package desde fuentes oficiales y muestra avance si no usas `--json`. |
 | `sfao version-context validate` | Revisa los archivos de version-context. |
 
 ## Que Se Instala
@@ -160,6 +160,9 @@ sfao knowledge refresh --project-root .
 sfao knowledge doctor --project-root .
 ```
 
+Los comandos Knowledge sin `--json` muestran avance mientras escanean, resumen
+y escriben paginas metadata. Usa `--json` para salida compacta de automatizacion.
+
 Actualizar contexto Salesforce release/API/package:
 
 ```bash
@@ -167,6 +170,10 @@ sfao version-context scaffold
 sfao version-context update
 sfao version-context validate
 ```
+
+Los comandos version-context sin `--json` muestran avance mientras escriben
+archivos y revisan fuentes oficiales Salesforce. Usa
+`sfao version-context update --offline` para saltar controles de red.
 
 El acceso a org nunca es implicito. Cuando un comando necesita metadata o datos
 Salesforce, el agente debe pedir un alias explicito. Las orgs de produccion son
@@ -183,7 +190,15 @@ sfao doctor
 Alternativa:
 
 ```bash
-pipx upgrade salesforce-agent-optimizer
+python -m pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+`pip` simple:
+
+```bash
+python -m pip install --upgrade salesforce-agent-optimizer
 sfao update --project --platform all
 sfao doctor
 ```
@@ -199,7 +214,7 @@ Alternativa:
 
 ```bash
 sfao uninstall --project --platform all --yes
-pipx uninstall salesforce-agent-optimizer
+python -m pipx uninstall salesforce-agent-optimizer
 ```
 
 ## Privacidad Y Seguridad
@@ -219,7 +234,16 @@ pipx uninstall salesforce-agent-optimizer
 
 `uv: command not found`
 
-- Instala `uv`, o usa `pipx install salesforce-agent-optimizer`.
+- Instala `uv`, o usa `python -m pipx install salesforce-agent-optimizer`.
+
+`pipx: command not found`
+
+- Usa `python -m pipx ...`.
+- Si falta el modulo, instalalo con `python -m pip install --user pipx` y luego ejecuta `python -m pipx ensurepath`.
+
+`pip upgrade` no es un comando
+
+- Usa `python -m pip install --upgrade salesforce-agent-optimizer`.
 
 Paquete no encontrado en PyPI
 

@@ -26,7 +26,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `1.2.0`
+- Current version: `1.2.1`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 - End-user install guide: see `Installation.md`
@@ -47,12 +47,18 @@ sfao knowledge init --project-root .
 sfao knowledge refresh --project-root .
 ```
 
+These commands print progress in non-JSON mode while scanning, summarizing, and
+writing metadata Knowledge files.
+
 Refresh Salesforce release/API/SOAP/package guidance from official Salesforce sources:
 
 ```bash
 sfao version-context scaffold
 sfao version-context update
 ```
+
+Use `sfao version-context update --offline` to skip network checks. Non-JSON
+mode prints progress while checking official Salesforce sources.
 
 Before planning, an agent should:
 

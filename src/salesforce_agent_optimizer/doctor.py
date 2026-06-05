@@ -6,9 +6,9 @@ import json
 import os
 import platform
 import shutil
-import site
 import subprocess
 import sys
+import sysconfig
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -134,14 +134,49 @@ def is_git_repo(root: Path) -> bool:
 
 
 def user_scripts_on_path() -> bool:
-    scripts = Path(site.USER_BASE) / "Scripts"
-    path_parts = [Path(part) for part in (os.environ.get("PATH") or "").split(os.pathsep) if part]
-    return any(part == scripts for part in path_parts)
+    path_parts = {normalized_path(Path(part)) for part in path_entries()}
+    return any(normalized_path(path) in path_parts for path in windows_user_script_paths())
 
 
 def windows_path_detail() -> str:
-    scripts = Path(site.USER_BASE) / "Scripts"
-    return f"{scripts} is {'on' if user_scripts_on_path() else 'not on'} PATH"
+    path_parts = {normalized_path(Path(part)) for part in path_entries()}
+    details = []
+    for scripts in windows_user_script_paths():
+        status = "on" if normalized_path(scripts) in path_parts else "not on"
+        details.append(f"{scripts} is {status} PATH")
+    return "; ".join(details)
+
+
+def path_entries() -> list[str]:
+    return [part for part in (os.environ.get("PATH") or "").split(os.pathsep) if part]
+
+
+def windows_user_script_paths() -> list[Path]:
+    candidates: list[Path] = []
+    for scheme in ("nt_user",):
+        try:
+            scripts = sysconfig.get_path("scripts", scheme=scheme)
+        except (KeyError, AttributeError):
+            scripts = None
+        if scripts:
+            candidates.append(Path(scripts))
+    return unique_paths(candidates)
+
+
+def normalized_path(path: Path) -> str:
+    return os.path.normcase(os.path.normpath(str(path)))
+
+
+def unique_paths(paths: list[Path]) -> list[Path]:
+    seen: set[str] = set()
+    unique: list[Path] = []
+    for path in paths:
+        key = normalized_path(path)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(path)
+    return unique
 
 
 def format_report(report: DoctorReport, verbose: bool = False) -> str:

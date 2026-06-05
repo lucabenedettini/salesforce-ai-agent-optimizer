@@ -21,6 +21,10 @@ Every version update must include:
 
 ## Current Version
 
+`1.2.1` fixes PATH-safe update documentation for `pipx` and `pip`, and adds
+visible terminal progress for Knowledge and Salesforce version-context refresh
+commands while preserving compact `--json` automation output.
+
 `1.2.0` adds the Field Service Mobile and mobile Flow planning reference plus the mandatory web/mobile and online/offline specification preflight for larger work.
 
 `1.1.1` is an installer bugfix that makes bare `sfao install` project-scoped by default and copies Copilot-local `references/` and `scripts/`.

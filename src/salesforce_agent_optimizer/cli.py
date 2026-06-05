@@ -164,11 +164,13 @@ def main(argv: list[str] | None = None) -> int:
             print(output, end="", file=stream)
         return 0 if result.ok else 1
     if args.command == "knowledge":
+        progress = None if args.json else print_progress
         report = run_knowledge(
             args.knowledge_command,
             args.project_root,
             target_org=args.target_org,
             max_items=args.max_items,
+            progress=progress,
         )
         if args.json:
             print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
@@ -176,12 +178,13 @@ def main(argv: list[str] | None = None) -> int:
             print(format_knowledge_report(report, verbose=args.verbose), end="")
         return 0 if report.ok else 1
     if args.command == "version-context":
+        progress = None if args.json else print_progress
         if args.version_context_command == "scaffold":
-            report = version_context_scaffold(args.root)
+            report = version_context_scaffold(args.root, progress=progress)
         elif args.version_context_command == "update":
-            report = version_context_update(args.root, offline=args.offline)
+            report = version_context_update(args.root, offline=args.offline, progress=progress)
         else:
-            report = version_context_validate(args.root)
+            report = version_context_validate(args.root, progress=progress)
         if args.json:
             print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
         else:
@@ -204,6 +207,10 @@ def format_validation_result(result, verbose: bool = False) -> str:
     if verbose and result.ok:
         lines.append("Validated required files, versions, frontmatter, YAML, TOML, JSON, Python, and text shape.")
     return "\n".join(lines) + "\n"
+
+
+def print_progress(message: str) -> None:
+    print(message, file=sys.stderr, flush=True)
 
 
 def print_operation_summary(action: str, report, json_output: bool = False) -> None:

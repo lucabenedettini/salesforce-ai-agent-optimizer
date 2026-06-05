@@ -8,7 +8,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from urllib.parse import urlparse
 
 
@@ -62,6 +62,7 @@ DEFAULT_CONTEXT: dict[str, Any] = {
         },
     ],
 }
+ProgressCallback = Callable[[str], None]
 
 
 @dataclass
@@ -87,6 +88,11 @@ class VersionContextReport:
             "warnings": self.warnings,
             "errors": self.errors,
         }
+
+
+def progress_line(progress: ProgressCallback | None, message: str) -> None:
+    if progress:
+        progress(f"sfao version-context: {message}")
 
 
 def references_dir(root: Path) -> Path:
@@ -191,32 +197,44 @@ def render_official_sources(payload: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def verify_official_sources(payload: dict[str, Any], timeout: int = 8) -> tuple[list[str], list[str]]:
+def verify_official_sources(
+    payload: dict[str, Any],
+    timeout: int = 8,
+    progress: ProgressCallback | None = None,
+) -> tuple[list[str], list[str]]:
     checked: list[str] = []
     warnings: list[str] = []
-    for source in payload.get("sources", []):
-        if not isinstance(source, dict):
-            continue
+    sources = [source for source in payload.get("sources", []) if isinstance(source, dict)]
+    total = len(sources)
+    progress_line(progress, f"checking official sources 0/{total} (0%)")
+    for index, source in enumerate(sources, start=1):
         url = str(source.get("url", ""))
         host = urlparse(url).netloc.lower()
         if host not in OFFICIAL_DOMAINS:
             warnings.append(f"Skipped non-official source host: {url}")
+            progress_line(progress, f"checking official sources {index}/{total}")
             continue
         try:
+            progress_line(progress, f"checking {source.get('label')} ({index}/{total})")
             request = urllib.request.Request(url, method="GET", headers={"User-Agent": "sfao/1.0"})
             with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
                 status = getattr(response, "status", 200)
                 checked.append(f"{source.get('label')}: HTTP {status}")
         except Exception as exc:  # noqa: BLE001
             warnings.append(f"Could not verify {source.get('label')}: {exc}")
+        percent = round(index * 100 / total) if total else 100
+        progress_line(progress, f"checking official sources {index}/{total} ({percent}%)")
     return checked, warnings
 
 
-def scaffold(root: Path) -> VersionContextReport:
+def scaffold(root: Path, progress: ProgressCallback | None = None) -> VersionContextReport:
     root = root.resolve()
     report = VersionContextReport(action="scaffold", root=str(root))
+    progress_line(progress, f"scaffold started for {root}")
+    progress_line(progress, "loading version context")
     payload = load_context(root)
     if not version_json_path(root).exists():
+        progress_line(progress, "writing references/salesforce-version.json")
         write_if_changed(
             version_json_path(root),
             json.dumps(payload, indent=2, sort_keys=False),
@@ -224,44 +242,60 @@ def scaffold(root: Path) -> VersionContextReport:
             root,
         )
     if not current_version_md_path(root).exists():
+        progress_line(progress, "writing references/salesforce-current-version.md")
         write_if_changed(current_version_md_path(root), render_current_version(payload, []), report.changed, root)
     if not official_sources_path(root).exists():
+        progress_line(progress, "writing references/official-salesforce-sources.md")
         write_if_changed(official_sources_path(root), render_official_sources(payload), report.changed, root)
+    progress_line(progress, "done")
     return report
 
 
-def update(root: Path, offline: bool = False) -> VersionContextReport:
+def update(
+    root: Path,
+    offline: bool = False,
+    progress: ProgressCallback | None = None,
+) -> VersionContextReport:
     root = root.resolve()
     report = VersionContextReport(action="update", root=str(root))
+    progress_line(progress, f"update started for {root}")
+    progress_line(progress, "loading version context")
     payload = load_context(root)
     source_status: list[str] = []
     if offline:
         report.warnings.append("Offline update used existing official-source metadata.")
+        progress_line(progress, "offline mode: skipping network checks")
     else:
-        checked, warnings = verify_official_sources(payload)
+        checked, warnings = verify_official_sources(payload, progress=progress)
         report.checked_sources = checked
         report.warnings.extend(warnings)
         source_status = checked or ["Official source links configured; no source returned content."]
+    progress_line(progress, "writing references/salesforce-version.json")
     write_if_changed(
         version_json_path(root),
         json.dumps(payload, indent=2, sort_keys=False),
         report.changed,
         root,
     )
+    progress_line(progress, "writing references/salesforce-current-version.md")
     write_if_changed(
         current_version_md_path(root),
         render_current_version(payload, source_status),
         report.changed,
         root,
     )
+    progress_line(progress, "writing references/official-salesforce-sources.md")
     write_if_changed(official_sources_path(root), render_official_sources(payload), report.changed, root)
+    progress_line(progress, "done")
     return report
 
 
-def validate(root: Path) -> VersionContextReport:
+def validate(root: Path, progress: ProgressCallback | None = None) -> VersionContextReport:
     root = root.resolve()
     report = VersionContextReport(action="validate", root=str(root))
+    progress_line(progress, f"validate started for {root}")
     for path in (version_json_path(root), current_version_md_path(root), official_sources_path(root)):
+        progress_line(progress, f"checking {path.relative_to(root).as_posix()}")
         if not path.exists():
             report.errors.append(f"Missing version-context file: {path.relative_to(root).as_posix()}")
     if report.errors:

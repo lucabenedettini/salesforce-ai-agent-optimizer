@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer is an MIT-licensed Salesforce Agent Skill packaged as the
 `sfao` command for Codex, Claude Code, and GitHub Copilot.
 
-Current version: `1.2.0`
+Current version: `1.2.1`
 
 It installs agent instructions that enforce Salesforce-first solutioning,
 configuration before custom code, minimal reversible changes, token-efficient
@@ -39,7 +39,7 @@ sfao doctor
 Alternative:
 
 ```bash
-pipx install salesforce-agent-optimizer
+python -m pipx install salesforce-agent-optimizer
 sfao install
 sfao doctor
 ```
@@ -56,7 +56,7 @@ Plain `pip` is acceptable when you intentionally want the command in the active
 Python environment:
 
 ```bash
-pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
+python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 sfao install
 sfao doctor
 ```
@@ -81,11 +81,11 @@ sfao doctor
 | `sfao validate --verbose` | Prints validation details useful for troubleshooting. |
 | `sfao validate --json` | Prints compact machine-readable validation results. |
 | `sfao knowledge init --project-root .` | Creates `.salesforce-agent-knowledge/` for a Salesforce project. |
-| `sfao knowledge refresh --project-root .` | Refreshes local Knowledge after metadata changes. |
+| `sfao knowledge refresh --project-root .` | Refreshes local Knowledge after metadata changes and prints progress unless `--json` is used. |
 | `sfao knowledge doctor --project-root .` | Checks whether local Knowledge exists and is usable. |
 | `sfao knowledge refresh --project-root . --target-org <alias>` | Optionally enriches Knowledge from an org. The alias must be explicit. |
 | `sfao version-context scaffold` | Creates local Salesforce release/API context files if missing. |
-| `sfao version-context update` | Refreshes concise Salesforce release/API/package guidance from official Salesforce sources. |
+| `sfao version-context update` | Refreshes concise Salesforce release/API/package guidance from official Salesforce sources and prints progress unless `--json` is used. |
 | `sfao version-context validate` | Checks version-context files for required content. |
 
 ## What Gets Installed
@@ -160,6 +160,9 @@ sfao knowledge refresh --project-root .
 sfao knowledge doctor --project-root .
 ```
 
+Non-JSON Knowledge commands print progress to the terminal while scanning,
+summarizing, and writing metadata pages. Use `--json` for compact automation output.
+
 Refresh Salesforce release/API/package context:
 
 ```bash
@@ -167,6 +170,10 @@ sfao version-context scaffold
 sfao version-context update
 sfao version-context validate
 ```
+
+Non-JSON version-context commands print progress while writing files and checking
+official Salesforce sources. Use `sfao version-context update --offline` to skip
+network checks.
 
 Org access is never implicit. When a command needs Salesforce org metadata or
 data, the agent must ask for an explicit alias. Production orgs are read-only
@@ -183,7 +190,15 @@ sfao doctor
 Alternative:
 
 ```bash
-pipx upgrade salesforce-agent-optimizer
+python -m pipx upgrade salesforce-agent-optimizer
+sfao update --project --platform all
+sfao doctor
+```
+
+Plain `pip`:
+
+```bash
+python -m pip install --upgrade salesforce-agent-optimizer
 sfao update --project --platform all
 sfao doctor
 ```
@@ -199,7 +214,7 @@ Alternative:
 
 ```bash
 sfao uninstall --project --platform all --yes
-pipx uninstall salesforce-agent-optimizer
+python -m pipx uninstall salesforce-agent-optimizer
 ```
 
 ## Privacy And Safety
@@ -219,7 +234,16 @@ pipx uninstall salesforce-agent-optimizer
 
 `uv: command not found`
 
-- Install `uv`, or use `pipx install salesforce-agent-optimizer`.
+- Install `uv`, or use `python -m pipx install salesforce-agent-optimizer`.
+
+`pipx: command not found`
+
+- Use `python -m pipx ...`.
+- If the module is missing, install it with `python -m pip install --user pipx`, then run `python -m pipx ensurepath`.
+
+`pip upgrade` is not a command
+
+- Use `python -m pip install --upgrade salesforce-agent-optimizer`.
 
 PyPI package not found
 
