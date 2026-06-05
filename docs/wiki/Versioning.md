@@ -21,6 +21,8 @@ Every version update must include:
 
 ## Current Version
 
+`1.2.3` fixes validation false positives from local Salesforce CLI caches, clarifies doctor version-alignment reporting, adds doctor/validate progress output, and removes an unnecessary Metadata Coverage source check from version-context refresh.
+
 `1.2.2` fixes privacy and portability in distributed resources by removing local
 machine paths from the Salesforce CLI command catalog and by making `sfao
 doctor` Windows PATH diagnostics generic.

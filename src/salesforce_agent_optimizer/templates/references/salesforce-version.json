@@ -1,5 +1,5 @@
 {
-  "last_verified_date": "2026-06-03",
+  "last_verified_date": "2026-06-05",
   "current_release": "Summer '26",
   "current_platform_api_version": "67.0",
   "current_metadata_api_version": "67.0",
@@ -31,10 +31,6 @@
     {
       "label": "Version Lightning Web Components",
       "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-version-components.html"
-    },
-    {
-      "label": "Metadata Coverage Report",
-      "url": "https://developer.salesforce.com/docs/metadata-coverage"
     }
   ]
 }

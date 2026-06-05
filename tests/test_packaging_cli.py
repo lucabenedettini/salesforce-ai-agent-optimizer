@@ -113,6 +113,7 @@ def test_sfao_validate_and_doctor() -> None:
     validate = run_cli(["validate", "--json", "--root", str(ROOT)], ROOT)
     assert validate.returncode == 0, validate.stdout + validate.stderr
     assert json.loads(validate.stdout)["ok"]
+    assert validate.stderr == ""
 
     doctor = run_cli(["doctor", "--json", "--root", str(ROOT)], ROOT)
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
@@ -125,6 +126,15 @@ def test_sfao_validate_and_doctor() -> None:
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
     assert "Use --verbose" in compact.stdout
+    assert "sfao doctor:" in compact.stderr
+    assert "running skill validation" in compact.stderr
+    assert "sfao validate:" in compact.stderr
+
+    validate_progress = run_cli(["validate", "--root", str(ROOT)], ROOT)
+    assert validate_progress.returncode == 0, validate_progress.stdout + validate_progress.stderr
+    assert "Salesforce Agent Optimizer validation: OK" in validate_progress.stdout
+    assert "sfao validate:" in validate_progress.stderr
+    assert "checking Salesforce metadata guardrails" in validate_progress.stderr
 
 
 def test_windows_path_check_uses_versioned_user_scripts(monkeypatch, tmp_path: Path) -> None:
@@ -141,6 +151,17 @@ def test_windows_path_check_uses_versioned_user_scripts(monkeypatch, tmp_path: P
 
     assert doctor_module.user_scripts_on_path()
     assert doctor_module.windows_path_detail() == "Python user Scripts directory is on PATH"
+
+
+def test_doctor_version_alignment_is_not_used_for_unrelated_validation_errors(tmp_path: Path) -> None:
+    (tmp_path / "AGENTS.md").write_text("user-owned instructions\n", encoding="utf-8")
+
+    report = doctor_module.run_doctor(tmp_path)
+    validation_checks = {check.name: check for check in report.sections["Validation"]}
+
+    assert validation_checks["Skill package"].status == "ERROR"
+    assert validation_checks["Version alignment"].status == "OK"
+    assert validation_checks["Version alignment"].detail == f"v{__version__}"
 
 
 def test_public_resources_do_not_contain_local_machine_paths() -> None:
@@ -479,6 +500,21 @@ def test_salesforce_micro_validators_warn_on_risky_metadata(tmp_path: Path) -> N
     assert "Destructive metadata file requires separate explicit user approval" in warnings
 
 
+def test_salesforce_micro_validators_ignore_salesforce_cli_cache(tmp_path: Path) -> None:
+    (tmp_path / "sfdx-project.json").write_text('{"packageDirectories":[]}\n', encoding="utf-8")
+    sfdx_cache = tmp_path / ".sfdx" / "tools" / "sobjects" / "standardObjects"
+    sf_cache = tmp_path / ".sf" / "tools" / "sobjects" / "standardObjects"
+    for cache in (sfdx_cache, sf_cache):
+        cache.mkdir(parents=True)
+        (cache / "Account.cls").write_text("public class Account {}\n", encoding="utf-8")
+
+    result = ValidationResult()
+    validate_salesforce_metadata(tmp_path, result)
+
+    assert result.ok, result.to_dict()
+    assert not result.warnings
+
+
 def test_salesforce_micro_validators_error_on_broken_metadata(tmp_path: Path) -> None:
     (tmp_path / "sfdx-project.json").write_text('{"packageDirectories":[]}\n', encoding="utf-8")
     trigger_dir = tmp_path / "force-app" / "main" / "default" / "triggers"
@@ -582,6 +618,15 @@ def test_version_context_commands(tmp_path: Path) -> None:
     assert "Salesforce Version Context: OK" in scaffold.stdout
     assert "sfao version-context:" in scaffold.stderr
     assert "writing references/" in scaffold.stderr
+    version_path = tmp_path / "references" / "salesforce-version.json"
+    legacy_payload = json.loads(version_path.read_text(encoding="utf-8"))
+    legacy_payload["sources"].append(
+        {
+            "label": "Metadata Coverage Report",
+            "url": "https://developer.salesforce.com/docs/metadata-coverage",
+        }
+    )
+    version_path.write_text(json.dumps(legacy_payload, indent=2) + "\n", encoding="utf-8")
 
     update_result = run_cli(
         ["version-context", "update", "--root", str(tmp_path), "--offline"],
@@ -602,6 +647,9 @@ def test_version_context_commands(tmp_path: Path) -> None:
     assert validate.returncode == 0, validate.stdout + validate.stderr
     assert validate.stderr == ""
     assert json.loads(validate.stdout)["ok"]
+    version_payload = json.loads(version_path.read_text(encoding="utf-8"))
+    source_urls = [source["url"] for source in version_payload["sources"]]
+    assert "https://developer.salesforce.com/docs/metadata-coverage" not in source_urls
 
 
 def test_release_manifest_and_workflow_requirements() -> None:

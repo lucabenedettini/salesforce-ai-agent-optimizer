@@ -8,6 +8,19 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.2.3] - 2026-06-05
+
+### Fixed
+
+- Fixed `sfao validate` Salesforce metadata scanning so local Salesforce CLI and tooling cache folders such as `.sfdx/` and `.sf/` no longer produce false Apex metadata errors.
+- Fixed `sfao doctor` version-alignment reporting so unrelated validation failures no longer appear as version mismatch errors.
+- Fixed `sfao version-context update` by removing the unnecessary Metadata Coverage Report verification and avoiding a custom User-Agent that caused Salesforce Developer documentation to return HTTP 403 for LWC component versioning.
+
+### Changed
+
+- Added visible step and percentage progress output for `sfao doctor` and `sfao validate` while keeping `--json` output clean for automation.
+- Kept version-context source references and packaged templates aligned with the updated official-source checks.
+
 ## [1.2.2] - 2026-06-05
 
 ### Fixed

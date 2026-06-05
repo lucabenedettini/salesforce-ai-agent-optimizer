@@ -5,7 +5,7 @@
 Salesforce Agent Optimizer is an MIT-licensed Salesforce Agent Skill packaged as the
 `sfao` command for Codex, Claude Code, and GitHub Copilot.
 
-Current version: `1.2.2`
+Current version: `1.2.3`
 
 It installs agent instructions that enforce Salesforce-first solutioning,
 configuration before custom code, minimal reversible changes, token-efficient

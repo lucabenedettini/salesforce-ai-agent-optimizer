@@ -1,6 +1,6 @@
 # Salesforce Current Version Context
 
-Last verified: 2026-06-03
+Last verified: 2026-06-05
 
 ## Current Production Reference
 
@@ -45,4 +45,3 @@ Record package name, namespace, installed version name/number, subscriber packag
 - Platform SOAP API login() Retirement: https://help.salesforce.com/s/articleView?id=005132110&language=en_US&type=1
 - Salesforce API and Data Loader versions: https://help.salesforce.com/s/articleView?id=000349115&language=en_US&type=1
 - LWC component versioning: https://developer.salesforce.com/docs/platform/lwc/guide/create-version-components.html
-- Metadata Coverage Report: https://developer.salesforce.com/docs/metadata-coverage

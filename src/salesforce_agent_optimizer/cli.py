@@ -151,11 +151,13 @@ def main(argv: list[str] | None = None) -> int:
         print_operation_summary("uninstall", report, json_output=args.json)
         return 0 if report.ok else 1
     if args.command == "doctor":
-        report = run_doctor(args.root)
+        progress = None if args.json else print_progress
+        report = run_doctor(args.root, progress=progress)
         print(report_to_json(report) if args.json else format_report(report, verbose=args.verbose), end="")
         return 1 if report.has_errors else 0
     if args.command == "validate":
-        result = validate_auto(args.root, expected_version=__version__)
+        progress = None if args.json else print_progress
+        result = validate_auto(args.root, expected_version=__version__, progress=progress)
         if args.json:
             print(json.dumps(result.to_dict(), separators=(",", ":"), sort_keys=True))
         else:

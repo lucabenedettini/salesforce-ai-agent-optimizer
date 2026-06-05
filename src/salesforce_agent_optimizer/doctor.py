@@ -11,10 +11,21 @@ import sys
 import sysconfig
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from . import __version__
 from .validation import SKILL_NAME, validate_auto
+
+
+ProgressCallback = Callable[[str], None]
+VERSION_ERROR_FRAGMENTS = (
+    "metadata.version must match",
+    "project.version must match VERSION",
+    "VERSION is missing or empty",
+    "CHANGELOG.md must contain the current version entry",
+    "metadata.version must match VERSION",
+    "must include current VERSION",
+)
 
 
 @dataclass
@@ -58,13 +69,23 @@ class DoctorReport:
         return payload
 
 
-def run_doctor(root: Path | None = None) -> DoctorReport:
+def emit_progress(progress: ProgressCallback | None, index: int, total: int, label: str) -> None:
+    if progress is None:
+        return
+    percentage = round(index / total * 100)
+    progress(f"sfao doctor: [{index}/{total}] {percentage}% {label}")
+
+
+def run_doctor(root: Path | None = None, progress: ProgressCallback | None = None) -> DoctorReport:
     root = (root or Path.cwd()).resolve()
     report = DoctorReport()
+    total_steps = 6
+    emit_progress(progress, 1, total_steps, "checking package, Python, and OS")
     report.add("Core", "Package", "OK", f"salesforce-agent-optimizer v{__version__}")
     py_status = "OK" if sys.version_info >= (3, 10) else "ERROR"
     report.add("Core", "Python", py_status, platform.python_version())
     report.add("Core", "OS", "OK", platform.system() or sys.platform)
+    emit_progress(progress, 2, total_steps, "checking Git and Salesforce CLI")
     report.add("Core", "Git", "OK" if shutil.which("git") else "WARN", tool_detail("git"))
     report.add(
         "Core",
@@ -72,11 +93,13 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         "OK" if shutil.which("sf") else "WARN",
         tool_detail("sf"),
     )
+    emit_progress(progress, 3, total_steps, "checking project root")
+    git_repo = is_git_repo(root)
     report.add(
         "Core",
         "Git repository",
-        "OK" if is_git_repo(root) else "WARN",
-        "repository detected" if is_git_repo(root) else "not detected at current root",
+        "OK" if git_repo else "WARN",
+        "repository detected" if git_repo else "not detected at current root",
     )
     report.add(
         "Core",
@@ -84,6 +107,7 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
         "OK" if (root / "sfdx-project.json").exists() else "WARN",
         "sfdx-project.json found" if (root / "sfdx-project.json").exists() else "not found",
     )
+    emit_progress(progress, 4, total_steps, "checking installed agent adapters")
     report.add(
         "Agent adapters",
         "Codex skill",
@@ -107,7 +131,8 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     ).exists()
     report.add("Agent adapters", "GitHub Copilot instructions", "OK" if copilot_ok else "WARN")
     report.add("Agent adapters", "AGENTS.md", "OK" if (root / "AGENTS.md").exists() else "WARN")
-    validation = validate_auto(root, expected_version=__version__)
+    emit_progress(progress, 5, total_steps, "running skill validation")
+    validation = validate_auto(root, expected_version=__version__, progress=progress)
     report.add(
         "Validation",
         "Skill package",
@@ -116,10 +141,21 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     )
     if validation.warnings:
         report.add("Validation", "Warnings", "WARN", "; ".join(validation.warnings[:3]))
-    report.add("Validation", "Version alignment", "OK" if validation.ok else "ERROR", f"v{__version__}")
+    version_errors = version_alignment_errors(validation.errors)
+    report.add(
+        "Validation",
+        "Version alignment",
+        "OK" if not version_errors else "ERROR",
+        f"v{__version__}" if not version_errors else "; ".join(version_errors[:3]),
+    )
+    emit_progress(progress, 6, total_steps, "checking Windows PATH and final status")
     if platform.system().lower().startswith("windows"):
         report.add("Windows", "PATH", "OK" if user_scripts_on_path() else "WARN", windows_path_detail())
     return report
+
+
+def version_alignment_errors(errors: list[str]) -> list[str]:
+    return [error for error in errors if any(fragment in error for fragment in VERSION_ERROR_FRAGMENTS)]
 
 
 def is_git_repo(root: Path) -> bool:
@@ -206,7 +242,12 @@ def format_report(report: DoctorReport, verbose: bool = False) -> str:
             lines.append(f"- {check.name}: {check.status}{detail}")
         lines.append("")
     lines.append("Status:")
-    lines.append("Everything looks good." if not report.has_errors else "Problems found.")
+    if report.has_errors:
+        lines.append("Problems found.")
+    elif report.has_warnings:
+        lines.append("No blocking errors. Review warnings above.")
+    else:
+        lines.append("Everything looks good.")
     return "\n".join(lines).rstrip() + "\n"
 
 

@@ -17,6 +17,93 @@ OFFICIAL_DOMAINS = {
     "help.salesforce.com",
     "architect.salesforce.com",
 }
+DEPRECATED_SOURCE_URLS = {"https://developer.salesforce.com/docs/metadata-coverage"}
+EXTRA_OFFICIAL_SOURCES = [
+    (
+        "Salesforce Well-Architected overview",
+        "https://architect.salesforce.com/docs/architect/well-architected/guide/overview.html",
+    ),
+    (
+        "Salesforce Well-Architected Secure and least privilege",
+        "https://architect.salesforce.com/docs/architect/well-architected/guide/secure",
+    ),
+    (
+        "Configure permissions and access in permission sets",
+        "https://help.salesforce.com/s/articleView?id=platform.perm_sets_permissions_access.htm&language=en_US&type=5",
+    ),
+    (
+        "PermissionSetAssignment profile-backed behavior",
+        "https://help.salesforce.com/s/articleView?id=000387815&language=en_US&type=1",
+    ),
+    (
+        "Salesforce CLI plugin flag and JSON conventions",
+        "https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/flags.html",
+    ),
+    (
+        "Salesforce CLI command flags and standard org flags",
+        "https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/command-flags.html",
+    ),
+    (
+        "Salesforce CLI migration from `sfdx` to `sf`",
+        "https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/migrate-sfdx-sf.html",
+    ),
+    (
+        "Salesforce CLI command reference",
+        "https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm",
+    ),
+    (
+        "Metadata API deploy manifest/package.xml and destructive changes",
+        "https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm",
+    ),
+    (
+        "GraphQL API record deletion",
+        "https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html",
+    ),
+    (
+        "LWC `deleteRecord(recordId)`",
+        "https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html",
+    ),
+    (
+        "Salesforce MCP SObject Deletes",
+        "https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-deletes.html",
+    ),
+    (
+        "Apex testing and code coverage",
+        "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm",
+    ),
+    (
+        "Application unit tests for Apex and Flow",
+        "https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5",
+    ),
+    (
+        "LWC data access guidelines",
+        "https://developer.salesforce.com/docs/platform/lwc/guide/data.html",
+    ),
+    (
+        "LWC secure Apex classes",
+        "https://developer.salesforce.com/docs/platform/lwc/guide/apex-security",
+    ),
+    (
+        "LWC performance guidance",
+        "https://developer.salesforce.com/docs/platform/lwc/guide/perf-intro.html",
+    ),
+    (
+        "Salesforce Developers blog on LWC performance best practices",
+        "https://developer.salesforce.com/blogs/2020/06/lightning-web-components-performance-best-practices",
+    ),
+    (
+        "Salesforce Developers blog on bulkification and governor limits",
+        "https://developer.salesforce.com/blogs/2014/08/understanding-bulk-salesforce1-platform",
+    ),
+    (
+        "Salesforce Developers blog on Apex best-practice heuristics",
+        "https://developer.salesforce.com/blogs/2015/01/apex-best-practices-15-apex-commandments",
+    ),
+    (
+        "Salesforce Developers blog on user-mode database operations",
+        "https://developer.salesforce.com/blogs/2023/05/write-simplified-and-secure-apex-with-spring-23-updates",
+    ),
+]
 DEFAULT_CONTEXT: dict[str, Any] = {
     "last_verified_date": date.today().isoformat(),
     "current_release": "Summer '26",
@@ -55,10 +142,6 @@ DEFAULT_CONTEXT: dict[str, Any] = {
         {
             "label": "LWC component versioning",
             "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-version-components.html",
-        },
-        {
-            "label": "Metadata Coverage Report",
-            "url": "https://developer.salesforce.com/docs/metadata-coverage",
         },
     ],
 }
@@ -119,10 +202,25 @@ def load_context(root: Path) -> dict[str, Any]:
             if isinstance(payload, dict):
                 merged = DEFAULT_CONTEXT | payload
                 merged["last_verified_date"] = date.today().isoformat()
-                return merged
+                return normalize_context(merged)
         except json.JSONDecodeError:
-            return DEFAULT_CONTEXT
-    return DEFAULT_CONTEXT
+            return normalize_context(DEFAULT_CONTEXT)
+    return normalize_context(DEFAULT_CONTEXT)
+
+
+def normalize_context(payload: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(payload)
+    sources = normalized.get("sources", [])
+    if isinstance(sources, list):
+        normalized["sources"] = [
+            source
+            for source in sources
+            if not (
+                isinstance(source, dict)
+                and str(source.get("url", "")).rstrip("/") in DEPRECATED_SOURCE_URLS
+            )
+        ]
+    return normalized
 
 
 def write_if_changed(path: Path, text: str, changed: list[str], root: Path) -> None:
@@ -180,17 +278,22 @@ def render_official_sources(payload: dict[str, Any]) -> str:
     lines = [
         "# Official Salesforce Sources",
         "",
-        "Use only official Salesforce sources for release-sensitive version context. "
-        "Prefer concise summaries and links over copied release-note text.",
+        "Use these official Salesforce sources to refresh guidance when the task needs exact current wording, release-sensitive behavior, or citations. If local knowledge is uncertain or incomplete, search online in official Salesforce sources and prefer the latest available documentation or release guidance:",
         "",
     ]
+    seen_urls: set[str] = set()
     for source in payload.get("sources", []):
         if isinstance(source, dict):
-            lines.append(f"- {source.get('label')}: {source.get('url')}")
+            url = str(source.get("url"))
+            seen_urls.add(url)
+            lines.append(f"- {source.get('label')}: {url}")
+    for label, url in EXTRA_OFFICIAL_SOURCES:
+        if url not in seen_urls:
+            lines.append(f"- {label}: {url}")
     lines.extend(
         [
-            "- Salesforce CLI command reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm",
-            "- Salesforce Well-Architected: https://architect.salesforce.com/docs/architect/well-architected/guide/overview.html",
+            "",
+            "Prefer documentation pages over blog posts when both cover the same current platform behavior. Use blog posts as implementation heuristics, then verify release-sensitive syntax in product docs. Do not rely on non-official sources unless the user explicitly asks for broader research.",
             "",
         ]
     )
@@ -216,7 +319,7 @@ def verify_official_sources(
             continue
         try:
             progress_line(progress, f"checking {source.get('label')} ({index}/{total})")
-            request = urllib.request.Request(url, method="GET", headers={"User-Agent": "sfao/1.0"})
+            request = urllib.request.Request(url, method="GET")
             with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
                 status = getattr(response, "status", 200)
                 checked.append(f"{source.get('label')}: HTTP {status}")
