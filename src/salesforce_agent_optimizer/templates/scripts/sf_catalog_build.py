@@ -106,7 +106,6 @@ def main() -> int:
 
     payload = {
         "generated_at": generated_at,
-        "sf_binary": sf_binary(),
         "count": len(records),
         "commands": records,
     }

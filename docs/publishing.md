@@ -16,8 +16,8 @@ The repository expects PyPI Trusted Publishing from GitHub Actions.
 Tag a release:
 
 ```bash
-git tag v1.2.1
-git push origin v1.2.1
+git tag v1.2.2
+git push origin v1.2.2
 ```
 
 ## Required Local Checks

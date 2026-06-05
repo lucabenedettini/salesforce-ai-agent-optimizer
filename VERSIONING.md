@@ -15,6 +15,7 @@ Every version update must include:
 
 ## Current Version
 
+- `1.2.2`: privacy and portability bugfix that removes local machine paths from distributed resources and makes `sfao doctor` PATH diagnostics generic.
 - `1.2.1`: command usability bugfix for PATH-safe pipx/pip update docs and visible Knowledge/version-context progress output.
 - `1.2.0`: Field Service Mobile and mobile Flow planning reference with mandatory web/mobile and online/offline specification preflight for larger work.
 - `1.1.1`: installer bugfix that makes bare `sfao install` project-scoped by default and copies Copilot-local `references/` and `scripts/`.

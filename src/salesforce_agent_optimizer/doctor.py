@@ -65,18 +65,18 @@ def run_doctor(root: Path | None = None) -> DoctorReport:
     py_status = "OK" if sys.version_info >= (3, 10) else "ERROR"
     report.add("Core", "Python", py_status, platform.python_version())
     report.add("Core", "OS", "OK", platform.system() or sys.platform)
-    report.add("Core", "Git", "OK" if shutil.which("git") else "WARN", shutil.which("git") or "not found")
+    report.add("Core", "Git", "OK" if shutil.which("git") else "WARN", tool_detail("git"))
     report.add(
         "Core",
         "Salesforce CLI sf",
         "OK" if shutil.which("sf") else "WARN",
-        shutil.which("sf") or "not found",
+        tool_detail("sf"),
     )
     report.add(
         "Core",
         "Git repository",
         "OK" if is_git_repo(root) else "WARN",
-        str(root),
+        "repository detected" if is_git_repo(root) else "not detected at current root",
     )
     report.add(
         "Core",
@@ -133,18 +133,19 @@ def is_git_repo(root: Path) -> bool:
     return completed.returncode == 0
 
 
+def tool_detail(name: str) -> str:
+    return "available on PATH" if shutil.which(name) else "not found on PATH"
+
+
 def user_scripts_on_path() -> bool:
     path_parts = {normalized_path(Path(part)) for part in path_entries()}
     return any(normalized_path(path) in path_parts for path in windows_user_script_paths())
 
 
 def windows_path_detail() -> str:
-    path_parts = {normalized_path(Path(part)) for part in path_entries()}
-    details = []
-    for scripts in windows_user_script_paths():
-        status = "on" if normalized_path(scripts) in path_parts else "not on"
-        details.append(f"{scripts} is {status} PATH")
-    return "; ".join(details)
+    if user_scripts_on_path():
+        return "Python user Scripts directory is on PATH"
+    return "Python user Scripts directory is not on PATH; run python -m pipx ensurepath"
 
 
 def path_entries() -> list[str]:

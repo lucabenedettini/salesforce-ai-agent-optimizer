@@ -8,6 +8,14 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [1.2.2] - 2026-06-05
+
+### Fixed
+
+- Removed local machine paths from the generated Salesforce CLI command catalog and packaged templates.
+- Changed `sfao doctor` Windows PATH diagnostics so it reports generic PATH readiness instead of exposing user-specific absolute directories.
+- Added regression coverage to prevent private Windows user paths from appearing in distributed skill resources.
+
 ## [1.2.1] - 2026-06-05
 
 ### Fixed

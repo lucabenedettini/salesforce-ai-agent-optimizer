@@ -21,6 +21,10 @@ Every version update must include:
 
 ## Current Version
 
+`1.2.2` fixes privacy and portability in distributed resources by removing local
+machine paths from the Salesforce CLI command catalog and by making `sfao
+doctor` Windows PATH diagnostics generic.
+
 `1.2.1` fixes PATH-safe update documentation for `pipx` and `pip`, and adds
 visible terminal progress for Knowledge and Salesforce version-context refresh
 commands while preserving compact `--json` automation output.

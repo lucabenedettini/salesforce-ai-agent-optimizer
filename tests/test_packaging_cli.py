@@ -119,6 +119,8 @@ def test_sfao_validate_and_doctor() -> None:
     payload = json.loads(doctor.stdout)
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     assert payload["Core"][0]["detail"].endswith(f"v{version}")
+    assert str(Path.home()) not in doctor.stdout
+    assert ("App" + "Data") not in doctor.stdout
 
     compact = run_cli(["doctor", "--root", str(ROOT)], ROOT)
     assert compact.returncode == 0, compact.stdout + compact.stderr
@@ -126,7 +128,7 @@ def test_sfao_validate_and_doctor() -> None:
 
 
 def test_windows_path_check_uses_versioned_user_scripts(monkeypatch, tmp_path: Path) -> None:
-    scripts = tmp_path / "Python314" / "Scripts"
+    scripts = tmp_path / ("Python" + "314") / "Scripts"
     scripts.mkdir(parents=True)
 
     def fake_get_path(name: str, scheme: str | None = None) -> str:
@@ -138,7 +140,41 @@ def test_windows_path_check_uses_versioned_user_scripts(monkeypatch, tmp_path: P
     monkeypatch.setenv("PATH", str(scripts))
 
     assert doctor_module.user_scripts_on_path()
-    assert f"{scripts} is on PATH" in doctor_module.windows_path_detail()
+    assert doctor_module.windows_path_detail() == "Python user Scripts directory is on PATH"
+
+
+def test_public_resources_do_not_contain_local_machine_paths() -> None:
+    public_roots = [
+        ROOT / "references",
+        ROOT / "src" / "salesforce_agent_optimizer" / "templates",
+        ROOT / "README.md",
+        ROOT / "README.it.md",
+        ROOT / "README.es.md",
+        ROOT / "README.zh-CN.md",
+        ROOT / "docs",
+        ROOT / "SKILL.md",
+        ROOT / "AGENTS.md",
+        ROOT / ".agents",
+        ROOT / ".claude",
+        ROOT / ".github",
+    ]
+    forbidden = [
+        "C:" + "\\" + "Users" + "\\",
+        "\\" + "App" + "Data" + "\\",
+        "Documents" + "\\" + "New project",
+        "Python" + "314" + "\\" + "Scripts",
+        "luca" + "_",
+    ]
+    files: list[Path] = []
+    for root in public_roots:
+        if root.is_file():
+            files.append(root)
+        else:
+            files.extend(path for path in root.rglob("*") if path.is_file())
+    for path in files:
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for value in forbidden:
+            assert value not in text, f"{path.relative_to(ROOT)} contains local path fragment {value}"
 
 
 def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
