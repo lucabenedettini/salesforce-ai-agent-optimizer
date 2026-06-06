@@ -28,7 +28,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `2.1.0`
+- Current version: `2.2.2`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 - End-user install guide: see `Installation.md`

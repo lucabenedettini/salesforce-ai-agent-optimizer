@@ -46,7 +46,7 @@ Compact information-only mode is allowed only for simple explanation questions w
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance before planning changes.
 - Read project memory after Knowledge indexes/history and before raw metadata when `.salesforce-agent-knowledge/memory.md` exists. Update memory at completion only with compact durable facts, decisions, validation lessons, risks, and follow-ups.
-- Read specialized guidance only when routed: `references/specialized-guidance/apex.md`, `lwc.md`, `flow.md`, `soql.md`, `deploy.md`, or `data-operations.md`.
+- Read specialized guidance only when routed: `references/specialized-guidance/apex.md`, `lwc.md`, `flow.md`, `soql.md`, `deploy.md`, `data-operations.md`, or `agentforce.md`.
 - Always evaluate multi-country and multi-currency impact: locale, language, country process, currency, Advanced Currency Management, price books, tax, translations, compliance, automation, reporting, and integrations.
 - For Field Service Mobile or offline mobile requests, read `references/field-service-mobile-flow.md` and plan web/mobile plus online/offline behavior separately.
 - Inspect current org permissions before proposing access changes. If alias or persona is missing, ask instead of guessing.

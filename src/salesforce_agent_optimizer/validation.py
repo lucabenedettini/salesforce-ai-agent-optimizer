@@ -88,6 +88,7 @@ SOURCE_REQUIRED_FILES = [
     "references/specialized-guidance/soql.md",
     "references/specialized-guidance/deploy.md",
     "references/specialized-guidance/data-operations.md",
+    "references/specialized-guidance/agentforce.md",
     "references/specialized-guidance/index.md",
     "scripts/sync_agent_instructions.py",
     "scripts/build_release_artifacts.py",
@@ -110,6 +111,7 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/templates/references/external-skill-interop.md",
     "src/salesforce_agent_optimizer/templates/references/iterative-tool-guardrails.md",
     "src/salesforce_agent_optimizer/templates/references/specialized-guidance/index.md",
+    "src/salesforce_agent_optimizer/templates/references/specialized-guidance/agentforce.md",
     "src/salesforce_agent_optimizer/templates/github/copilot-instructions.md",
     "src/salesforce_agent_optimizer/templates/github/instructions/salesforce-agent-optimizer.instructions.md",
     "evals/trigger-evals.json",
@@ -514,6 +516,7 @@ def validate_templates(root: Path, result: ValidationResult, expected_version: s
         "references/specialized-guidance/soql.md",
         "references/specialized-guidance/deploy.md",
         "references/specialized-guidance/data-operations.md",
+        "references/specialized-guidance/agentforce.md",
         "references/specialized-guidance/index.md",
         "github/skills/salesforce-agent-optimizer/SKILL.md",
         "github/copilot-instructions.md",
@@ -532,6 +535,124 @@ def validate_templates(root: Path, result: ValidationResult, expected_version: s
         path = template_root / relative
         if path.exists():
             validate_skill_file(path, result, expected_version, require_all_compatibility=False)
+
+
+def markdown_reference_paths(text: str) -> set[str]:
+    return set(re.findall(r"`(references/[^`]+?\.md)`", text))
+
+
+def combine_with_section(text: str) -> str:
+    match = re.search(
+        r"(?ms)^## Combine With Existing References\s*(.*?)(?=^## |\Z)",
+        text,
+    )
+    return match.group(1).strip() if match else ""
+
+
+def validate_specialized_guidance_directory(
+    guidance_dir: Path,
+    references_base: Path,
+    result: ValidationResult,
+    label: str,
+) -> None:
+    if not guidance_dir.exists():
+        result.error(f"Missing specialized guidance directory: {label}")
+        return
+    required_headings = [
+        "## When To Read",
+        "## Combine With Existing References",
+        "## Non-Negotiable Checks",
+        "## Minimal Planning Evidence",
+        "## Preferred Approach",
+        "## Validation Expectations",
+        "## SFAO Command Hints",
+        "## Mini-Rubric",
+        "## Output Hint",
+    ]
+    skill_suffix = "sf" + "-skills"
+    prohibited_fragments = [
+        "forcedotcom/" + skill_suffix,
+        skill_suffix,
+        "bypass SFAO guardrails",
+        "ignore SFAO guardrails",
+        "skip SFAO guardrails",
+        "automatic install of external skills",
+        "install external skills automatically",
+    ]
+    area_files = sorted(path for path in guidance_dir.glob("*.md") if path.name != "index.md")
+    if not area_files:
+        result.error(f"No specialized guidance area files found: {label}")
+        return
+    for path in area_files:
+        text = read_text(path)
+        relative_label = str(path.relative_to(references_base.parent))
+        if len(text.splitlines()) > 220:
+            result.error(f"Specialized guidance exceeds 220 lines: {relative_label}")
+        for heading in required_headings:
+            if heading not in text:
+                result.error(f"{relative_label} missing heading: {heading}")
+        section = combine_with_section(text)
+        if not section:
+            result.error(f"{relative_label} missing Combine With Existing References section")
+        for reference in markdown_reference_paths(section):
+            if not (references_base.parent / reference).exists():
+                result.error(f"{relative_label} references missing file: {reference}")
+        for fragment in prohibited_fragments:
+            if fragment in text:
+                result.error(f"{relative_label} contains prohibited guidance: {fragment}")
+    index = guidance_dir / "index.md"
+    if not index.exists():
+        result.error(f"Missing specialized guidance index: {label}/index.md")
+        return
+    index_text = read_text(index)
+    if "Agentforce" not in index_text or "agentforce.md" not in index_text:
+        result.error(f"{label}/index.md must mention Agentforce guidance")
+    if "Do not load this whole folder by default" not in index_text:
+        result.error(f"{label}/index.md must forbid loading the whole folder by default")
+    if "Core SFAO safety always wins" not in index_text:
+        result.error(f"{label}/index.md must state that core SFAO safety wins")
+
+
+def validate_routing_references(root: Path, result: ValidationResult) -> None:
+    routing_paths = [
+        root / "references" / "routing.md",
+        root
+        / "src"
+        / "salesforce_agent_optimizer"
+        / "templates"
+        / "references"
+        / "routing.md",
+    ]
+    for path in routing_paths:
+        if not path.exists():
+            continue
+        text = read_text(path)
+        relative = path.relative_to(root)
+        if "Agentforce" not in text or "references/specialized-guidance/agentforce.md" not in text:
+            result.error(f"{relative.as_posix()} must include Agentforce routing")
+        base = root
+        if "templates" in path.parts:
+            base = root / "src" / "salesforce_agent_optimizer" / "templates"
+        for reference in markdown_reference_paths(text):
+            if not (base / reference).exists():
+                result.error(f"{relative.as_posix()} references missing file: {reference}")
+
+
+def validate_specialized_guidance(root: Path, result: ValidationResult) -> None:
+    validate_specialized_guidance_directory(
+        root / "references" / "specialized-guidance",
+        root / "references",
+        result,
+        "references/specialized-guidance",
+    )
+    template_references = root / "src" / "salesforce_agent_optimizer" / "templates" / "references"
+    validate_specialized_guidance_directory(
+        template_references / "specialized-guidance",
+        template_references,
+        result,
+        "src/salesforce_agent_optimizer/templates/references/specialized-guidance",
+    )
+    validate_routing_references(root, result)
 
 
 def validate_copilot_apply_to(root: Path, result: ValidationResult) -> None:
@@ -792,6 +913,7 @@ def validate_source_tree(root: Path, progress: ProgressCallback | None = None) -
     validate_copilot_apply_to(root, result)
     validate_release_workflow(root, result)
     validate_prohibited_references(root, result)
+    validate_specialized_guidance(root, result)
     emit_progress(progress, "sfao validate", 12, total_steps, "checking Salesforce metadata guardrails")
     validate_salesforce_metadata(root, result)
     return result

@@ -1,6 +1,6 @@
 {
   "name": "salesforce-agent-optimizer-tool-registry",
-  "version": "2.1.1",
+  "version": "2.2.2",
   "principles": [
     "Ask for an explicit org alias before org operations.",
     "Treat production orgs as read-only.",

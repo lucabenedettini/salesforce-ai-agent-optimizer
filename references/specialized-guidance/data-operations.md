@@ -1,45 +1,67 @@
 # Data Operations Guidance
 
-Read this for data CRUD, data loads, exports/imports, test data, and cleanup.
+## When To Read
+
+Read this file only when the current task involves test data, data create/update/delete/upsert, imports, exports, cleanup scripts, anonymous Apex for data setup, or bulk operations.
+
+## Combine With Existing References
+
+- `references/privacy-security.md` for customer data, exports, logs, and sensitive data handling.
+- `references/deletion-guardrails.md` when delete, purge, hard delete, or destructive cleanup is involved.
+- `references/sf-agent-cli-commands.md` for compact Salesforce CLI data command shapes.
+- `references/least-privilege-planning.md` for access and user permission impact.
 
 ## Non-Negotiable Checks
 
 - Distinguish script generation from remote org execution.
-- Remote org data operations need explicit alias and approval.
-- Production data changes are blocked/not allowed through SFAO guardrails.
-- Use synthetic data for testing unless the user explicitly authorizes real data reads.
-- Describe first when schema or required fields are uncertain.
-- Create a cleanup plan for test data.
-- Destructive data delete requires separate explicit approval for exact records/scope.
-- Do not export/store customer data in repo, Knowledge, memory, docs, screenshots, or logs.
-- Redact IDs, emails, names, and sensitive values unless essential and approved.
+- Require explicit org alias for remote data operations.
+- Block production data mutation through SFAO guardrails.
+- Use synthetic/non-sensitive data for tests.
+- Do not commit raw customer data to repo, Knowledge, memory, docs, logs, or screenshots.
+- Describe/check schema when required fields, picklists, or relationships are uncertain.
+- Define cleanup plan for created data.
+- Require separate explicit approval for destructive data operations.
+- Use bulk mechanisms only when volume requires them.
+- Verify required fields and picklist values before remote execution.
 
 ## Minimal Planning Evidence
 
-- Target org alias and production/sandbox status.
-- Object schema, required fields, validation rules, triggers/flows, duplicate rules.
-- Data volume and filter scope.
-- Permission/access check for the acting user or integration user.
+- Target objects and operation type.
+- Target org alias for remote execution.
+- Volume and filter scope.
+- Parent-child dependencies, required fields, and picklist values.
+- Cleanup strategy and permission/access assumptions.
 
 ## Preferred Approach
 
-- Prefer local synthetic payloads for tests.
-- Use narrow SOQL selectors and `LIMIT`.
-- Use create/update/delete only through SFAO facade guardrails.
-- Avoid bulk operations unless the user asked and rollback is defined.
+- Generate local scripts or payloads first when possible.
+- Use small, reversible, synthetic data sets.
+- Use narrow SOQL selectors and `LIMIT` for verification.
+- Prefer CLI for simple operations and Apex only when orchestration requires it.
+- Avoid storing exports; if unavoidable, require explicit scope and retention plan.
 
 ## Validation Expectations
 
-- Dry-run or preview command shape first.
-- Confirm created records with a compact query only when needed.
-- Clean up test data with explicit approval for deletes.
-- Record durable lessons in memory without raw data.
+- Report record counts and created/updated IDs only when safe.
+- Confirm cleanup commands and destructive approval if deletes are needed.
+- Verify no sensitive data was stored.
+- Update memory only for durable decisions or lessons, never raw data.
 
 ## SFAO Command Hints
 
 - `python scripts/sf_agent_cli.py data-query --target-org <alias> --query "<SOQL>" --max-list 5`
 - `python scripts/sf_agent_cli.py data-record-create --target-org <alias> --sobject Account --values "Name=ACC Test"`
 - `python scripts/sf_agent_cli.py data-record-delete --target-org <alias> --sobject Account --record-id <id> --delete-approval "I explicitly approve this deletion"`
+
+## Mini-Rubric
+
+- Script generation vs remote execution distinguished: yes/no
+- Org alias required for remote operations: yes/no
+- Production data mutation blocked: yes/no
+- Synthetic/non-sensitive data only: yes/no
+- Schema assumptions checked: yes/no
+- Cleanup plan identified: yes/no
+- Destructive approval required when applicable: yes/no
 
 ## Output Hint
 

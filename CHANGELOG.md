@@ -8,6 +8,19 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.2.2] - 2026-06-06
+
+### Changed
+
+- Strengthened Salesforce specialized guidance for Apex, LWC, Flow, SOQL, deploy, and data operations with concise operational checks.
+- Added lightweight Agentforce guidance for agent topics, actions, prompts, permissions, and publish/activation planning.
+- Improved specialized guidance cross-reference alignment so each task area coordinates with existing SFAO references without duplicating core rules.
+- Added mini-rubrics and validation expectations to specialized guidance while preserving lightweight, token-efficient behavior.
+
+### Preserved
+
+- Existing install, update, uninstall, doctor, validate, Knowledge, memory, version-context, Salesforce CLI facade, privacy, production read-only, and destructive-operation guardrails remain backward compatible.
+
 ## [2.1.1] - 2026-06-06
 
 ### Changed

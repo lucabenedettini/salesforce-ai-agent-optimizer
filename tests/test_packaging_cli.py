@@ -664,6 +664,7 @@ def test_wheel_includes_templates(tmp_path: Path) -> None:
         "salesforce_agent_optimizer/templates/references/external-skill-interop.md",
         "salesforce_agent_optimizer/templates/references/iterative-tool-guardrails.md",
         "salesforce_agent_optimizer/templates/references/specialized-guidance/index.md",
+        "salesforce_agent_optimizer/templates/references/specialized-guidance/agentforce.md",
         "salesforce_agent_optimizer/templates/scripts/sf_agent_cli.py",
         "salesforce_agent_optimizer/templates/codex/SKILL.md",
         "salesforce_agent_optimizer/templates/claude/SKILL.md",

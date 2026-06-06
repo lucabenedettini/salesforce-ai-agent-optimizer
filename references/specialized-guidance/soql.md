@@ -1,42 +1,65 @@
 # SOQL Guidance
 
-Read this for SOQL design, query fixes, schema-driven planning, and compact data reads.
+## When To Read
+
+Read this file only when the current task involves SOQL/SOSL query design, query optimization, relationship queries, aggregate queries, query embedded in Apex, or query used by data read/export.
+
+## Combine With Existing References
+
+- `references/sf-agent-cli-commands.md` for compact Salesforce CLI query command shapes.
+- `references/privacy-security.md` when query output, exports, customer data, or sensitive fields are involved.
+- `references/least-privilege-planning.md` when query access moves into Apex, LWC, Flow, or integration users.
 
 ## Non-Negotiable Checks
 
-- Never use `SELECT *` thinking.
+- Do not use `SELECT *` thinking.
 - Select only fields needed for the question or behavior.
-- Keep relationship queries only as deep as needed.
-- Filter in SOQL instead of Apex when selective and safe.
-- Consider indexed/selective filters for high-volume objects.
+- Filter in SOQL rather than post-filtering when possible.
+- Justify relationship direction and depth.
+- Use aggregate queries for counts/summaries when record payloads are unnecessary.
 - Use bind variables for user input in Apex.
-- Apply user-mode/security expectations when SOQL is embedded in Apex.
-- Avoid exporting customer data into repo, Knowledge, memory, or logs.
+- Define security/user-mode expectations when embedded in Apex.
+- Consider selective filters and indexed fields when volume matters.
+- Avoid leading wildcards when performance matters.
+- Use `LIMIT` and `ORDER BY` deliberately.
+- Do not export sensitive data without explicit approval.
 
 ## Minimal Planning Evidence
 
-- SObject describe when schema is uncertain.
-- Required fields, relationship names, picklists, record types, and FLS expectations.
-- Data volume/selectivity risk when the query can run on large tables.
-- Target alias and approval for org data reads.
+- Target object and required fields.
+- Filter criteria and expected volume.
+- Relationship direction and depth.
+- Consuming context: Apex, CLI, export, UI, automation, or integration.
+- FLS/access assumptions when user-visible.
 
 ## Preferred Approach
 
-- Build a narrow query first.
-- Use schema describe only for the object/fields needed.
-- Use `LIMIT` for exploration.
-- Prefer compact JSON selectors over full query payloads.
+- Start with the simplest correct query.
+- Add only needed fields and relationships.
+- Use semi-joins or anti-joins when they reduce payload and match the requirement.
+- Use aggregates instead of loading records for summaries.
+- Use the SFAO SOQL helper when available.
 
 ## Validation Expectations
 
-- Validate field names and relationship paths before recommending Apex/query changes.
-- For Apex, run tests that cover empty, one, and many records.
-- Confirm FLS/CRUD strategy when query results are user-visible.
+- Validate syntax and field existence from local metadata or org describe when needed.
+- Use query plan/performance review only when volume/performance risk justifies it.
+- Confirm no sensitive export or storage unless explicitly approved.
+- For Apex queries, run tests covering empty, one, and many records when behavior changes.
 
 ## SFAO Command Hints
 
-- `sfao soql build --sobject Account --field Id --field Name --where "Name LIKE 'ACC%'"`
+- `sfao soql build --object Account --fields Id,Name --where "Name LIKE 'ACC%'"`
 - `python scripts/sf_agent_cli.py data-query --target-org <alias> --query "<SOQL>" --max-list 5`
+
+## Mini-Rubric
+
+- Fields minimized: yes/no
+- Filters/selectivity considered: yes/no
+- Relationship depth justified: yes/no
+- Security context considered: yes/no
+- Expected volume considered: yes/no
+- Execution path identified: yes/no
 
 ## Output Hint
 

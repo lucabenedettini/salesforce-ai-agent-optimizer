@@ -21,7 +21,7 @@ Every version update must include:
 
 ## Current Version
 
-`2.1.1` documents every user-facing `sfao` terminal command in the multilingual README files and wiki while preserving the lightweight, safety-first command surface.
+`2.2.2` strengthens specialized Salesforce guidance, adds lightweight Agentforce routing, and preserves the lightweight, safety-first command surface.
 
 ## Recent Stable Lines
 

@@ -4,9 +4,11 @@
 
 Salesforce Agent Optimizer e' una CLI `sfao` e una skill per Codex, Claude Code e GitHub Copilot, distribuita con licenza MIT.
 
-Versione corrente: `2.1.1`
+Versione corrente: `2.2.2`
 
 Aiuta gli agenti AI sui progetti Salesforce con pianificazione Salesforce-first, configurazione prima del codice custom, modifiche minime e reversibili, Knowledge locale, uso token-efficient della Salesforce CLI, least privilege, alias org espliciti, consapevolezza di `package.xml` e guardrail per operazioni distruttive.
+
+La guidance Salesforce specializzata include Apex, LWC, Flow, SOQL, deploy, data operations e Agentforce; ogni file viene caricato solo quando rilevante e coordina le reference SFAO esistenti.
 
 ## Quick Start
 
