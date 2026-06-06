@@ -69,11 +69,13 @@ def test_init_generates_metadata_docs() -> dict[str, object]:
             "metadata_doc_count": len(metadata_docs),
             "markdown_index": (knowledge / "markdown-index.md").exists(),
             "history": (knowledge / "history" / "project-history.md").exists(),
+            "memory": (knowledge / "memory.md").exists(),
             "index_links_metadata": "metadata/" in (knowledge / "index.md").read_text(encoding="utf-8"),
         }
         assert checks["metadata_doc_count"] == 3
         assert checks["markdown_index"]
         assert checks["history"]
+        assert checks["memory"]
         assert checks["index_links_metadata"]
         return checks
 

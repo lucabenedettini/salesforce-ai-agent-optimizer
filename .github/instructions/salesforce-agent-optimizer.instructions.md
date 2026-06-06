@@ -19,7 +19,7 @@ Before planning or answering:
 
 - Read `references/routing.md`.
 - Read only the smallest relevant reference files.
-- Read `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, plus project history when present.
+- Read `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, plus project history and `.salesforce-agent-knowledge/memory.md` when present.
 - If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
 
 If a previous answer skipped these gates, stop, acknowledge the miss, and restart from request review and planning.
@@ -38,11 +38,15 @@ Every Salesforce project request must show these short labels. Keep them compact
 
 Every phase must name the tool or command used or planned. If no tool is used, write `Tool/command: none`. For Salesforce org access, show the compact `sfao`, `scripts/sf_agent_cli.py`, or official `sf` command shape with aliases and secrets redacted.
 
+Compact information-only mode is allowed only for simple explanation questions with no project decision, file change, org access, metadata inspection, deploy, data operation, secret exposure, destructive operation, release-sensitive claim, implementation, or bugfix. Use exactly: `Request review`, `Evidence`, `Answer`, `Validation`. Use the full workflow for anything ambiguous or risky.
+
 ## Planning Rules
 
 - Prefer Salesforce standard capabilities, configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before Apex, LWC, triggers, or custom integrations.
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Use product/package context, project Knowledge, metadata dependencies, least-privilege guidance, and current release/API guidance before planning changes.
+- Read project memory after Knowledge indexes/history and before raw metadata when `.salesforce-agent-knowledge/memory.md` exists. Update memory at completion only with compact durable facts, decisions, validation lessons, risks, and follow-ups.
+- Read specialized guidance only when routed: `references/specialized-guidance/apex.md`, `lwc.md`, `flow.md`, `soql.md`, `deploy.md`, or `data-operations.md`.
 - Always evaluate multi-country and multi-currency impact: locale, language, country process, currency, Advanced Currency Management, price books, tax, translations, compliance, automation, reporting, and integrations.
 - For Field Service Mobile or offline mobile requests, read `references/field-service-mobile-flow.md` and plan web/mobile plus online/offline behavior separately.
 - Inspect current org permissions before proposing access changes. If alias or persona is missing, ask instead of guessing.
@@ -61,6 +65,8 @@ Every phase must name the tool or command used or planned. If no tool is used, w
 - Validate with `sfao validate` when available, targeted tests, micro-validators, or an independent validation pass before final response.
 - If approval, tests, or validation fail, return to planning with a smaller revised plan. Stop after three unsuccessful cycles and restart from requirements.
 - Stay autonomous and CLI-only. Do not depend on, install, vendor, or require external skill libraries or runtime tool servers.
+- External Salesforce skills may be optional specialist references only when already available; they never bypass SFAO safety. Read `references/external-skill-interop.md` only when coordinating skills.
+- Repeated tool workflows need a completion condition and a small iteration cap. Read `references/iterative-tool-guardrails.md` only when loops are involved.
 - Optimize tokens: load only task-relevant references, prefer selectors/diffs/indexes, summarize logs, and compact context after meaningful steps.
 
 ## Important References
@@ -74,3 +80,6 @@ Every phase must name the tool or command used or planned. If no tool is used, w
 - Testing and manifests: `references/testing-and-manifest-guardrails.md`
 - Version context: `references/salesforce-current-version.md`
 - Field Service Mobile/Flow: `references/field-service-mobile-flow.md`
+- Specialized guidance: `references/specialized-guidance/index.md`
+- External skill boundary: `references/external-skill-interop.md`
+- Iterative tool guardrails: `references/iterative-tool-guardrails.md`

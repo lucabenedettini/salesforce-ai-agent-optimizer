@@ -6,6 +6,32 @@ Use this workflow for every Salesforce project request: metadata information, im
 
 Keep every phase token-efficient. A small metadata-information request can use a compact one-paragraph phase output, but it still needs request review, planning/evidence, implementation decision, validation, and completion.
 
+## Compact Information-Only Mode
+
+Use compact information-only mode only when all conditions are true:
+
+- No file changes.
+- No org access.
+- No metadata inspection.
+- No deploy.
+- No data read/write.
+- No secret exposure.
+- No destructive operation.
+- No release-sensitive claim requiring current docs.
+- No implementation or bugfix requested.
+- No project-specific decision.
+
+Compact mode still needs this visible structure:
+
+```text
+Request review: <one line>
+Evidence: <reference/source used or none>
+Answer: <concise answer>
+Validation: <how the answer was checked or why no check was needed>
+```
+
+Do not use compact mode for implementation, bugfix, refactor, org inspection, metadata inspection, permissions, Apex/LWC/Flow generation, deployment, package.xml, release work, security-sensitive work, destructive actions, secrets, customer data, project-specific decisions, or anything ambiguous/risky.
+
 Every phase must include the tool or command used or planned. If no tool is used, write `Tool/command: none`. For Salesforce org operations, show the exact `sfao`, `scripts/sf_agent_cli.py`, or official `sf` command shape with aliases and secrets redacted.
 
 Maximum: 3 unsuccessful cycles. On the fourth unsuccessful cycle, stop implementation and return to requirement explanation before proposing another plan.
@@ -59,9 +85,11 @@ Consult project Knowledge first:
 - Read `.salesforce-agent-knowledge/markdown-index.md` when the exact metadata page is not obvious.
 - Read the relevant per-metadata Markdown files under `.salesforce-agent-knowledge/metadata/` before opening raw source.
 - Read `.salesforce-agent-knowledge/history/project-history.md` for previous deployed changes to the same artifacts.
+- Read `.salesforce-agent-knowledge/memory.md` when present for durable facts, decisions, validation lessons, risks, and follow-ups before opening raw source.
 - Read the relevant wiki pages under `.salesforce-agent-knowledge/wiki/` only when a higher-level summary is needed.
 - If the folder is missing, stale, or the user invokes `/sf-init-project-skill`, run `sfao knowledge init --project-root <project-root>` or `sfao knowledge refresh --project-root <project-root>` before planning, unless the user asked for a quick answer that does not touch the project.
 - Use the Knowledge to decide what to inspect next; verify against source metadata files before making changes.
+- At completion, update `.salesforce-agent-knowledge/memory.md` with compact durable decisions, lessons, risks, and follow-ups when the task creates reusable project knowledge. For information-only tasks, update memory only when the answer creates a durable project decision or reusable lesson. Never store secrets, auth URLs, tokens, customer data, raw records, screenshots with PII, large logs, or raw diffs.
 
 Always assess multi-country and multi-currency impact before proposing the solution:
 

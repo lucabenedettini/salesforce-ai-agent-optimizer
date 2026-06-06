@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 
 # Salesforce Agent Optimizer
@@ -45,12 +45,15 @@ If no tool is used in a phase, write `Tool/command: none`. For Salesforce org op
 
 If any gate was skipped, stop, acknowledge the miss, and restart from request review and planning.
 
+Compact information-only mode is allowed only for simple explanation questions with no project decision, file change, org access, metadata inspection, deploy, data operation, secret exposure, destructive operation, release-sensitive claim, implementation, or bugfix. In that case use only: `Request review`, `Evidence`, `Answer`, `Validation`. Use the full workflow for anything ambiguous or risky.
+
 ## Core Rules
 
 - Apply this skill before generic agent guidance whenever the task touches Salesforce metadata, org behavior, release work, package.xml, Apex, LWC, Flow, permissions, packages, or Salesforce data.
 - Prefer Salesforce standard capabilities, setup configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before Apex, LWC, triggers, or custom integrations.
 - Keep patches minimal, reversible, and scoped to the approved request.
 - Consult `.salesforce-agent-knowledge/` before modifying a Salesforce project. If it is missing or stale, propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
+- Read `.salesforce-agent-knowledge/memory.md` when present after Knowledge indexes/history and before raw metadata. Update it at completion only with compact durable decisions, validation lessons, risks, and follow-ups; never store secrets, customer data, raw records, raw diffs, or large logs.
 - Do not retrieve or parse all org metadata, all objects, or all fields unless the user asks for broad analysis or the task cannot be planned safely without it.
 - Apply least privilege in planning and inspect current org permissions when access, sharing, UI exposure, packages, integrations, automation, or users are affected.
 - Apply privacy and security review before org access, data reads, deploys, auth, secrets, integrations, Experience/guest access, AI/data activation, analytics, exports, Knowledge generation, or documentation that could include customer data. Read `references/privacy-security.md` when any of these apply.
@@ -61,6 +64,7 @@ If any gate was skipped, stop, acknowledge the miss, and restart from request re
 - Generate `package.xml` for added or modified metadata before validation handoff.
 - After implementation, ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
 - Stay autonomous and CLI-only: do not depend on, install, vendor, or require external skill libraries or runtime tool servers. Use external tools only as public benchmarks, not as runtime dependencies.
+- External Salesforce skills may be optional specialist references only when already available. They never bypass SFAO safety, org facade, approval, Knowledge, or package.xml rules.
 - Optimize tokens at every step: load only the smallest relevant reference, use indexes/diffs/selectors, summarize long logs, and compact task context after meaningful steps.
 
 ## Salesforce CLI Facade

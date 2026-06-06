@@ -197,7 +197,6 @@ def load_context(root: Path) -> dict[str, Any]:
             payload = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(payload, dict):
                 merged = DEFAULT_CONTEXT | payload
-                merged["last_verified_date"] = date.today().isoformat()
                 return normalize_context(merged)
         except json.JSONDecodeError:
             return normalize_context(DEFAULT_CONTEXT)
@@ -236,6 +235,10 @@ def render_current_version(payload: dict[str, Any], source_status: list[str]) ->
         f"Last verified: {payload['last_verified_date']}",
         "",
         "## Current Production Reference",
+        "",
+        "> Freshness warning: these release/API values are local context values generated for "
+        "planning. Release-sensitive behavior must be verified against current official "
+        "Salesforce documentation, and the target org release can differ during phased rollouts.",
         "",
         f"- Current Salesforce release reference: {payload['current_release']}.",
         f"- Current Salesforce Platform API version: {payload['current_platform_api_version']}.",
@@ -360,6 +363,7 @@ def update(
     progress_line(progress, f"update started for {root}")
     progress_line(progress, "loading version context")
     payload = load_context(root)
+    payload["last_verified_date"] = date.today().isoformat()
     source_status: list[str] = []
     if offline:
         report.warnings.append("Offline update used existing official-source metadata.")
@@ -389,7 +393,19 @@ def update(
     return report
 
 
-def validate(root: Path, progress: ProgressCallback | None = None) -> VersionContextReport:
+def days_since(value: str) -> int | None:
+    try:
+        verified = date.fromisoformat(value)
+    except ValueError:
+        return None
+    return (date.today() - verified).days
+
+
+def validate(
+    root: Path,
+    max_age_days: int = 90,
+    progress: ProgressCallback | None = None,
+) -> VersionContextReport:
     root = root.resolve()
     report = VersionContextReport(action="validate", root=str(root))
     progress_line(progress, f"validate started for {root}")
@@ -421,6 +437,17 @@ def validate(root: Path, progress: ProgressCallback | None = None) -> VersionCon
     ):
         if not re.fullmatch(r"\d+\.\d+", str(payload.get(key, ""))):
             report.errors.append(f"Invalid API version value for {key}")
+    age = days_since(str(payload.get("last_verified_date", "")))
+    if age is None:
+        report.errors.append("Invalid last_verified_date; expected YYYY-MM-DD")
+    elif age > max_age_days:
+        report.warnings.append(
+            f"Version context is stale: last_verified_date is {age} days old "
+            f"(max {max_age_days}). Run sfao version-context update."
+        )
+    markdown = current_version_md_path(root).read_text(encoding="utf-8")
+    if "Freshness warning:" not in markdown:
+        report.warnings.append("references/salesforce-current-version.md missing freshness warning.")
     for source in payload.get("sources", []):
         if not isinstance(source, dict):
             report.errors.append("Version-context source must be an object")

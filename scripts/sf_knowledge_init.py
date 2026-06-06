@@ -529,6 +529,27 @@ def ensure_history(knowledge_dir: Path) -> None:
         )
 
 
+def ensure_memory(knowledge_dir: Path) -> None:
+    memory_path = knowledge_dir / "memory.md"
+    if memory_path.exists():
+        return
+    write(
+        memory_path,
+        "# Salesforce Agent Project Memory\n\n"
+        "Generated/managed by Salesforce Agent Optimizer.\n\n"
+        "Use this curated planning memory after Knowledge indexes/history and before raw metadata. "
+        "Keep it compact and redacted. Do not store secrets, auth URLs, tokens, customer data, raw "
+        "records, screenshots with PII, large logs, or raw diffs.\n\n"
+        "## Current Project Facts\n- None recorded yet.\n\n"
+        "## Durable Decisions\n- None recorded yet.\n\n"
+        "## Recent Bugfixes\n- None recorded yet.\n\n"
+        "## Recent Developments\n- None recorded yet.\n\n"
+        "## Validation Lessons\n- None recorded yet.\n\n"
+        "## Risks And Follow-ups\n- None recorded yet.\n\n"
+        "## Deprecated Or Superseded Notes\n- None recorded yet.\n",
+    )
+
+
 def markdown_title(path: Path) -> str:
     try:
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -592,6 +613,7 @@ def main() -> int:
 
     write_default_config(knowledge_dir)
     ensure_history(knowledge_dir)
+    ensure_memory(knowledge_dir)
     write_indexes(root, knowledge_dir, entries, generated_at)
     write_wiki(knowledge_dir, entries, generated_at)
     write_metadata_docs(root, knowledge_dir, entries, generated_at)

@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer is an MIT-licensed `sfao` CLI and agent skill for Codex, Claude Code, and GitHub Copilot.
 
-Current version: `2.0.0`
+Current version: `2.1.0`
 
 It helps AI agents work on Salesforce projects with Salesforce-first planning, configuration before custom code, minimal reversible changes, local Knowledge, token-efficient Salesforce CLI usage, least-privilege checks, explicit org aliases, package.xml awareness, and destructive-operation guardrails.
 
@@ -51,10 +51,15 @@ sfao validate
 sfao validate --json
 sfao knowledge init --project-root .
 sfao knowledge refresh --project-root .
+sfao knowledge init --project-root . --scan-root
 sfao knowledge doctor --project-root .
+sfao memory init --project-root .
+sfao memory add --project-root . --task-type bugfix --summary "..."
+sfao memory compact --project-root . --max-bytes 60000
+sfao memory doctor --project-root .
 sfao version-context scaffold
 sfao version-context update
-sfao version-context validate
+sfao version-context validate --max-age-days 90
 ```
 
 For org operations the agent must ask for an explicit org alias. Production orgs are read-only through the skill guardrails.
@@ -72,10 +77,17 @@ Installed agents must follow the same visible phases for information requests, b
 
 During each phase the agent must state the tool or command it is using or planning. For Salesforce CLI access it must show the compact `sfao`, `scripts/sf_agent_cli.py`, or official `sf` command shape with aliases and secrets redacted.
 
+For simple explanation-only questions with no project decision, org access, metadata inspection, deploy, data operation, secret exposure, destructive action, release-sensitive claim, implementation, or bugfix, agents may use compact information-only mode: `Request review`, `Evidence`, `Answer`, `Validation`.
+
 ## Safety
 
 - Prefer Salesforce configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before custom code.
 - Inspect local Knowledge before changing Salesforce metadata.
+- Use project memory at `.salesforce-agent-knowledge/memory.md` for durable decisions, lessons, risks, and follow-ups. It is project-local curated planning knowledge, not a raw log, and must not contain secrets, customer data, raw records, or large logs.
+- Knowledge scans Salesforce DX `packageDirectories` by default when available; use `sfao knowledge init --project-root . --scan-root` only for an intentional broad scan.
+- Specialized Apex, LWC, Flow, SOQL, deploy, and data-operation guidance is loaded only when relevant.
+- External Salesforce skills are optional references only when already available and can never bypass SFAO guardrails.
+- `safe-run --safety` cannot downgrade the automatic risk classification.
 - Apply least privilege before access, sharing, UI, package, integration, or automation changes.
 - Do not retrieve or parse all org metadata unless the user asks for broad analysis or the task requires it.
 - Never delete data or metadata without separate explicit approval for the exact scope.

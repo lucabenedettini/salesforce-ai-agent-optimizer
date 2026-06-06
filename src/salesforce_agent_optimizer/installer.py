@@ -175,6 +175,12 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
                 destination / "evals" / "salesforce-agent-optimizer-trigger-evals.json",
             )
         )
+        targets.append(
+            TemplateTarget(
+                root / "evals" / "salesforce-agent-optimizer-quality-evals.json",
+                destination / "evals" / "salesforce-agent-optimizer-quality-evals.json",
+            )
+        )
     for item in platforms:
         if item == "codex":
             base = destination / ".agents" / "skills" / SKILL_NAME

@@ -10,7 +10,7 @@ details outside the end-user README.
 - CLI command: `sfao`
 - Source layout: `src/salesforce_agent_optimizer/`
 - Packaged templates: `src/salesforce_agent_optimizer/templates/`
-- Current version: `2.0.0`
+- Current version: `2.1.0`
 
 ## Local Development Install
 
@@ -119,8 +119,8 @@ Recommended publishing uses PyPI Trusted Publishing from GitHub Actions.
 Release tag example:
 
 ```bash
-git tag v2.0.0
-git push origin v2.0.0
+git tag v<version>
+git push origin v<version>
 ```
 
 The release workflow runs validation, tests, ruff, `sfao validate`, build,

@@ -80,6 +80,15 @@ SOURCE_REQUIRED_FILES = [
     "references/field-service-mobile-flow.md",
     "references/routing.md",
     "references/agent-instruction-spine.md",
+    "references/external-skill-interop.md",
+    "references/iterative-tool-guardrails.md",
+    "references/specialized-guidance/apex.md",
+    "references/specialized-guidance/lwc.md",
+    "references/specialized-guidance/flow.md",
+    "references/specialized-guidance/soql.md",
+    "references/specialized-guidance/deploy.md",
+    "references/specialized-guidance/data-operations.md",
+    "references/specialized-guidance/index.md",
     "scripts/sync_agent_instructions.py",
     "scripts/build_release_artifacts.py",
     "src/salesforce_agent_optimizer/__init__.py",
@@ -88,6 +97,7 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/doctor.py",
     "src/salesforce_agent_optimizer/validation.py",
     "src/salesforce_agent_optimizer/knowledge.py",
+    "src/salesforce_agent_optimizer/memory.py",
     "src/salesforce_agent_optimizer/version_context.py",
     "src/salesforce_agent_optimizer/templates/SKILL.md",
     "src/salesforce_agent_optimizer/templates/AGENTS.md",
@@ -96,9 +106,14 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/templates/claude/SKILL.md",
     "src/salesforce_agent_optimizer/templates/github/skills/salesforce-agent-optimizer/SKILL.md",
     "src/salesforce_agent_optimizer/templates/evals/trigger-evals.json",
+    "src/salesforce_agent_optimizer/templates/evals/salesforce-agent-optimizer-quality-evals.json",
+    "src/salesforce_agent_optimizer/templates/references/external-skill-interop.md",
+    "src/salesforce_agent_optimizer/templates/references/iterative-tool-guardrails.md",
+    "src/salesforce_agent_optimizer/templates/references/specialized-guidance/index.md",
     "src/salesforce_agent_optimizer/templates/github/copilot-instructions.md",
     "src/salesforce_agent_optimizer/templates/github/instructions/salesforce-agent-optimizer.instructions.md",
     "evals/trigger-evals.json",
+    "evals/salesforce-agent-optimizer-quality-evals.json",
     "tests/test_packaging_cli.py",
 ]
 INSTALL_REQUIRED_FILES = [
@@ -116,6 +131,7 @@ INSTALL_REQUIRED_FILES = [
     ".github/copilot-instructions.md",
     ".github/instructions/salesforce-agent-optimizer.instructions.md",
     "evals/salesforce-agent-optimizer-trigger-evals.json",
+    "evals/salesforce-agent-optimizer-quality-evals.json",
 ]
 
 
@@ -238,7 +254,12 @@ def validate_required_files(root: Path, result: ValidationResult, files: list[st
 
 
 def should_ignore_path(path: Path) -> bool:
-    return any(part in SCAN_IGNORED_PARTS or part.endswith(".egg-info") for part in path.parts)
+    return any(
+        part in SCAN_IGNORED_PARTS
+        or part.endswith(".egg-info")
+        or part.startswith(".venv")
+        for part in path.parts
+    )
 
 
 def validate_text_shape(root: Path, result: ValidationResult) -> None:
@@ -447,6 +468,25 @@ def validate_trigger_evals(root: Path, result: ValidationResult) -> None:
                 result.error(f"evals/trigger-evals.json {key}[{index}] must include prompt and reason")
 
 
+def validate_quality_evals(root: Path, result: ValidationResult) -> None:
+    path = root / "evals" / "salesforce-agent-optimizer-quality-evals.json"
+    if not path.exists():
+        result.error("Missing evals/salesforce-agent-optimizer-quality-evals.json")
+        return
+    payload = json.loads(read_text(path))
+    examples = payload.get("examples")
+    if not isinstance(examples, list) or len(examples) < 10:
+        result.error("Quality evals must include at least 10 examples")
+        return
+    for index, item in enumerate(examples):
+        if not isinstance(item, dict):
+            result.error(f"Quality eval example {index} must be an object")
+            continue
+        for key in ("prompt", "expected_behavior", "risk_area"):
+            if not item.get(key):
+                result.error(f"Quality eval example {index} missing {key}")
+
+
 def validate_templates(root: Path, result: ValidationResult, expected_version: str) -> None:
     template_root = root / "src" / "salesforce_agent_optimizer" / "templates"
     if not template_root.exists():
@@ -465,6 +505,16 @@ def validate_templates(root: Path, result: ValidationResult, expected_version: s
         "codex/SKILL.md",
         "claude/SKILL.md",
         "evals/trigger-evals.json",
+        "evals/salesforce-agent-optimizer-quality-evals.json",
+        "references/external-skill-interop.md",
+        "references/iterative-tool-guardrails.md",
+        "references/specialized-guidance/apex.md",
+        "references/specialized-guidance/lwc.md",
+        "references/specialized-guidance/flow.md",
+        "references/specialized-guidance/soql.md",
+        "references/specialized-guidance/deploy.md",
+        "references/specialized-guidance/data-operations.md",
+        "references/specialized-guidance/index.md",
         "github/skills/salesforce-agent-optimizer/SKILL.md",
         "github/copilot-instructions.md",
         "github/instructions/salesforce-agent-optimizer.instructions.md",
@@ -735,6 +785,7 @@ def validate_source_tree(root: Path, progress: ProgressCallback | None = None) -
     validate_text_shape(root, result)
     emit_progress(progress, "sfao validate", 9, total_steps, "checking trigger evals")
     validate_trigger_evals(root, result)
+    validate_quality_evals(root, result)
     emit_progress(progress, "sfao validate", 10, total_steps, "checking generated agent adapters")
     validate_generated_sync(root, result)
     emit_progress(progress, "sfao validate", 11, total_steps, "checking Copilot and release guardrails")

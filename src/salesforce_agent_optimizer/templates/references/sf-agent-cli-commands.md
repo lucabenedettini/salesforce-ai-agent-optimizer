@@ -98,6 +98,7 @@ Rules:
 - Provide `--target-org <alias>` when the command connects to Salesforce.
 - The facade appends `--json` unless `--raw` is used.
 - The facade classifies safety and blocks `write`/`execute` commands on production.
+- `--safety` can keep the automatic classification or make it more restrictive; unsafe downgrades are blocked.
 - Delete, uninstall, purge, hard-delete, source delete, and destructiveChanges deploy commands require `--delete-approval "I explicitly approve this deletion"` after the user approves the exact destructive scope.
 - Commands that can expose or handle access tokens, auth URLs, private keys, connected-app secrets, or session material require `--secret-approval "I explicitly approve exposing Salesforce secrets"` after the user approves the exact secret scope.
 - If the official command is `project deploy start` and succeeds, the facade appends deploy history.

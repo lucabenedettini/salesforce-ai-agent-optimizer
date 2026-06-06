@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Callable
 from xml.etree import ElementTree
 
+from .memory import ensure_memory
+
 
 KNOWLEDGE_DIR = ".salesforce-agent-knowledge"
 SKIP_DIRS = {
@@ -89,6 +91,7 @@ REQUIRED_KNOWLEDGE_FILES = [
     "index.md",
     "markdown-index.md",
     "log.md",
+    "memory.md",
     "sources.json",
     "history/project-history.md",
     "wiki/overview.md",
@@ -251,10 +254,55 @@ def should_report_step(index: int, total: int) -> bool:
     return index == 1 or index == total or index % interval == 0
 
 
+def load_package_directories(root: Path) -> tuple[list[Path], list[str]]:
+    path = root / "sfdx-project.json"
+    if not path.exists():
+        return [root], []
+    warnings: list[str] = []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [root], [f"Invalid sfdx-project.json; scanning project root: {exc}"]
+    directories = payload.get("packageDirectories")
+    if not isinstance(directories, list):
+        return [root], ["Missing packageDirectories in sfdx-project.json; scanning project root."]
+    scan_roots: list[Path] = []
+    for item in directories:
+        if not isinstance(item, dict):
+            continue
+        value = item.get("path")
+        if not isinstance(value, str) or not value.strip():
+            continue
+        candidate = (root / value).resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError:
+            warnings.append(f"Ignored packageDirectory outside project root: {value}")
+            continue
+        if candidate.exists() and candidate.is_dir():
+            scan_roots.append(candidate)
+        else:
+            warnings.append(f"Ignored missing packageDirectory: {value}")
+    if not scan_roots:
+        warnings.append("No valid packageDirectories found; scanning project root.")
+        return [root], warnings
+    return sorted(set(scan_roots)), warnings
+
+
+def collect_files(root: Path, scan_roots: list[Path]) -> list[Path]:
+    files: dict[str, Path] = {}
+    for scan_root in scan_roots:
+        for path in scan_root.rglob("*"):
+            if path.is_file():
+                files[posix(path.relative_to(root))] = path
+    return [files[key] for key in sorted(files)]
+
+
 def build_entries(
     root: Path,
     knowledge_dir: Path,
     config: dict[str, Any],
+    scan_roots: list[Path] | None = None,
     progress: ProgressCallback | None = None,
 ) -> list[dict[str, Any]]:
     metadata_types = config.get("metadata_types", DEFAULT_METADATA_TYPES)
@@ -262,7 +310,7 @@ def build_entries(
     if not isinstance(metadata_types, dict) or not isinstance(exclude_patterns, list):
         metadata_types = DEFAULT_METADATA_TYPES
         exclude_patterns = DEFAULT_CONFIG["exclude_patterns"]
-    all_files = sorted(path for path in root.rglob("*") if path.is_file())
+    all_files = collect_files(root, scan_roots or [root])
     total_files = len(all_files)
     progress_line(progress, f"scanning project files 0/{total_files} (0%)")
     candidates: list[tuple[Path, str, str, str]] = []
@@ -346,6 +394,7 @@ def write_knowledge(
             root,
         )
     ensure_history(root, knowledge_dir, changed)
+    ensure_memory(root, changed)
     progress_line(progress, "writing indexes")
     write_indexes(root, knowledge_dir, entries, generated_at, changed)
     progress_line(progress, "writing wiki summaries")
@@ -496,6 +545,7 @@ def run_knowledge(
     project_root: Path,
     target_org: str | None = None,
     max_items: int | None = None,
+    scan_root: bool = False,
     progress: ProgressCallback | None = None,
 ) -> KnowledgeReport:
     root = project_root.resolve()
@@ -507,7 +557,15 @@ def run_knowledge(
     if action in {"init", "refresh"}:
         progress_line(progress, "loading configuration")
         config = load_config(knowledge_dir)
-        entries = build_entries(root, knowledge_dir, config, progress=progress)
+        scan_roots = [root]
+        if not scan_root:
+            scan_roots, warnings = load_package_directories(root)
+            report.warnings.extend(warnings)
+        progress_line(
+            progress,
+            "scan roots: " + ", ".join(path.relative_to(root).as_posix() or "." for path in scan_roots),
+        )
+        entries = build_entries(root, knowledge_dir, config, scan_roots=scan_roots, progress=progress)
         if max_items is not None:
             progress_line(progress, f"limiting entries to {max_items}")
             entries = entries[:max_items]

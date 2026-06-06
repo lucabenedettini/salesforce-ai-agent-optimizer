@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer es una CLI `sfao` y una skill para Codex, Claude Code y GitHub Copilot, publicada con licencia MIT.
 
-Version actual: `2.0.0`
+Version actual: `2.1.0`
 
 Ayuda a los agentes AI en proyectos Salesforce con planificacion Salesforce-first, configuracion antes que codigo custom, cambios minimos y reversibles, Knowledge local, uso eficiente de tokens con Salesforce CLI, least privilege, alias de org explicitos, conciencia de `package.xml` y guardrails para operaciones destructivas.
 
@@ -51,10 +51,15 @@ sfao validate
 sfao validate --json
 sfao knowledge init --project-root .
 sfao knowledge refresh --project-root .
+sfao knowledge init --project-root . --scan-root
 sfao knowledge doctor --project-root .
+sfao memory init --project-root .
+sfao memory add --project-root . --task-type bugfix --summary "..."
+sfao memory compact --project-root . --max-bytes 60000
+sfao memory doctor --project-root .
 sfao version-context scaffold
 sfao version-context update
-sfao version-context validate
+sfao version-context validate --max-age-days 90
 ```
 
 Para operaciones con org, el agente debe pedir un alias explicito. Las orgs de produccion son read-only mediante los guardrails de la skill.
@@ -72,10 +77,17 @@ Los agentes instalados deben seguir las mismas fases visibles para preguntas inf
 
 En cada fase el agente debe indicar el tool o comando que esta usando o planeando. Para acceso Salesforce CLI debe mostrar la forma compacta del comando `sfao`, `scripts/sf_agent_cli.py` o `sf`, con alias y secretos redactados.
 
+Para preguntas solo informativas, sin decision de proyecto, acceso a org, inspeccion de metadata, deploy, operaciones de datos, secretos, acciones destructivas, afirmaciones sensibles a release, implementacion o bugfix, el agente puede usar modo compacto: `Request review`, `Evidence`, `Answer`, `Validation`.
+
 ## Seguridad
 
 - Preferir configuracion Salesforce, Flow, permission sets, UI API/LDS, named credentials y managed packages antes que codigo custom.
 - Consultar la Knowledge local antes de cambiar metadata Salesforce.
+- Usar `.salesforce-agent-knowledge/memory.md` para decisiones duraderas, lecciones, riesgos y follow-ups. Es memoria curada del proyecto, no un log bruto, y no debe contener secretos, datos de cliente, registros brutos ni logs grandes.
+- Knowledge usa por defecto las `packageDirectories` de Salesforce DX cuando existen; usar `--scan-root` solo para un escaneo amplio intencional.
+- La guia especializada Apex, LWC, Flow, SOQL, deploy y data operations se carga solo cuando es relevante.
+- Skills Salesforce externas son referencias opcionales si ya estan disponibles y nunca pueden saltarse los guardrails SFAO.
+- `safe-run --safety` no puede bajar la clasificacion automatica de riesgo.
 - Aplicar least privilege antes de cambios en acceso, sharing, UI, packages, integraciones o automatizaciones.
 - No recuperar ni parsear todos los metadata de la org salvo peticion amplia o necesidad real.
 - No borrar datos o metadata sin aprobacion separada para el alcance exacto.

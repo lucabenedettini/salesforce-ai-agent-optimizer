@@ -22,6 +22,7 @@ from salesforce_agent_optimizer.validation import (
     validate_generated_sync,
     validate_salesforce_metadata,
     validate_source_tree,
+    validate_text_shape,
 )
 
 
@@ -69,10 +70,15 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
         "sfao validate --json",
         "sfao knowledge init --project-root .",
         "sfao knowledge refresh --project-root .",
+        "sfao knowledge init --project-root . --scan-root",
         "sfao knowledge doctor --project-root .",
+        "sfao memory init --project-root .",
+        "sfao memory add --project-root . --task-type bugfix --summary \"...\"",
+        "sfao memory compact --project-root . --max-bytes 60000",
+        "sfao memory doctor --project-root .",
         "sfao version-context scaffold",
         "sfao version-context update",
-        "sfao version-context validate",
+        "sfao version-context validate --max-age-days 90",
         "python -m pipx install salesforce-agent-optimizer",
         "python -m pipx upgrade salesforce-agent-optimizer",
         "python -m pipx uninstall salesforce-agent-optimizer",
@@ -208,6 +214,7 @@ def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
         tmp_path / ".github" / "copilot-instructions.md",
         tmp_path / ".github" / "instructions" / "salesforce-agent-optimizer.instructions.md",
         tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json",
+        tmp_path / "evals" / "salesforce-agent-optimizer-quality-evals.json",
     ]
     for path in expected:
         assert path.exists(), path
@@ -280,6 +287,7 @@ def test_existing_copilot_files_are_merged_and_updated(tmp_path: Path) -> None:
     report = install(tmp_path, project=True, platform="copilot")
     assert report.ok, report.to_dict()
     assert (tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json").exists()
+    assert (tmp_path / "evals" / "salesforce-agent-optimizer-quality-evals.json").exists()
     for path, existing in (
         (agents, "existing agent guidance"),
         (copilot, "existing copilot guidance"),
@@ -299,16 +307,20 @@ def test_update_installs_new_missing_managed_templates(tmp_path: Path) -> None:
     report = install(tmp_path, project=True, platform="copilot")
     assert report.ok, report.to_dict()
     eval_file = tmp_path / "evals" / "salesforce-agent-optimizer-trigger-evals.json"
+    quality_eval_file = tmp_path / "evals" / "salesforce-agent-optimizer-quality-evals.json"
     copilot_skill = tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "SKILL.md"
     eval_file.unlink()
+    quality_eval_file.unlink()
     copilot_skill.unlink()
 
     update_report = update(tmp_path, project=True, platform="copilot")
 
     assert update_report.ok, update_report.to_dict()
     assert eval_file.exists()
+    assert quality_eval_file.exists()
     assert copilot_skill.exists()
     assert any(path.endswith("salesforce-agent-optimizer-trigger-evals.json") for path in update_report.installed)
+    assert any(path.endswith("salesforce-agent-optimizer-quality-evals.json") for path in update_report.installed)
     assert any(path.endswith(".github/skills/salesforce-agent-optimizer/SKILL.md") for path in update_report.installed)
 
 
@@ -512,6 +524,63 @@ def test_salesforce_micro_validators_ignore_salesforce_cli_cache(tmp_path: Path)
     assert not result.warnings
 
 
+def test_safe_run_safety_downgrade_is_blocked(tmp_path: Path) -> None:
+    script = ROOT / "scripts" / "sf_agent_cli.py"
+    blocked = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "safe-run",
+            "--target-org",
+            "dev",
+            "--safety",
+            "read",
+            "--dry-run",
+            "--",
+            "project",
+            "deploy",
+            "start",
+            "--source-dir",
+            "force-app",
+        ],
+        cwd=tmp_path,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        check=False,
+    )
+    assert blocked.returncode != 0
+    assert "Blocked unsafe safety downgrade" in (blocked.stdout + blocked.stderr)
+
+    allowed = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "safe-run",
+            "--target-org",
+            "dev",
+            "--safety",
+            "execute",
+            "--dry-run",
+            "--",
+            "data",
+            "query",
+            "--query",
+            "SELECT Id FROM Account LIMIT 1",
+        ],
+        cwd=tmp_path,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        check=False,
+    )
+    assert allowed.returncode == 0, allowed.stdout + allowed.stderr
+    assert '"automatic_safety": "read"' in allowed.stdout
+    assert '"classified_safety": "execute"' in allowed.stdout
+
+
 def test_salesforce_micro_validators_error_on_broken_metadata(tmp_path: Path) -> None:
     (tmp_path / "sfdx-project.json").write_text('{"packageDirectories":[]}\n', encoding="utf-8")
     trigger_dir = tmp_path / "force-app" / "main" / "default" / "triggers"
@@ -539,6 +608,17 @@ def test_salesforce_micro_validators_error_on_broken_metadata(tmp_path: Path) ->
 
 def test_source_validation_catches_text_shape() -> None:
     result = validate_source_tree(ROOT)
+    assert result.ok, result.to_dict()
+
+
+def test_text_shape_ignores_local_virtualenvs(tmp_path: Path) -> None:
+    venv_dist = tmp_path / ".venv-wheel-test" / "Lib" / "site-packages" / "pkg.dist-info"
+    venv_dist.mkdir(parents=True)
+    (venv_dist / "direct_url.json").write_text('{"url":"file:///tmp/project"}', encoding="utf-8")
+
+    result = ValidationResult()
+    validate_text_shape(tmp_path, result)
+
     assert result.ok, result.to_dict()
 
 
@@ -571,9 +651,13 @@ def test_wheel_includes_templates(tmp_path: Path) -> None:
         "salesforce_agent_optimizer/templates/AGENTS.md",
         "salesforce_agent_optimizer/templates/agents/openai.yaml",
         "salesforce_agent_optimizer/templates/evals/trigger-evals.json",
+        "salesforce_agent_optimizer/templates/evals/salesforce-agent-optimizer-quality-evals.json",
         "salesforce_agent_optimizer/templates/references/routing.md",
         "salesforce_agent_optimizer/templates/references/agent-tool-registry.json",
         "salesforce_agent_optimizer/templates/references/field-service-mobile-flow.md",
+        "salesforce_agent_optimizer/templates/references/external-skill-interop.md",
+        "salesforce_agent_optimizer/templates/references/iterative-tool-guardrails.md",
+        "salesforce_agent_optimizer/templates/references/specialized-guidance/index.md",
         "salesforce_agent_optimizer/templates/scripts/sf_agent_cli.py",
         "salesforce_agent_optimizer/templates/codex/SKILL.md",
         "salesforce_agent_optimizer/templates/claude/SKILL.md",
@@ -608,6 +692,73 @@ def test_knowledge_commands(tmp_path: Path) -> None:
     assert doctor.returncode == 0, doctor.stdout + doctor.stderr
     assert doctor.stderr == ""
     assert json.loads(doctor.stdout)["ok"]
+    assert (project / ".salesforce-agent-knowledge" / "memory.md").exists()
+
+
+def test_memory_commands(tmp_path: Path) -> None:
+    init = run_cli(["memory", "init", "--project-root", str(tmp_path)], ROOT)
+    assert init.returncode == 0, init.stdout + init.stderr
+    memory = tmp_path / ".salesforce-agent-knowledge" / "memory.md"
+    assert memory.exists()
+
+    add = run_cli(
+        [
+            "memory",
+            "add",
+            "--project-root",
+            str(tmp_path),
+            "--task-type",
+            "bugfix",
+            "--summary",
+            "Fix token access_token=secret-value",
+            "--metadata",
+            "ApexClass:AccountService",
+            "--validation",
+            "pytest passed",
+        ],
+        ROOT,
+    )
+    assert add.returncode == 0, add.stdout + add.stderr
+    text = memory.read_text(encoding="utf-8")
+    assert "ApexClass:AccountService" in text
+    assert "secret-value" not in text
+    assert "[REDACTED]" in text
+
+    compact = run_cli(
+        ["memory", "compact", "--project-root", str(tmp_path), "--max-bytes", "4000"],
+        ROOT,
+    )
+    assert compact.returncode == 0, compact.stdout + compact.stderr
+    doctor = run_cli(["memory", "doctor", "--project-root", str(tmp_path), "--json"], ROOT)
+    assert doctor.returncode == 0, doctor.stdout + doctor.stderr
+    assert json.loads(doctor.stdout)["ok"]
+
+
+def test_knowledge_scans_package_directories_by_default(tmp_path: Path) -> None:
+    project = tmp_path / "project"
+    package = project / "force-app" / "main" / "default" / "classes"
+    outside = project / "other-app" / "main" / "default" / "classes"
+    package.mkdir(parents=True)
+    outside.mkdir(parents=True)
+    (project / "sfdx-project.json").write_text(
+        json.dumps({"packageDirectories": [{"path": "force-app", "default": True}]}) + "\n",
+        encoding="utf-8",
+    )
+    (package / "Included.cls").write_text("public class Included {}\n", encoding="utf-8")
+    (outside / "Excluded.cls").write_text("public class Excluded {}\n", encoding="utf-8")
+
+    init = run_cli(["knowledge", "init", "--project-root", str(project), "--json"], ROOT)
+    assert init.returncode == 0, init.stdout + init.stderr
+    index = json.loads((project / ".salesforce-agent-knowledge" / "index.json").read_text(encoding="utf-8"))
+    names = {entry["name"] for entry in index["entries"]}
+    assert "Included" in names
+    assert "Excluded" not in names
+
+    broad = run_cli(["knowledge", "refresh", "--project-root", str(project), "--scan-root", "--json"], ROOT)
+    assert broad.returncode == 0, broad.stdout + broad.stderr
+    index = json.loads((project / ".salesforce-agent-knowledge" / "index.json").read_text(encoding="utf-8"))
+    names = {entry["name"] for entry in index["entries"]}
+    assert {"Included", "Excluded"} <= names
 
 
 def test_version_context_commands(tmp_path: Path) -> None:
@@ -648,6 +799,15 @@ def test_version_context_commands(tmp_path: Path) -> None:
     version_payload = json.loads(version_path.read_text(encoding="utf-8"))
     source_urls = [source["url"] for source in version_payload["sources"]]
     assert "https://developer.salesforce.com/docs/metadata-coverage" not in source_urls
+
+    version_payload["last_verified_date"] = "2020-01-01"
+    version_path.write_text(json.dumps(version_payload, indent=2) + "\n", encoding="utf-8")
+    stale = run_cli(
+        ["version-context", "validate", "--root", str(tmp_path), "--max-age-days", "90", "--json"],
+        ROOT,
+    )
+    assert stale.returncode == 0, stale.stdout + stale.stderr
+    assert "stale" in "\n".join(json.loads(stale.stdout)["warnings"]).lower()
 
 
 def test_release_manifest_and_workflow_requirements() -> None:

@@ -69,11 +69,13 @@ def test_init_generates_metadata_docs() -> dict[str, object]:
             "metadata_doc_count": len(metadata_docs),
             "markdown_index": (knowledge / "markdown-index.md").exists(),
             "history": (knowledge / "history" / "project-history.md").exists(),
+            "memory": (knowledge / "memory.md").exists(),
             "index_links_metadata": "metadata/" in (knowledge / "index.md").read_text(encoding="utf-8"),
         }
         assert checks["metadata_doc_count"] == 3
         assert checks["markdown_index"]
         assert checks["history"]
+        assert checks["memory"]
         assert checks["index_links_metadata"]
         return checks
 
@@ -252,6 +254,48 @@ def test_agent_cli_guardrails() -> dict[str, object]:
         assert sf_min_delete.returncode != 0
         assert "Blocked destructive command" in (sf_min_delete.stdout + sf_min_delete.stderr)
 
+        secret_missing_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "safe-run",
+                "--target-org",
+                "dev",
+                "--",
+                "org",
+                "display",
+                "--verbose",
+                "--dry-run",
+            ],
+            cwd=root,
+            check=False,
+        )
+        assert secret_missing_approval.returncode != 0
+        assert "Blocked secret-exposure operation" in (secret_missing_approval.stdout + secret_missing_approval.stderr)
+
+        secret_with_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "safe-run",
+                "--target-org",
+                "dev",
+                "--secret-approval",
+                "I explicitly approve exposing Salesforce secrets",
+                "--",
+                "org",
+                "login",
+                "access-token",
+                "--access-token",
+                "00D000000000000!very-secret-token",
+                "--dry-run",
+            ],
+            cwd=root,
+        )
+        assert '"dry_run": true' in secret_with_approval.stdout
+        assert "very-secret-token" not in secret_with_approval.stdout
+        assert "[REDACTED]" in secret_with_approval.stdout
+
         access_inspect = run(
             [
                 PYTHON,
@@ -279,6 +323,8 @@ def test_agent_cli_guardrails() -> dict[str, object]:
             "delete_approval_allows_dry_run": True,
             "safe_run_delete_missing_approval_blocked": True,
             "sf_min_destructive_blocked": True,
+            "secret_missing_approval_blocked": True,
+            "secret_values_redacted": True,
             "access_inspect_dry_run": True,
         }
 

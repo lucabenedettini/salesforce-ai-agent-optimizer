@@ -9,6 +9,7 @@ It helps Codex, Claude Code, GitHub Copilot, and similar agents plan and impleme
 - Minimal, reviewable patches.
 - Token-efficient Salesforce CLI usage.
 - Local project Knowledge generated from metadata.
+- Curated project memory for durable decisions, lessons, risks, and follow-ups.
 - Product and AppExchange package context before planning.
 - Current Salesforce release/API/SOAP/package version context with `sfao version-context`.
 - Metadata dependency planning.
@@ -27,10 +28,11 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `2.0.0`
+- Current version: `2.1.0`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 - End-user install guide: see `Installation.md`
+- Memory and specialized guidance: see `Memory-And-Guidance.md`
 - Privacy and security model: see `Privacy-And-Security.md`
 - Maintainer packaging and publishing guide: see `Packaging-And-Publishing.md`
 
@@ -47,6 +49,8 @@ Build or refresh `.salesforce-agent-knowledge/` for a Salesforce project:
 ```bash
 sfao knowledge init --project-root .
 sfao knowledge refresh --project-root .
+sfao memory init --project-root .
+sfao memory doctor --project-root .
 ```
 
 These commands print progress in non-JSON mode while scanning, summarizing, and
@@ -70,7 +74,7 @@ Before planning, an agent should:
 4. Read only relevant product/package files.
 5. Read `references/metadata-dependencies.md`.
 6. Read `references/least-privilege-planning.md` for access, sharing, UI, integration, automation, or package exposure.
-7. Read the local project Knowledge.
+7. Read the local project Knowledge, project history, and `memory.md` when present.
 8. Inspect source metadata and targeted org access before modifying.
 
 Agent adapters are synchronized from `references/agent-instruction-spine.md` with:
@@ -120,6 +124,10 @@ Aliases are allowed; secrets, tokens, auth URLs, passwords, and private keys mus
 | `sfao validate` | Validate source/install shape, versions, frontmatter, YAML/TOML/JSON/Python, generated adapters, and Salesforce metadata guardrails. |
 | `sfao knowledge init --project-root .` | Build compact local Salesforce project Knowledge. |
 | `sfao knowledge refresh --project-root .` | Refresh Knowledge after metadata changes. |
+| `sfao memory init --project-root .` | Create curated project memory. |
+| `sfao memory add --project-root . --task-type bugfix --summary "..."` | Add a compact durable memory entry. |
+| `sfao memory compact --project-root .` | Keep project memory token-efficient. |
+| `sfao memory doctor --project-root .` | Validate memory structure and secret redaction. |
 | `sfao version-context update` | Refresh release/API/package context from official Salesforce sources. |
 | `sfao command search` | Find a safe Salesforce CLI facade command from the internal registry. |
 | `sfao command payload-example` | Show a compact payload for a facade command. |
@@ -162,4 +170,5 @@ Trigger evals:
 
 ```text
 evals/salesforce-agent-optimizer-trigger-evals.json
+evals/salesforce-agent-optimizer-quality-evals.json
 ```

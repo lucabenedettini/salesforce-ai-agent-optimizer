@@ -121,6 +121,7 @@ WRITE_VERBS = {
 EXECUTE_VERBS = {"run", "test", "validate"}
 LOCAL_PREFIXES = {"autocomplete", "commands", "completion", "config", "plugins", "schema", "version"}
 AUTH_PARTS = {"auth", "login", "logout"}
+SAFETY_RANK = {"local": 0, "auth": 1, "read": 2, "execute": 3, "write": 4}
 
 
 def redact(value: Any) -> Any:
@@ -326,6 +327,19 @@ def classify_official_safety(command_id: str, connects_to_org: bool = False) -> 
     if "generate" in part_set:
         return "execute" if connects_to_org else "local"
     return "read"
+
+
+def resolve_safety_override(automatic: str, requested: str | None) -> str:
+    if not requested:
+        return automatic
+    automatic_rank = SAFETY_RANK.get(automatic, SAFETY_RANK["read"])
+    requested_rank = SAFETY_RANK[requested]
+    if requested_rank < automatic_rank:
+        raise SystemExit(
+            "Blocked unsafe safety downgrade: automatic classification is "
+            f"{automatic}, requested override is {requested}."
+        )
+    return requested
 
 
 def is_destructive_operation(command_id: str, sf_args: list[str]) -> bool:
@@ -813,7 +827,8 @@ def safe_run(args: argparse.Namespace) -> int:
     command_id = canonical_official_command_id(sf_args)
     target_org = args.target_org or extract_flag_value(sf_args, "--target-org", "-o")
     connects = command_likely_connects(command_id, sf_args, target_org)
-    safety = args.safety or classify_official_safety(command_id, connects_to_org=connects)
+    automatic_safety = classify_official_safety(command_id, connects_to_org=connects)
+    safety = resolve_safety_override(automatic_safety, args.safety)
     target_org = args.target_org or extract_flag_value(sf_args, "--target-org", "-o")
 
     if connects and not target_org and safety not in {"auth", "local"}:
@@ -832,6 +847,7 @@ def safe_run(args: argparse.Namespace) -> int:
             dry_command.append("--json")
         payload = {
             "dry_run": True,
+            "automatic_safety": automatic_safety,
             "classified_safety": safety,
             "command_id": command_id,
             "sf_command": redact_cli_args(dry_command),

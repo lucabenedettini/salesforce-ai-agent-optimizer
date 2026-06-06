@@ -13,6 +13,7 @@ from .doctor import format_report, report_to_json, run_doctor
 from .installer import install, project_destination, uninstall, update, user_destination
 from .knowledge import format_knowledge_report, run_knowledge
 from .live_tests import WRITE_CONFIRMATION, format_live_report, run_live_tests
+from .memory import DEFAULT_MEMORY_MAX_BYTES, format_memory_report, run_memory
 from .permission_analyzer import analyze_access_file
 from .soql import build_soql
 from .validation import validate_auto
@@ -135,6 +136,40 @@ def build_parser() -> argparse.ArgumentParser:
         parser_for_command.add_argument("--compact", action="store_true", help="Emit compact summary")
         parser_for_command.add_argument("--verbose", action="store_true", help="Emit changed paths")
         parser_for_command.add_argument("--max-items", type=int, help="Limit indexed entries")
+        if name in {"init", "refresh"}:
+            parser_for_command.add_argument(
+                "--scan-root",
+                action="store_true",
+                help="Scan the whole project root instead of sfdx-project packageDirectories.",
+            )
+
+    memory_parser = subparsers.add_parser("memory", help="Manage curated project memory")
+    memory_subparsers = memory_parser.add_subparsers(dest="memory_command", required=True)
+    memory_init = memory_subparsers.add_parser("init", help="Create project memory.md if missing")
+    memory_init.add_argument("--project-root", type=Path, default=Path.cwd())
+    memory_init.add_argument("--json", action="store_true", help="Emit compact JSON")
+    memory_add = memory_subparsers.add_parser("add", help="Append a compact curated memory entry")
+    memory_add.add_argument("--project-root", type=Path, default=Path.cwd())
+    memory_add.add_argument(
+        "--task-type",
+        choices=["bugfix", "development", "config", "release", "validation", "decision", "note"],
+        required=True,
+    )
+    memory_add.add_argument("--summary", required=True)
+    memory_add.add_argument("--metadata", action="append", default=[])
+    memory_add.add_argument("--file", action="append", default=[])
+    memory_add.add_argument("--validation")
+    memory_add.add_argument("--risk")
+    memory_add.add_argument("--follow-up")
+    memory_add.add_argument("--decision")
+    memory_add.add_argument("--json", action="store_true", help="Emit compact JSON")
+    memory_compact = memory_subparsers.add_parser("compact", help="Compact project memory")
+    memory_compact.add_argument("--project-root", type=Path, default=Path.cwd())
+    memory_compact.add_argument("--max-bytes", type=int, default=DEFAULT_MEMORY_MAX_BYTES)
+    memory_compact.add_argument("--json", action="store_true", help="Emit compact JSON")
+    memory_doctor = memory_subparsers.add_parser("doctor", help="Validate project memory.md")
+    memory_doctor.add_argument("--project-root", type=Path, default=Path.cwd())
+    memory_doctor.add_argument("--json", action="store_true", help="Emit compact JSON")
 
     version_context_parser = subparsers.add_parser(
         "version-context",
@@ -159,6 +194,13 @@ def build_parser() -> argparse.ArgumentParser:
                 "--offline",
                 action="store_true",
                 help="Use existing official-source context without network checks",
+            )
+        if name == "validate":
+            parser_for_command.add_argument(
+                "--max-age-days",
+                type=int,
+                default=90,
+                help="Warn when last_verified_date is older than this many days.",
             )
 
     subparsers.add_parser("version", help="Print package version")
@@ -271,12 +313,32 @@ def main(argv: list[str] | None = None) -> int:
             args.project_root,
             target_org=args.target_org,
             max_items=args.max_items,
+            scan_root=getattr(args, "scan_root", False),
             progress=progress,
         )
         if args.json:
             print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
         else:
             print(format_knowledge_report(report, verbose=args.verbose), end="")
+        return 0 if report.ok else 1
+    if args.command == "memory":
+        report = run_memory(
+            args.memory_command,
+            args.project_root,
+            task_type=getattr(args, "task_type", None),
+            summary=getattr(args, "summary", None),
+            metadata=getattr(args, "metadata", None),
+            files=getattr(args, "file", None),
+            validation=getattr(args, "validation", None),
+            risk=getattr(args, "risk", None),
+            follow_up=getattr(args, "follow_up", None),
+            decision=getattr(args, "decision", None),
+            max_bytes=getattr(args, "max_bytes", DEFAULT_MEMORY_MAX_BYTES),
+        )
+        if args.json:
+            print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
+        else:
+            print(format_memory_report(report), end="")
         return 0 if report.ok else 1
     if args.command == "version-context":
         progress = None if args.json else print_progress
@@ -285,7 +347,11 @@ def main(argv: list[str] | None = None) -> int:
         elif args.version_context_command == "update":
             report = version_context_update(args.root, offline=args.offline, progress=progress)
         else:
-            report = version_context_validate(args.root, progress=progress)
+            report = version_context_validate(
+                args.root,
+                max_age_days=args.max_age_days,
+                progress=progress,
+            )
         if args.json:
             print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
         else:

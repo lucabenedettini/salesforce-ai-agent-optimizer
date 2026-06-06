@@ -21,10 +21,11 @@ Every version update must include:
 
 ## Current Version
 
-`2.0.0` adds the CLI-only agent tool registry, command facade, dynamic toolsets, compact SOQL helper, Permission Analyzer v2 summaries, real-org `sfao live-test`, compact metadata/schema output, and expanded mocked/live validation while preserving production read-only and destructive-operation guardrails.
+`2.1.0` adds compact project memory, safer `safe-run` classification, package-directory-first Knowledge scanning, stale version-context validation, lightweight quality evals, and specialized guidance for Apex, LWC, Flow, SOQL, deploy, and data operations while preserving production read-only and destructive-operation guardrails.
 
 ## Recent Stable Lines
 
+- `2.0.x`: CLI-only agent tool registry, command facade, dynamic toolsets, compact SOQL helper, Permission Analyzer v2 summaries, real-org `sfao live-test`, compact metadata/schema output, and expanded mocked/live validation.
 - `1.2.x`: installer, PATH, progress, and validation fixes.
 - `1.1.x`: Copilot project skill compatibility, eval installation, and metadata micro-validators.
 - `1.0.x`: public distribution baseline with stable install, update, uninstall, Knowledge, version-context, validation, build, release, and PyPI workflows.

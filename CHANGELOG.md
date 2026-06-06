@@ -8,6 +8,30 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.1.0] - 2026-06-06
+
+### Added
+
+- Added curated project memory at `.salesforce-agent-knowledge/memory.md` with `sfao memory init`, `sfao memory add`, `sfao memory compact`, and `sfao memory doctor`.
+- Added Knowledge scan optimization that prefers Salesforce DX `packageDirectories`, with `--scan-root` for intentional broad scans.
+- Added compact information-only mode for simple explanation-only questions that do not touch project files, org access, metadata, deploys, data, secrets, destructive actions, release-sensitive claims, implementations, or bugfixes.
+- Added lightweight specialized guidance for Apex, LWC, Flow, SOQL, deploy, and data operations with routed progressive disclosure.
+- Added optional external Salesforce skill interoperability guidance that keeps SFAO as the safety/governance layer.
+- Added iterative tool guardrails for repeated tool workflows with completion conditions and iteration caps.
+- Added deterministic quality evals for safety, workflow, Knowledge, memory, package.xml, interop, and loop guardrails.
+
+### Changed
+
+- Hardened `safe-run --safety` so manual overrides cannot downgrade automatic risk classification.
+- Improved version-context freshness messaging and added stale warnings to `sfao version-context validate --max-age-days`.
+- Updated README and wiki documentation for memory, compact mode, Knowledge scan scope, specialized guidance, external skill boundary, and safety override behavior.
+
+### Preserved
+
+- Salesforce CLI remains the only org-operation runtime.
+- Production orgs remain read-only for write and execute operations.
+- Existing install, update, uninstall, validation, Knowledge, package.xml, least-privilege, deletion, and secret-exposure guardrails remain backward compatible.
+
 ## [2.0.0] - 2026-06-06
 
 ### Added
