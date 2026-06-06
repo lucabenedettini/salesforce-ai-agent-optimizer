@@ -68,6 +68,7 @@ def test_readmes_document_main_sfao_commands_without_maintainer_noise() -> None:
         "sfao doctor --verbose",
         "sfao validate",
         "sfao validate --json",
+        "sfao report --project-root .",
         "sfao knowledge init --project-root .",
         "sfao knowledge refresh --project-root .",
         "sfao knowledge init --project-root . --scan-root",

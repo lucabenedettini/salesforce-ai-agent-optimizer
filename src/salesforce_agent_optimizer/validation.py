@@ -54,6 +54,55 @@ HIGH_RISK_USER_PERMISSIONS = {
     "ViewAllData",
 }
 HIGH_RISK_OBJECT_PERMISSIONS = {"allowDelete", "modifyAllRecords", "viewAllRecords"}
+ALLOWED_SFAO_COMMANDS = {
+    "version",
+    "install",
+    "update",
+    "uninstall",
+    "doctor",
+    "validate",
+    "knowledge",
+    "memory",
+    "version-context",
+    "command",
+    "soql",
+    "permissions",
+    "live-test",
+    "report",
+}
+DESTRUCTIVE_HINT_TERMS = (
+    "delete",
+    "destructive",
+    "purge",
+    "hard delete",
+    "uninstall package",
+    "data-record-delete",
+    "destructiveChanges",
+)
+DESTRUCTIVE_APPROVAL_TERMS = (
+    "explicit approval",
+    "separate explicit approval",
+    "delete approval",
+    "destructive approval",
+    "--delete-approval",
+)
+BROAD_SPECIALIZED_LOADING_PATTERNS = (
+    "read all specialized guidance",
+    "load all specialized guidance",
+    "load this whole folder",
+    "read the whole specialized-guidance folder",
+)
+PROHIBITED_GUARDRAIL_PHRASES = (
+    "skip SFAO guardrails",
+    "ignore SFAO guardrails",
+    "bypass SFAO guardrails",
+    "skip production read-only",
+    "ignore production read-only",
+    "skip destructive approval",
+    "ignore destructive approval",
+    "skip secret exposure approval",
+    "ignore secret exposure approval",
+)
 REQUIRED_COMPATIBILITY = {
     "agents": {"Codex", "Claude Code", "GitHub Copilot"},
     "platforms": {"Windows", "macOS", "Linux"},
@@ -99,6 +148,7 @@ SOURCE_REQUIRED_FILES = [
     "src/salesforce_agent_optimizer/validation.py",
     "src/salesforce_agent_optimizer/knowledge.py",
     "src/salesforce_agent_optimizer/memory.py",
+    "src/salesforce_agent_optimizer/report.py",
     "src/salesforce_agent_optimizer/version_context.py",
     "src/salesforce_agent_optimizer/templates/SKILL.md",
     "src/salesforce_agent_optimizer/templates/AGENTS.md",
@@ -549,6 +599,49 @@ def combine_with_section(text: str) -> str:
     return match.group(1).strip() if match else ""
 
 
+def markdown_section(text: str, heading: str) -> str:
+    match = re.search(rf"(?ms)^## {re.escape(heading)}\s*(.*?)(?=^## |\Z)", text)
+    return match.group(1).strip() if match else ""
+
+
+def extract_sfao_commands(text: str) -> list[str]:
+    return re.findall(r"(?<![\w-])sfao\s+([a-z][a-z0-9-]*)", text)
+
+
+def validate_sfao_command_hints(text: str, path: Path, result: ValidationResult) -> None:
+    relative = path.as_posix()
+    for command in extract_sfao_commands(markdown_section(text, "SFAO Command Hints")):
+        if command not in ALLOWED_SFAO_COMMANDS:
+            result.error(f"{relative} references unknown sfao command: {command}")
+
+
+def validate_destructive_hints(text: str, path: Path, result: ValidationResult) -> None:
+    section = markdown_section(text, "SFAO Command Hints")
+    if not section:
+        return
+    lowered = section.lower()
+    has_destructive = any(term.lower() in lowered for term in DESTRUCTIVE_HINT_TERMS)
+    has_approval = any(term.lower() in lowered for term in DESTRUCTIVE_APPROVAL_TERMS)
+    if has_destructive and not has_approval:
+        result.error(f"{path.as_posix()} has destructive command hints without approval wording")
+
+
+def validate_no_broad_specialized_loading(text: str, path: Path, result: ValidationResult) -> None:
+    for line in text.splitlines():
+        lowered = line.lower()
+        if "do not" in lowered or "never" in lowered:
+            continue
+        for phrase in BROAD_SPECIALIZED_LOADING_PATTERNS:
+            if phrase.lower() in lowered:
+                result.error(f"{path.as_posix()} asks agents to load too much specialized guidance")
+
+
+def validate_no_guardrail_bypass(text: str, path: Path, result: ValidationResult) -> None:
+    for phrase in PROHIBITED_GUARDRAIL_PHRASES:
+        if phrase in text:
+            result.error(f"{path.as_posix()} contains prohibited guardrail guidance: {phrase}")
+
+
 def validate_specialized_guidance_directory(
     guidance_dir: Path,
     references_base: Path,
@@ -573,9 +666,6 @@ def validate_specialized_guidance_directory(
     prohibited_fragments = [
         "forcedotcom/" + skill_suffix,
         skill_suffix,
-        "bypass SFAO guardrails",
-        "ignore SFAO guardrails",
-        "skip SFAO guardrails",
         "automatic install of external skills",
         "install external skills automatically",
     ]
@@ -600,6 +690,9 @@ def validate_specialized_guidance_directory(
         for fragment in prohibited_fragments:
             if fragment in text:
                 result.error(f"{relative_label} contains prohibited guidance: {fragment}")
+        validate_sfao_command_hints(text, Path(relative_label), result)
+        validate_destructive_hints(text, Path(relative_label), result)
+        validate_no_guardrail_bypass(text, Path(relative_label), result)
     index = guidance_dir / "index.md"
     if not index.exists():
         result.error(f"Missing specialized guidance index: {label}/index.md")
@@ -630,6 +723,8 @@ def validate_routing_references(root: Path, result: ValidationResult) -> None:
         relative = path.relative_to(root)
         if "Agentforce" not in text or "references/specialized-guidance/agentforce.md" not in text:
             result.error(f"{relative.as_posix()} must include Agentforce routing")
+        validate_no_broad_specialized_loading(text, relative, result)
+        validate_no_guardrail_bypass(text, relative, result)
         base = root
         if "templates" in path.parts:
             base = root / "src" / "salesforce_agent_optimizer" / "templates"

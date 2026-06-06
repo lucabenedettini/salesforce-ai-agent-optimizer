@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer es una CLI `sfao` y una skill para Codex, Claude Code y GitHub Copilot, publicada con licencia MIT.
 
-Version actual: `2.2.2`
+Version actual: `2.2.3`
 
 Ayuda a los agentes AI en proyectos Salesforce con planificacion Salesforce-first, configuracion antes que codigo custom, cambios minimos y reversibles, Knowledge local, uso eficiente de tokens con Salesforce CLI, least privilege, alias de org explicitos, conciencia de `package.xml` y guardrails para operaciones destructivas.
 
@@ -52,6 +52,7 @@ uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optim
 | `sfao doctor --verbose` | Muestra diagnostico detallado. Usalo para investigar warnings. | Analisis transparente. |
 | `sfao validate` | Valida archivos skill, versiones, adapters generados, formatos y guardrails de metadata Salesforce. Usalo antes de commit/release. | Quality gate. |
 | `sfao validate --json` | Produce validacion machine-readable. Usalo en CI o fases del agente. | Salida automatizable. |
+| `sfao report --project-root .` | Escribe un health snapshot Markdown local para adapters, Knowledge, memory, guardrails, guidance, evals y version context. Usalo antes de planificar o hacer handoff. | Estado local observable. |
 | `sfao knowledge init --project-root .` | Crea Knowledge local compacta del proyecto Salesforce. Usalo antes del primer planning. | Knowledge antes de metadata bruta. |
 | `sfao knowledge refresh --project-root .` | Actualiza Knowledge despues de cambios metadata. | Evidencia de planning fresca. |
 | `sfao knowledge init --project-root . --scan-root` | Ejecuta un escaneo amplio intencional. Usalo solo si `packageDirectories` no basta. | Scope eficiente en tokens. |
@@ -93,7 +94,7 @@ Para preguntas solo informativas, sin decision de proyecto, acceso a org, inspec
 - Consultar la Knowledge local antes de cambiar metadata Salesforce.
 - Usar `.salesforce-agent-knowledge/memory.md` para decisiones duraderas, lecciones, riesgos y follow-ups. Es memoria curada del proyecto, no un log bruto, y no debe contener secretos, datos de cliente, registros brutos ni logs grandes.
 - Knowledge usa por defecto las `packageDirectories` de Salesforce DX cuando existen; usar `--scan-root` solo para un escaneo amplio intencional.
-- La guia especializada Apex, LWC, Flow, SOQL, deploy y data operations se carga solo cuando es relevante.
+- La guia especializada Apex, LWC, Flow, SOQL, deploy, data operations y Agentforce se carga solo cuando es relevante.
 - Skills Salesforce externas son referencias opcionales si ya estan disponibles y nunca pueden saltarse los guardrails SFAO.
 - `safe-run --safety` no puede bajar la clasificacion automatica de riesgo.
 - Aplicar least privilege antes de cambios en acceso, sharing, UI, packages, integraciones o automatizaciones.

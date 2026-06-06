@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer 是一个 MIT 许可的 `sfao` CLI 和 agent skill，面向 Codex、Claude Code 与 GitHub Copilot。
 
-当前版本：`2.2.2`
+当前版本：`2.2.3`
 
 它帮助 AI agent 在 Salesforce 项目中执行 Salesforce-first 规划、配置优先于自定义代码、最小且可回滚的变更、本地 Knowledge、token-efficient Salesforce CLI 使用、least privilege、显式 org alias、`package.xml` 管理和破坏性操作 guardrail。
 
@@ -52,6 +52,7 @@ uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optim
 | `sfao doctor --verbose` | 输出详细诊断。排查 warnings 时使用。 | 透明分析。 |
 | `sfao validate` | 验证 skill 文件、版本、生成 adapters、格式和 Salesforce metadata guardrails。commit/release 前使用。 | 质量门禁。 |
 | `sfao validate --json` | 输出机器可读验证结果。CI 或 agent validation 阶段使用。 | 自动化友好。 |
+| `sfao report --project-root .` | 生成本地 Markdown health snapshot，覆盖 adapters、Knowledge、memory、guardrails、guidance、evals 与 version context。planning 或 handoff 前使用。 | 可观察的本地状态。 |
 | `sfao knowledge init --project-root .` | 创建紧凑的本地 Salesforce 项目 Knowledge。第一次 planning 前使用。 | 先 Knowledge，后原始 metadata。 |
 | `sfao knowledge refresh --project-root .` | metadata 变更后刷新 Knowledge。 | 新鲜 planning evidence。 |
 | `sfao knowledge init --project-root . --scan-root` | 执行有意的广范围扫描。仅在 `packageDirectories` 不够时使用。 | Token-efficient scope。 |
@@ -93,7 +94,7 @@ uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optim
 - 修改 Salesforce metadata 前先查询本地 Knowledge。
 - 使用 `.salesforce-agent-knowledge/memory.md` 保存项目本地的持久决策、经验、风险和 follow-up。它是 curated planning knowledge，不是原始日志，不能包含 secrets、客户数据、原始记录或大日志。
 - Knowledge 默认使用 Salesforce DX `packageDirectories`；只有需要有意进行全项目扫描时才使用 `--scan-root`。
-- Apex、LWC、Flow、SOQL、deploy 和 data operations 的专项 guidance 只在相关任务中加载。
+- Apex、LWC、Flow、SOQL、deploy、data operations 和 Agentforce 的专项 guidance 只在相关任务中加载。
 - 外部 Salesforce skills 只能作为已安装时的可选参考，不能绕过 SFAO guardrails。
 - `safe-run --safety` 不能降低自动风险分类。
 - 在访问、sharing、UI、package、integration 或 automation 变更前应用 least privilege。

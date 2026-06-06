@@ -21,7 +21,7 @@ Every version update must include:
 
 ## Current Version
 
-`2.2.2` strengthens specialized Salesforce guidance, adds lightweight Agentforce routing, and preserves the lightweight, safety-first command surface.
+`2.2.3` adds a local Markdown health report and hardens validation for specialized guidance command hints, destructive wording, routing efficiency, and Agentforce documentation consistency.
 
 ## Recent Stable Lines
 

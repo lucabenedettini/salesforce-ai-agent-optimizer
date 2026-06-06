@@ -15,6 +15,7 @@ Every version update must include:
 
 ## Current Version
 
+- `2.2.3`: local report and validation hardening patch for observable project health, command hints, destructive wording, routing efficiency, and Agentforce documentation consistency.
 - `1.2.2`: privacy and portability bugfix that removes local machine paths from distributed resources and makes `sfao doctor` PATH diagnostics generic.
 - `1.2.1`: command usability bugfix for PATH-safe pipx/pip update docs and visible Knowledge/version-context progress output.
 - `1.2.0`: Field Service Mobile and mobile Flow planning reference with mandatory web/mobile and online/offline specification preflight for larger work.

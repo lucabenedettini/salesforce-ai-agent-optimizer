@@ -8,6 +8,14 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.2.3] - 2026-06-07
+
+### Changed
+
+- Added `sfao report` for local Markdown health snapshots of installation, Knowledge, memory, guardrails, guidance, eval coverage, and version context.
+- Hardened validation for specialized guidance command hints, destructive-command wording, routing efficiency, and reference consistency.
+- Fixed README wording so specialized guidance consistently includes Agentforce.
+
 ## [2.2.2] - 2026-06-06
 
 ### Changed

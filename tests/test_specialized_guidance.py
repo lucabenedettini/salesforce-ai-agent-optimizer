@@ -5,8 +5,18 @@ from pathlib import Path
 
 from conftest import ROOT
 
+from salesforce_agent_optimizer.validation import (
+    ValidationResult,
+    validate_destructive_hints,
+    validate_no_broad_specialized_loading,
+    validate_no_guardrail_bypass,
+    validate_routing_references,
+    validate_sfao_command_hints,
+    validate_specialized_guidance_directory,
+)
 
-TARGET_VERSION = "2.2.2"
+
+TARGET_VERSION = "2.2.3"
 SPECIALIZED_DIR = ROOT / "src" / "salesforce_agent_optimizer" / "templates" / "references" / "specialized-guidance"
 TEMPLATE_REFERENCES = ROOT / "src" / "salesforce_agent_optimizer" / "templates" / "references"
 REQUIRED_HEADINGS = [
@@ -20,6 +30,150 @@ REQUIRED_HEADINGS = [
     "## Mini-Rubric",
     "## Output Hint",
 ]
+
+
+def guidance_text(command_hint: str = "- `sfao validate`") -> str:
+    return (
+        "# Test Guidance\n\n"
+        "## When To Read\n\nUse for tests.\n\n"
+        "## Combine With Existing References\n\n"
+        "- `references/privacy-security.md`\n\n"
+        "## Non-Negotiable Checks\n\n- Keep guardrails.\n\n"
+        "## Minimal Planning Evidence\n\n- Evidence.\n\n"
+        "## Preferred Approach\n\n- Minimal.\n\n"
+        "## Validation Expectations\n\n- Validate.\n\n"
+        "## SFAO Command Hints\n\n"
+        f"{command_hint}\n\n"
+        "## Mini-Rubric\n\n- Safe: yes/no\n\n"
+        "## Output Hint\n\nState concise evidence.\n"
+    )
+
+
+def test_unknown_sfao_command_hint_fails_validation() -> None:
+    result = ValidationResult()
+    validate_sfao_command_hints(
+        guidance_text("- `sfao magic-optimize --all`"),
+        Path("references/specialized-guidance/test.md"),
+        result,
+    )
+    assert not result.ok
+    assert "unknown sfao command: magic-optimize" in "\n".join(result.errors)
+
+
+def test_valid_sfao_command_hints_pass_validation() -> None:
+    result = ValidationResult()
+    validate_sfao_command_hints(
+        guidance_text(
+            "- `sfao knowledge refresh --project-root .`\n"
+            "- `sfao report --project-root .`\n"
+            "- `sfao command search \"deploy\" --toolset deploy`"
+        ),
+        Path("references/specialized-guidance/test.md"),
+        result,
+    )
+    assert result.ok, result.to_dict()
+
+
+def test_destructive_command_hint_without_approval_fails_validation() -> None:
+    result = ValidationResult()
+    validate_destructive_hints(
+        guidance_text(
+            "- `python scripts/sf_agent_cli.py data-record-delete --target-org dev "
+            "--sobject Account --record-id 001`"
+        ),
+        Path("references/specialized-guidance/test.md"),
+        result,
+    )
+    assert not result.ok
+    assert "destructive command hints without approval wording" in "\n".join(result.errors)
+
+
+def test_destructive_command_hint_with_approval_passes_validation() -> None:
+    result = ValidationResult()
+    validate_destructive_hints(
+        guidance_text(
+            "- `python scripts/sf_agent_cli.py data-record-delete --target-org dev "
+            "--sobject Account --record-id 001 --delete-approval "
+            "\"I explicitly approve this deletion\"`"
+        ),
+        Path("references/specialized-guidance/test.md"),
+        result,
+    )
+    assert result.ok, result.to_dict()
+
+
+def test_routing_path_references_must_exist(tmp_path: Path) -> None:
+    references = tmp_path / "references"
+    references.mkdir()
+    (references / "routing.md").write_text(
+        (
+            "| Request signal | Read these files |\n"
+            "| --- | --- |\n"
+            "| Agentforce | `references/specialized-guidance/agentforce.md`, "
+            "`references/missing.md` |\n"
+        ),
+        encoding="utf-8",
+    )
+    guidance = references / "specialized-guidance"
+    guidance.mkdir()
+    (guidance / "agentforce.md").write_text("# Agentforce\n", encoding="utf-8")
+
+    result = ValidationResult()
+    validate_routing_references(tmp_path, result)
+
+    assert not result.ok
+    assert "references missing file: references/missing.md" in "\n".join(result.errors)
+
+
+def test_guidance_cannot_instruct_bypassing_sfao_guardrails() -> None:
+    result = ValidationResult()
+    validate_no_guardrail_bypass(
+        "Do not skip SFAO guardrails.",
+        Path("references/specialized-guidance/test.md"),
+        result,
+    )
+    assert not result.ok
+    assert "skip SFAO guardrails" in "\n".join(result.errors)
+
+
+def test_routing_cannot_load_all_specialized_guidance_by_default() -> None:
+    result = ValidationResult()
+    validate_no_broad_specialized_loading(
+        "For every request, read all specialized guidance before planning.",
+        Path("references/routing.md"),
+        result,
+    )
+    assert not result.ok
+    assert "load too much specialized guidance" in "\n".join(result.errors)
+
+
+def test_specialized_guidance_directory_enforces_line_threshold(tmp_path: Path) -> None:
+    references = tmp_path / "references"
+    guidance = references / "specialized-guidance"
+    guidance.mkdir(parents=True)
+    (references / "privacy-security.md").write_text("# Privacy\n", encoding="utf-8")
+    (guidance / "index.md").write_text(
+        (
+            "# Index\n\n"
+            "Agentforce guidance: `agentforce.md`.\n"
+            "Do not load this whole folder by default.\n"
+            "Core SFAO safety always wins.\n"
+        ),
+        encoding="utf-8",
+    )
+    oversized = guidance_text() + "\n".join("- filler" for _ in range(230)) + "\n"
+    (guidance / "agentforce.md").write_text(oversized, encoding="utf-8")
+
+    result = ValidationResult()
+    validate_specialized_guidance_directory(
+        guidance,
+        references,
+        result,
+        "references/specialized-guidance",
+    )
+
+    assert not result.ok
+    assert "exceeds 220 lines" in "\n".join(result.errors)
 
 
 def read(path: Path) -> str:

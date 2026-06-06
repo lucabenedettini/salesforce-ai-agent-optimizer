@@ -15,6 +15,7 @@ from .knowledge import format_knowledge_report, run_knowledge
 from .live_tests import WRITE_CONFIRMATION, format_live_report, run_live_tests
 from .memory import DEFAULT_MEMORY_MAX_BYTES, format_memory_report, run_memory
 from .permission_analyzer import analyze_access_file
+from .report import generate_report
 from .soql import build_soql
 from .validation import validate_auto
 from .version_context import (
@@ -76,6 +77,15 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser.add_argument("--summary", action="store_true", help="Emit compact summary")
     validate_parser.add_argument("--compact", action="store_true", help="Emit compact summary")
     validate_parser.add_argument("--verbose", action="store_true", help="Emit validation details")
+
+    report_parser = subparsers.add_parser("report", help="Generate a static local Markdown health report")
+    report_parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    report_parser.add_argument("--format", choices=["md"], default="md")
+    report_parser.add_argument(
+        "--output",
+        type=Path,
+        help="Report output path. Defaults to .salesforce-agent-knowledge/reports/sfao-report.md",
+    )
 
     command_parser = subparsers.add_parser("command", help="Search and execute registered CLI facade tools")
     command_subparsers = command_parser.add_subparsers(dest="command_action", required=True)
@@ -259,6 +269,18 @@ def main(argv: list[str] | None = None) -> int:
             stream = sys.stdout if result.ok else sys.stderr
             print(output, end="", file=stream)
         return 0 if result.ok else 1
+    if args.command == "report":
+        result = generate_report(args.project_root, output=args.output, fmt=args.format)
+        if result.ok:
+            try:
+                display_path = result.output_path.relative_to(args.project_root.resolve())
+            except ValueError:
+                display_path = result.output_path
+            print(f"Generated SFAO report: {display_path}")
+            return 0
+        for error in result.errors:
+            print(f"ERROR: {error}", file=sys.stderr)
+        return 1
     if args.command == "command":
         if args.command_action == "search":
             payload = search_payload(args.query, args.toolset, args.root, args.limit)
