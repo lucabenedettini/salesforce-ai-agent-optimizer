@@ -8,6 +8,18 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.1.1] - 2026-06-06
+
+### Changed
+
+- Replaced the README command list with concise command tables in English, Italian, Spanish, and Simplified Chinese.
+- Added when-to-use guidance and the core principle behind each main `sfao` terminal command.
+- Updated the wiki command summary with the same command coverage for maintainers and advanced users.
+
+### Preserved
+
+- Existing CLI behavior, Salesforce safety guardrails, install/update/uninstall flow, Knowledge, memory, validation, and release processes remain unchanged.
+
 ## [2.1.0] - 2026-06-06
 
 ### Added

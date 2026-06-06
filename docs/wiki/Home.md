@@ -114,27 +114,32 @@ Aliases are allowed; secrets, tokens, auth URLs, passwords, and private keys mus
 
 ## `sfao` Command Summary
 
-| Command | Purpose |
-| --- | --- |
-| `sfao version` | Print installed package version. |
-| `sfao install` | Install all project-scoped adapters in the current project. |
-| `sfao update --project --platform all` | Refresh managed adapters and newly introduced templates. |
-| `sfao uninstall --project --platform all --yes` | Remove generated adapter files only. |
-| `sfao doctor` | Diagnose package, OS, Git, Salesforce CLI, adapters, PATH, and validation status. |
-| `sfao validate` | Validate source/install shape, versions, frontmatter, YAML/TOML/JSON/Python, generated adapters, and Salesforce metadata guardrails. |
-| `sfao knowledge init --project-root .` | Build compact local Salesforce project Knowledge. |
-| `sfao knowledge refresh --project-root .` | Refresh Knowledge after metadata changes. |
-| `sfao memory init --project-root .` | Create curated project memory. |
-| `sfao memory add --project-root . --task-type bugfix --summary "..."` | Add a compact durable memory entry. |
-| `sfao memory compact --project-root .` | Keep project memory token-efficient. |
-| `sfao memory doctor --project-root .` | Validate memory structure and secret redaction. |
-| `sfao version-context update` | Refresh release/API/package context from official Salesforce sources. |
-| `sfao command search` | Find a safe Salesforce CLI facade command from the internal registry. |
-| `sfao command payload-example` | Show a compact payload for a facade command. |
-| `sfao command execute` | Execute a registry payload through the Salesforce CLI facade. |
-| `sfao soql build` | Build focused SOQL plus a ready-to-run `data-query` payload. |
-| `sfao permissions explain` | Summarize why access exists from `access-inspect` output. |
-| `sfao live-test` | Run opt-in real-org CLI facade validation; write/destructive tests require sandbox/scratch evidence and explicit confirmation. |
+| Command | What it does / when to run it | Principle |
+| --- | --- | --- |
+| `sfao version` | Print installed package version after install or upgrade. | Version clarity. |
+| `sfao install` | Install project-scoped adapters in the current Salesforce repo. | Frictionless setup. |
+| `sfao install --project --platform all` | Explicitly install Codex, Claude Code, and GitHub Copilot adapters. | Agent compatibility. |
+| `sfao update --project --platform all` | Refresh managed generated files after package upgrades. | Safe upgrade. |
+| `sfao uninstall --project --platform all --yes` | Remove generated SFAO adapter files only. | Reversible changes. |
+| `sfao doctor` / `sfao doctor --verbose` | Diagnose package, OS, Git, Salesforce CLI, adapters, PATH, validation, and warnings. | Transparent diagnostics. |
+| `sfao validate` / `sfao validate --json` | Validate file shape, versions, frontmatter, formats, generated adapters, and Salesforce metadata guardrails. | Quality gate. |
+| `sfao knowledge init --project-root .` | Build compact local Salesforce project Knowledge before planning. | Knowledge before raw metadata. |
+| `sfao knowledge refresh --project-root .` | Refresh Knowledge after metadata changes. | Fresh planning evidence. |
+| `sfao knowledge init --project-root . --scan-root` | Intentionally scan beyond Salesforce DX packageDirectories. | Token-efficient scope control. |
+| `sfao knowledge doctor --project-root .` | Check Knowledge structure when missing or stale. | Reliable local context. |
+| `sfao memory init --project-root .` | Create curated project memory for durable decisions and lessons. | Compact durable memory. |
+| `sfao memory add --project-root . --task-type bugfix --summary "..."` | Add redacted decisions, lessons, risks, or follow-ups after work. | No raw logs, no secrets. |
+| `sfao memory compact --project-root . --max-bytes 60000` | Keep memory small enough for agent planning. | Token efficiency. |
+| `sfao memory doctor --project-root .` | Validate memory structure and redaction. | Privacy-safe memory. |
+| `sfao version-context scaffold` | Create version-context files when bootstrapping references. | Official-source readiness. |
+| `sfao version-context update` | Refresh release/API/package context from official Salesforce sources. | No invented behavior. |
+| `sfao version-context validate --max-age-days 90` | Check version-context freshness before release-sensitive planning. | Current API evidence. |
+| `sfao command search "permission account"` | Find a safe registered Salesforce CLI facade command before org access. | Discover before execute. |
+| `sfao command payload-example access-inspect` | Print compact payload examples to avoid invented flags. | Schema-guided commands. |
+| `sfao command execute --payload payload.json` | Execute a registered facade command with compact guardrails and explicit org alias where required. | Safe Salesforce CLI facade. |
+| `sfao soql build --object Account --fields Id,Name` | Build focused SOQL and a ready `data-query` payload. | Minimal data retrieval. |
+| `sfao permissions explain --input access.json` | Explain access evidence from `access-inspect` output. | Least-privilege planning. |
+| `sfao live-test --target-org <alias>` | Run opt-in real-org validation; write/destructive suites require non-production/scratch evidence and explicit confirmation. | Real validation with consent. |
 
 ## Installed Paths
 

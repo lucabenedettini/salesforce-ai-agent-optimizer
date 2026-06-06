@@ -21,10 +21,11 @@ Every version update must include:
 
 ## Current Version
 
-`2.1.0` adds compact project memory, safer `safe-run` classification, package-directory-first Knowledge scanning, stale version-context validation, lightweight quality evals, and specialized guidance for Apex, LWC, Flow, SOQL, deploy, and data operations while preserving production read-only and destructive-operation guardrails.
+`2.1.1` documents every user-facing `sfao` terminal command in the multilingual README files and wiki while preserving the lightweight, safety-first command surface.
 
 ## Recent Stable Lines
 
+- `2.1.x`: compact project memory, safer `safe-run` classification, package-directory-first Knowledge scanning, stale version-context validation, lightweight quality evals, specialized guidance, and command documentation.
 - `2.0.x`: CLI-only agent tool registry, command facade, dynamic toolsets, compact SOQL helper, Permission Analyzer v2 summaries, real-org `sfao live-test`, compact metadata/schema output, and expanded mocked/live validation.
 - `1.2.x`: installer, PATH, progress, and validation fixes.
 - `1.1.x`: Copilot project skill compatibility, eval installation, and metadata micro-validators.

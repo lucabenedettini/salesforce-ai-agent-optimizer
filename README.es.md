@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer es una CLI `sfao` y una skill para Codex, Claude Code y GitHub Copilot, publicada con licencia MIT.
 
-Version actual: `2.1.0`
+Version actual: `2.1.1`
 
 Ayuda a los agentes AI en proyectos Salesforce con planificacion Salesforce-first, configuracion antes que codigo custom, cambios minimos y reversibles, Knowledge local, uso eficiente de tokens con Salesforce CLI, least privilege, alias de org explicitos, conciencia de `package.xml` y guardrails para operaciones destructivas.
 
@@ -39,28 +39,34 @@ uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optim
 
 ## Comandos Principales
 
-```bash
-sfao version
-sfao install
-sfao install --project --platform all
-sfao update --project --platform all
-sfao uninstall --project --platform all --yes
-sfao doctor
-sfao doctor --verbose
-sfao validate
-sfao validate --json
-sfao knowledge init --project-root .
-sfao knowledge refresh --project-root .
-sfao knowledge init --project-root . --scan-root
-sfao knowledge doctor --project-root .
-sfao memory init --project-root .
-sfao memory add --project-root . --task-type bugfix --summary "..."
-sfao memory compact --project-root . --max-bytes 60000
-sfao memory doctor --project-root .
-sfao version-context scaffold
-sfao version-context update
-sfao version-context validate --max-age-days 90
-```
+| Comando | Que hace y cuando usarlo | Principio |
+| --- | --- | --- |
+| `sfao version` | Muestra la version instalada. Usalo despues de install o upgrade. | Claridad de version. |
+| `sfao install` | Instala adapters project-scoped para los agentes soportados. Usalo una vez por proyecto Salesforce. | Setup sin friccion. |
+| `sfao install --project --platform all` | Instalacion explicita para Codex, Claude Code y GitHub Copilot. Usalo al incorporar un repo. | Compatibilidad de agentes. |
+| `sfao update --project --platform all` | Actualiza adapters y templates generados despues de subir version del paquete. | Upgrade seguro. |
+| `sfao uninstall --project --platform all --yes` | Elimina solo archivos SFAO generados. Usalo para quitar la skill del proyecto. | Cambios reversibles. |
+| `sfao doctor` | Revisa Python, OS, Git, Salesforce CLI, adapters, PATH y validacion. Usalo despues de install/update o si la skill no aparece. | Diagnostico temprano. |
+| `sfao doctor --verbose` | Muestra diagnostico detallado. Usalo para investigar warnings. | Analisis transparente. |
+| `sfao validate` | Valida archivos skill, versiones, adapters generados, formatos y guardrails de metadata Salesforce. Usalo antes de commit/release. | Quality gate. |
+| `sfao validate --json` | Produce validacion machine-readable. Usalo en CI o fases del agente. | Salida automatizable. |
+| `sfao knowledge init --project-root .` | Crea Knowledge local compacta del proyecto Salesforce. Usalo antes del primer planning. | Knowledge antes de metadata bruta. |
+| `sfao knowledge refresh --project-root .` | Actualiza Knowledge despues de cambios metadata. | Evidencia de planning fresca. |
+| `sfao knowledge init --project-root . --scan-root` | Ejecuta un escaneo amplio intencional. Usalo solo si `packageDirectories` no basta. | Scope eficiente en tokens. |
+| `sfao knowledge doctor --project-root .` | Verifica estructura de Knowledge. Usalo si el agente reporta Knowledge faltante o stale. | Contexto local confiable. |
+| `sfao memory init --project-root .` | Crea memoria curada de proyecto. Usalo para aprendizaje duradero. | Memoria compacta. |
+| `sfao memory add --project-root . --task-type bugfix --summary "..."` | Agrega una leccion, decision, riesgo o follow-up redactado. Usalo tras implementacion o validacion. | Sin logs brutos ni secretos. |
+| `sfao memory compact --project-root . --max-bytes 60000` | Mantiene la memoria pequena y util. Usalo cuando crece demasiado. | Eficiencia de tokens. |
+| `sfao memory doctor --project-root .` | Valida estructura y redaccion de memoria. Usalo antes de usarla en planning. | Memoria privacy-safe. |
+| `sfao version-context scaffold` | Crea archivos version-context si faltan. Usalo para bootstrap de referencias. | Preparacion de fuentes oficiales. |
+| `sfao version-context update` | Actualiza release/API context desde fuentes oficiales Salesforce. Usalo cuando el contexto esta stale o es sensible a release. | No inventar comportamiento. |
+| `sfao version-context validate --max-age-days 90` | Revisa frescura del version-context. Usalo en validacion o planning sensible a release. | Evidencia API actual. |
+| `sfao command search "permission account"` | Busca en el registry interno seguro de la Salesforce CLI facade. Usalo antes de comandos org. | Descubrir antes de ejecutar. |
+| `sfao command payload-example access-inspect` | Muestra un payload compacto para un comando registrado. Usalo para evitar flags inventados. | Comandos guiados por schema. |
+| `sfao command execute --payload payload.json` | Ejecuta un comando registrado mediante guardrails compactos. Usalo solo con alias org explicito cuando sea requerido. | Salesforce CLI facade segura. |
+| `sfao soql build --object Account --fields Id,Name` | Construye SOQL focalizado y payload `data-query`. Usalo antes de consultar datos org. | Recuperacion minima de datos. |
+| `sfao permissions explain --input access.json` | Resume evidencia de acceso desde output `access-inspect`. Usalo para least-privilege planning. | Acceso explicable. |
+| `sfao live-test --target-org <alias>` | Ejecuta pruebas opt-in contra org real. Usa write/destructive suite solo con alias sandbox/scratch explicito. | Validacion real con consentimiento. |
 
 Para operaciones con org, el agente debe pedir un alias explicito. Las orgs de produccion son read-only mediante los guardrails de la skill.
 
