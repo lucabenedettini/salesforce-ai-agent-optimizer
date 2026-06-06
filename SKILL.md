@@ -16,57 +16,62 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 1.2.3
+  version: 2.0.0
 ---
 
 # Salesforce Agent Optimizer
 
-Use this skill for Salesforce solution design, implementation, review, validation, metadata/package.xml work, org inspection, release/API version context, and safe agent delivery.
+Use this skill for Salesforce solution design, metadata/code changes, org inspection, package.xml work, validation, release/API context, and safe agent delivery.
 
-## First Reads
+## Start
 
-Start with `references/routing.md`. Load only the rows needed for the user's request, then read `references/delivery-methodology.md` for implementation work.
+Read `references/routing.md` first, then only the task-relevant references and local Knowledge. For implementation work, read `references/delivery-methodology.md`.
 
-For every Salesforce task:
+Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show the visible phase gate below.
 
+## Response Contract
+
+Every Salesforce project request must show these compact phases, even for information-only answers:
+
+- `Request review`: requirement, scope, target org/environment if known, products/packages, acceptance criteria, and `Tool/command`.
+- `Specification preflight`: ask Salesforce web/desktop, Salesforce mobile, Field Service mobile, online behavior, and offline behavior only when new functionality, new metadata, complex bugfix, or heavy rework needs it.
+- `Planning evidence`: routed references, Knowledge/history, product/package context, metadata dependencies, least privilege, release/API context, and planned tool/command.
+- `Approval`: required before file, metadata, org, deploy, or destructive changes; separate approval is required for destructive scope.
+- `Implementation`: approved minimal change, or `not required` for information-only work.
+- `Validation`: evidence re-check, `sfao validate`, tests, micro-validator, org facade command, or independent validation pass.
+- `Completion`: outcome, changed/no-change result, validation, risks, optional artifact prompt, and push/branch question when repo changes exist.
+
+If no tool is used in a phase, write `Tool/command: none`. For Salesforce org operations, show the compact `sfao`, `scripts/sf_agent_cli.py`, or official `sf` command shape with aliases and secrets redacted.
+
+If any gate was skipped, stop, acknowledge the miss, and restart from request review and planning.
+
+## Core Rules
+
+- Apply this skill before generic agent guidance whenever the task touches Salesforce metadata, org behavior, release work, package.xml, Apex, LWC, Flow, permissions, packages, or Salesforce data.
 - Prefer Salesforce standard capabilities, setup configuration, Flow, permission sets, UI API/LDS, named credentials, and managed packages before Apex, LWC, triggers, or custom integrations.
 - Keep patches minimal, reversible, and scoped to the approved request.
-- Consult `.salesforce-agent-knowledge/` before modifying a project; run `/sf-init-project-skill` when Knowledge is missing, stale, or requested.
+- Consult `.salesforce-agent-knowledge/` before modifying a Salesforce project. If it is missing or stale, propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
+- Do not retrieve or parse all org metadata, all objects, or all fields unless the user asks for broad analysis or the task cannot be planned safely without it.
 - Apply least privilege in planning and inspect current org permissions when access, sharing, UI exposure, packages, integrations, automation, or users are affected.
-- Never invent Salesforce behavior. Ask the user or present scenarios when product behavior, package version, org state, record scope, or permission scope is unclear.
+- Apply privacy and security review before org access, data reads, deploys, auth, secrets, integrations, Experience/guest access, AI/data activation, analytics, exports, Knowledge generation, or documentation that could include customer data. Read `references/privacy-security.md` when any of these apply.
+- Always evaluate multi-country and multi-currency impact during planning.
+- Never invent Salesforce behavior. Ask the user, present scenarios, or check official Salesforce documentation when evidence is unclear or release-sensitive.
 - Never delete Salesforce data or metadata automatically. Read `references/deletion-guardrails.md` and require separate explicit approval for the exact destructive scope.
-- Use official Salesforce documentation when local guidance is missing, uncertain, or release-sensitive.
-- Optimize tokens at every step: load only the smallest relevant reference, summarize long logs, prefer diffs and paths over pasted files, and compact task context after each meaningful iteration.
+- Never expose Salesforce credentials, access tokens, auth URLs, private keys, connected-app secrets, session material, customer data, or personal data unless the user explicitly approves the exact scope and safer alternatives are insufficient.
+- Generate `package.xml` for added or modified metadata before validation handoff.
+- After implementation, ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
+- Stay autonomous and CLI-only: do not depend on, install, vendor, or require external skill libraries or runtime tool servers. Use external tools only as public benchmarks, not as runtime dependencies.
+- Optimize tokens at every step: load only the smallest relevant reference, use indexes/diffs/selectors, summarize long logs, and compact task context after meaningful steps.
 
-## Mandatory Phase Gates
+## Salesforce CLI Facade
 
-For every Salesforce project request, run the functional phases below. Do not skip them for metadata-information questions, bugfixes, new metadata implementations, architecture work, reviews, or release tasks. Keep each phase compact, but make the phase outcome visible to the user.
+Use `scripts/sf_agent_cli.py` before direct `sf` calls for org access. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
 
-Non-negotiable preflight:
+Secret-exposure commands through `safe-run` are blocked unless the user explicitly approves the exact secret scope with:
 
-- Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show a compact phase-gate response with request review, planned references/Knowledge to consult, implementation status, and approval need.
-- Before planning or answering, read `references/routing.md`, then the smallest relevant references, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history when present.
-- If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
-- Before planning new functionality, new metadata, complex bugfixes, or heavy rework, ask whether the solution must cover Salesforce web/desktop, Salesforce mobile, Field Service mobile, online use, and offline use when the request does not say so.
-- Every response must make the current phase visible with short labels: `Request review`, `Planning evidence`, `Approval`, `Implementation`, `Validation`, and `Completion`. For information-only requests, write `Implementation: not required`.
-- After implementation, explicitly ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
-- If these gates were skipped, stop, acknowledge the miss, and restart from request review and planning.
-
-1. Request review: restate the request, target org/environment, products/packages, scope, and acceptance criteria. Ask only high-value questions that cannot be discovered safely.
-2. Planning: read the routed references, project Knowledge, metadata history, product/package context, dependencies, least-privilege guidance, and release/API context needed for the task. Always evaluate whether the project or requirement is multi-country or multi-currency and account for locale, currency, Advanced Currency Management, price books, tax, translations, compliance, and country-specific automation when relevant. When Field Service Mobile, mobile flows, briefcases, sync, or offline behavior can matter, read `references/field-service-mobile-flow.md`. Produce a configuration-first plan, including evidence sources and web/mobile plus online/offline coverage. For information-only requests, plan the answer path and state that no implementation is expected.
-3. Approval gate: ask for approval before any file, metadata, org, or deployable change. Ask separately for destructive operations. If no implementation is needed, say so and continue to validation.
-4. Implementation: implement only the approved minimal changes. If the request is information-only, mark this phase as `not required`.
-5. Manifest/artifact gate: when metadata is added or modified, generate `package.xml` before validation handoff. Ask about optional release notes, technical specs, impact assessment, user testing, and manual procedures after implementation.
-6. Validation: validate the result before final answer. For information-only requests, re-check the cited metadata/Knowledge/source evidence. For implementation requests, run tests/static checks or an independent validation pass.
-   Use `sfao validate` when available to run lightweight checks for Apex, Flow, LWC, permissions, and `package.xml` in Salesforce DX projects.
-7. Failure loop: if approval, tests, or validation fail, return to planning with a smaller revised plan. Stop after three unsuccessful cycles and restart from requirements.
-8. Completion: summarize final requirements, evidence, changes or no-change result, validation, risks, and ask whether to push and which branch when repository changes exist.
-
-After each meaningful step, compact the current task context with: goal, state, changed files, commands executed, validation status, risks, and next minimal action. Remove repeated explanations, raw logs when summaries are enough, duplicate file contents, stale assumptions, and irrelevant metadata. Preserve safety warnings, validation errors, permission impacts, destructive-operation scope, and package.xml/deployment scope.
-
-## Salesforce CLI
-
-Use `scripts/sf_agent_cli.py` for org access. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
+```text
+I explicitly approve exposing Salesforce secrets
+```
 
 Common compact commands:
 
@@ -77,14 +82,22 @@ python scripts/sf_agent_cli.py access-inspect --target-org <alias> --username us
 python scripts/sf_agent_cli.py deploy-preview --target-org <alias> --source-dir force-app --select result
 ```
 
+Use the internal command registry before choosing facade commands:
+
+```bash
+sfao command search "permission access" --toolset permissions
+sfao command payload-example access-inspect
+sfao command execute --payload payload.json
+```
+
 ## Slash Commands
 
-- `/sf-init-project-skill`: wrapper for `sfao knowledge init --project-root .`; read `references/knowledge-init.md`.
-- `/sf-version-update-skill`: wrapper for `sfao version-context scaffold` and `sfao version-context update`; read `references/version-update.md`.
+- `/sf-init-project-skill`: run `sfao knowledge init --project-root .`; read `references/knowledge-init.md`.
+- `/sf-version-update-skill`: run `sfao version-context scaffold` or `sfao version-context update`; read `references/version-update.md`.
 
 ## Adapter Maintenance
 
-Agent-specific instruction files are generated from canonical sources. After changing `SKILL.md`, `references/routing.md`, or `references/agent-instruction-spine.md`, run:
+Agent adapter files are generated from canonical sources. After changing this file, `references/routing.md`, or `references/agent-instruction-spine.md`, run:
 
 ```bash
 python scripts/sync_agent_instructions.py

@@ -2,15 +2,11 @@
 
 [English](README.md) | [Italiano](README.it.md) | [Espanol](README.es.md) | [Simplified Chinese](README.zh-CN.md)
 
-Salesforce Agent Optimizer es una skill Salesforce con licencia MIT distribuida
-como comando `sfao` para Codex, Claude Code y GitHub Copilot.
+Salesforce Agent Optimizer es una CLI `sfao` y una skill para Codex, Claude Code y GitHub Copilot, publicada con licencia MIT.
 
-Version actual: `1.2.3`
+Version actual: `2.0.0`
 
-Instala instrucciones para agentes que aplican solutioning Salesforce-first,
-configuracion antes de codigo custom, cambios minimos y reversibles, Knowledge
-eficiente en tokens, least privilege, aliases org explicitos, conciencia de
-`package.xml` y guardrails para operaciones destructivas.
+Ayuda a los agentes AI en proyectos Salesforce con planificacion Salesforce-first, configuracion antes que codigo custom, cambios minimos y reversibles, Knowledge local, uso eficiente de tokens con Salesforce CLI, least privilege, alias de org explicitos, conciencia de `package.xml` y guardrails para operaciones destructivas.
 
 ## Quick Start
 
@@ -21,163 +17,71 @@ sfao knowledge init --project-root .
 sfao doctor
 ```
 
-Usa `uv tool install` o `pipx install` para aislar la CLI. `pip install`
-funciona, pero los instaladores aislados suelen evitar problemas de PATH y
-dependencias.
-`sfao install` sin flags instala en el proyecto actual; usa `--user` solo
-cuando quieras una instalacion HOME-scoped.
+Usa `uv tool install` o `python -m pipx install` para instalaciones CLI aisladas. `python -m pip install` tambien funciona cuando quieres `sfao` en el entorno Python activo.
 
 ## Instalacion
-
-Recomendado:
 
 ```bash
 uv tool install salesforce-agent-optimizer
 sfao install
-sfao doctor
+sfao validate
 ```
 
-Alternativa:
+Alternativas:
 
 ```bash
 python -m pipx install salesforce-agent-optimizer
-sfao install
-sfao doctor
-```
-
-Instalacion directa desde GitHub antes o fuera de la publicacion PyPI:
-
-```bash
-uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install
-sfao doctor
-```
-
-`pip` simple es aceptable cuando quieres el comando en el entorno Python activo:
-
-```bash
 python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
-sfao install
-sfao doctor
+uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 ```
 
-## Comandos `sfao` Principales
+`sfao install` instala adaptadores project-scoped para todos los agentes soportados. Usa `sfao install --user --platform all` solo cuando quieres una instalacion Codex/Claude a nivel usuario.
 
-| Comando | Para que sirve |
-| --- | --- |
-| `sfao version` | Muestra la version instalada. |
-| `sfao install` | Instala todos los adapters project-scoped y recursos locales en el proyecto actual. |
-| `sfao install --project --platform all` | Instala los adapters Codex, Claude Code y GitHub Copilot en el proyecto actual. |
-| `sfao install --user --platform all` | Instala archivos user-scoped Codex y Claude Code bajo HOME. |
-| `sfao install --project --platform codex` | Instala solo la skill Codex en `.agents/skills/`. |
-| `sfao install --project --platform claude` | Instala solo la skill Claude Code en `.claude/skills/`. |
-| `sfao install --project --platform copilot` | Instala skill project-scoped GitHub Copilot, instrucciones de repositorio, instrucciones path-specific y `AGENTS.md`. |
-| `sfao update --project --platform all` | Actualiza archivos generados/gestionados y agrega nuevos templates gestionados; los archivos generados pero editados por el usuario se omiten. |
-| `sfao uninstall --project --platform all --yes` | Elimina solo adapters generados; conserva carpetas del proyecto y archivos de usuario. |
-| `sfao doctor` | Revisa entorno local, adapters instalados, Salesforce CLI y problemas comunes de PATH. |
-| `sfao doctor --verbose` | Muestra diagnostico completo. |
-| `sfao doctor --json` | Muestra diagnostico compacto en JSON. |
-| `sfao validate` | Valida instalacion o fuentes: frontmatter, YAML, TOML, JSON, Python, versiones, newlines y controles Salesforce metadata ligeros. |
-| `sfao validate --verbose` | Muestra detalles utiles para troubleshooting. |
-| `sfao validate --json` | Muestra resultados de validacion compactos en JSON. |
-| `sfao knowledge init --project-root .` | Crea `.salesforce-agent-knowledge/` para un proyecto Salesforce. |
-| `sfao knowledge refresh --project-root .` | Actualiza Knowledge local despues de cambios metadata y muestra avance si no usas `--json`. |
-| `sfao knowledge doctor --project-root .` | Revisa si la Knowledge local existe y es usable. |
-| `sfao knowledge refresh --project-root . --target-org <alias>` | Enriquece opcionalmente la Knowledge desde una org. El alias debe ser explicito. |
-| `sfao version-context scaffold` | Crea archivos locales de contexto release/API Salesforce si faltan. |
-| `sfao version-context update` | Actualiza guidance Salesforce release/API/package desde fuentes oficiales y muestra avance si no usas `--json`. |
-| `sfao version-context validate` | Revisa los archivos de version-context. |
-
-## Que Se Instala
-
-Codex:
-
-```text
-.agents/skills/salesforce-agent-optimizer/SKILL.md
-.agents/skills/salesforce-agent-optimizer/references/
-.agents/skills/salesforce-agent-optimizer/scripts/
-.agents/skills/salesforce-agent-optimizer/agents/openai.yaml
-```
-
-Claude Code:
-
-```text
-.claude/skills/salesforce-agent-optimizer/SKILL.md
-.claude/skills/salesforce-agent-optimizer/references/
-.claude/skills/salesforce-agent-optimizer/scripts/
-```
-
-GitHub Copilot:
-
-```text
-AGENTS.md
-.github/skills/salesforce-agent-optimizer/SKILL.md
-.github/skills/salesforce-agent-optimizer/references/
-.github/skills/salesforce-agent-optimizer/scripts/
-.github/copilot-instructions.md
-.github/instructions/salesforce-agent-optimizer.instructions.md
-```
-
-Trigger evals:
-
-```text
-evals/salesforce-agent-optimizer-trigger-evals.json
-```
-
-Los archivos generados contienen:
-
-```md
-<!-- Generated by salesforce-agent-optimizer. Managed by sfao. -->
-```
-
-`sfao` nunca sobrescribe ni elimina archivos del usuario en silencio. Cuando
-`AGENTS.md`, `AGENT.md`, `agent.md`, `agents.md` o
-`.github/copilot-instructions.md` ya existen, `sfao` agrega o actualiza una
-seccion gestionada Salesforce Agent Optimizer y conserva el resto del archivo.
-
-## Workflow Del Agente
-
-Despues de la instalacion, las instrucciones del agente requieren el mismo
-workflow por fases para preguntas informativas sobre metadata, bugfixes, nuevas
-implementaciones, arquitectura, reviews, releases e inspeccion de org:
-
-1. Revisar la solicitud y resumir scope, productos/packages, org/ambiente y criterios de aceptacion.
-2. Planificar desde referencias relevantes, Knowledge local, dependencias metadata, least privilege, impacto multi-country/multi-currency y fuentes oficiales Salesforce cuando haga falta.
-3. Pedir aprobacion antes de cambios en archivos, metadata, org, deployables o acciones destructivas.
-4. Implementar solo cambios minimos aprobados, o marcar implementacion como `not required` para solicitudes informativas.
-5. Generar `package.xml` cuando se agregue o modifique metadata.
-6. Validar antes de la respuesta final.
-7. Volver a planificacion tras aprobacion, tests o validacion fallidos; detenerse tras tres ciclos sin exito.
-8. Resumir evidencia, cambios o resultado sin cambios, validacion, riesgos y preguntar si hacer push y a que branch cuando existan cambios en el repositorio.
-
-## Knowledge Y Version Context
-
-Crear o actualizar Knowledge local compacta:
+## Comandos Principales
 
 ```bash
+sfao version
+sfao install
+sfao install --project --platform all
+sfao update --project --platform all
+sfao uninstall --project --platform all --yes
+sfao doctor
+sfao doctor --verbose
+sfao validate
+sfao validate --json
 sfao knowledge init --project-root .
 sfao knowledge refresh --project-root .
 sfao knowledge doctor --project-root .
-```
-
-Los comandos Knowledge sin `--json` muestran avance mientras escanean, resumen
-y escriben paginas metadata. Usa `--json` para salida compacta de automatizacion.
-
-Actualizar contexto Salesforce release/API/package:
-
-```bash
 sfao version-context scaffold
 sfao version-context update
 sfao version-context validate
 ```
 
-Los comandos version-context sin `--json` muestran avance mientras escriben
-archivos y revisan fuentes oficiales Salesforce. Usa
-`sfao version-context update --offline` para saltar controles de red.
+Para operaciones con org, el agente debe pedir un alias explicito. Las orgs de produccion son read-only mediante los guardrails de la skill.
 
-El acceso a org nunca es implicito. Cuando un comando necesita metadata o datos
-Salesforce, el agente debe pedir un alias explicito. Las orgs de produccion son
-read-only mediante los guardrails de la skill.
+## Flujo Del Agente
+
+Los agentes instalados deben seguir las mismas fases visibles para preguntas informativas, bugfixes, implementaciones, arquitectura, reviews, inspeccion de org y releases:
+
+1. `Request review`
+2. `Planning evidence`
+3. `Approval`
+4. `Implementation`
+5. `Validation`
+6. `Completion`
+
+En cada fase el agente debe indicar el tool o comando que esta usando o planeando. Para acceso Salesforce CLI debe mostrar la forma compacta del comando `sfao`, `scripts/sf_agent_cli.py` o `sf`, con alias y secretos redactados.
+
+## Seguridad
+
+- Preferir configuracion Salesforce, Flow, permission sets, UI API/LDS, named credentials y managed packages antes que codigo custom.
+- Consultar la Knowledge local antes de cambiar metadata Salesforce.
+- Aplicar least privilege antes de cambios en acceso, sharing, UI, packages, integraciones o automatizaciones.
+- No recuperar ni parsear todos los metadata de la org salvo peticion amplia o necesidad real.
+- No borrar datos o metadata sin aprobacion separada para el alcance exacto.
+- No exponer secretos Salesforce ni datos de cliente sin aprobacion separada para el alcance exacto.
+- Generar `package.xml` para metadata agregados o modificados.
+- Despues de implementar, preguntar si se deben generar release notes, especificaciones tecnicas, impact assessment, user testing y manual procedures.
 
 ## Update
 
@@ -187,20 +91,11 @@ sfao update --project --platform all
 sfao doctor
 ```
 
-Alternativa:
+Alternativas:
 
 ```bash
 python -m pipx upgrade salesforce-agent-optimizer
-sfao update --project --platform all
-sfao doctor
-```
-
-`pip` simple:
-
-```bash
 python -m pip install --upgrade salesforce-agent-optimizer
-sfao update --project --platform all
-sfao doctor
 ```
 
 ## Uninstall
@@ -213,73 +108,13 @@ uv tool uninstall salesforce-agent-optimizer
 Alternativa:
 
 ```bash
-sfao uninstall --project --platform all --yes
 python -m pipx uninstall salesforce-agent-optimizer
 ```
 
-## Privacidad Y Seguridad
-
-- No commits credenciales Salesforce, `.sf/`, `.sfdx/`, archivos auth, tokens, claves privadas o secretos locales.
-- Least privilege es obligatorio en planificacion: inspecciona el acceso actual y concede solo el minimo necesario.
-- Operaciones destructivas sobre datos o metadata requieren aprobacion explicita del scope exacto.
-- Operaciones CLI destructivas requieren la frase exacta `I explicitly approve this deletion`.
-- Knowledge guarda resumenes y hashes compactos, no secretos raw.
-
-## Troubleshooting
-
-`sfao: command not found`
-
-- Ejecuta `uv tool update-shell`, abre una nueva terminal o agrega la carpeta del tool al PATH.
-- En Windows, revisa la carpeta Scripts de usuario indicada por `pip`.
-
-`uv: command not found`
-
-- Instala `uv`, o usa `python -m pipx install salesforce-agent-optimizer`.
-
-`pipx: command not found`
-
-- Usa `python -m pipx ...`.
-- Si falta el modulo, instalalo con `python -m pip install --user pipx` y luego ejecuta `python -m pipx ensurepath`.
-
-`pip upgrade` no es un comando
-
-- Usa `python -m pip install --upgrade salesforce-agent-optimizer`.
-
-Paquete no encontrado en PyPI
-
-- Usa la instalacion desde GitHub hasta que el paquete este publicado en PyPI.
-
-Salesforce CLI `sf` no encontrada
-
-- Instala la Salesforce CLI oficial y verifica `sf --version`.
-
-Skill no visible en Codex, Claude Code o GitHub Copilot
-
-- Ejecuta otra vez el comando `sfao install --project --platform ...` correcto.
-- Reinicia la superficie agente si cachea instrucciones.
-- Ejecuta `sfao doctor` y `sfao validate`.
-- Para Copilot, verifica que exista `.github/skills/salesforce-agent-optimizer/SKILL.md`.
-
-Archivos generados obsoletos o mismatch de version
-
-- Ejecuta `sfao update --project --platform all`.
-- Ejecuta `sfao validate --verbose`.
-
 ## Mas Documentacion
 
-Los detalles de usuario y maintainer viven en la wiki bajo `docs/wiki/`:
-
-- `docs/wiki/Home.md`
-- `docs/wiki/Installation.md`
-- `docs/wiki/Packaging-And-Publishing.md`
-- `docs/wiki/Principles.md`
-- `docs/wiki/Testing-And-Manifests.md`
-- `docs/wiki/Versioning.md`
-
-Los detalles de build, release, publishing y mantenimiento del paquete quedan
-fuera del README para mantener corto el flujo de usuario.
+Los detalles de instalacion, comandos, troubleshooting, publishing, release y versioning estan en `docs/wiki/`.
 
 ## Licencia
 
-MIT. Cualquier persona puede usar, copiar, modificar, distribuir y forkear este
-repositorio bajo los terminos de `LICENSE`.
+MIT. Cualquiera puede usar, copiar, modificar, distribuir y hacer fork de este repositorio bajo los terminos de `LICENSE`.

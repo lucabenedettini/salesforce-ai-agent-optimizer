@@ -53,7 +53,7 @@ jobs:
         run: python -m build
 
       - name: Check distributions
-        run: python -m twine check dist/*
+        run: python -m twine check dist/*.whl dist/*.tar.gz
 
       - name: Build release artifacts
         run: python scripts/build_release_artifacts.py

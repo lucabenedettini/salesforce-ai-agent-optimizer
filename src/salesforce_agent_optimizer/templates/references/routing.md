@@ -8,6 +8,7 @@ Read this file before planning. Load only the references needed for the current 
 | Product or AppExchange package mentioned or implied | `references/products-packages/index.md`, then only matching files under `references/products-packages/products/` or `references/products-packages/packages/` |
 | Metadata dependency planning, security model, layouts, pages, record types, picklists, sharing, analytics, mobile exposure | `references/metadata-dependencies.md`, `references/least-privilege-planning.md` |
 | Least-privilege access, permission sets, permission set groups, users, sharing, integration users, package permissions | `references/least-privilege-planning.md`, `references/sf-agent-cli-commands.md` |
+| Privacy, secrets, tokens, customer data, personal data, exports, auth URLs, connected apps, named credentials, Knowledge/documentation data exposure | `references/privacy-security.md`, `references/least-privilege-planning.md`, `references/sf-cli-token-patterns.md` |
 | Org inspection, Salesforce CLI, auth, deploy, retrieve, SOQL, installed packages, compact output | `references/sf-agent-cli-commands.md`, `references/sf-cli-token-patterns.md` |
 | Apex, triggers, async Apex, invocable Apex, backend security, bulkification, Apex tests | `references/backend-apex.md`, `references/testing-and-manifest-guardrails.md` |
 | LWC, Aura, Lightning UI, UI API, LDS, frontend security, accessibility, performance | `references/frontend-lwc.md`, `references/testing-and-manifest-guardrails.md` |

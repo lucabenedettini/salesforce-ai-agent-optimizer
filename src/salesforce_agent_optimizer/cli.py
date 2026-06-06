@@ -8,9 +8,13 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .command_facade import example_payload, execute_payload, load_payload, search_payload
 from .doctor import format_report, report_to_json, run_doctor
 from .installer import install, project_destination, uninstall, update, user_destination
 from .knowledge import format_knowledge_report, run_knowledge
+from .live_tests import WRITE_CONFIRMATION, format_live_report, run_live_tests
+from .permission_analyzer import analyze_access_file
+from .soql import build_soql
 from .validation import validate_auto
 from .version_context import (
     format_report as format_version_context_report,
@@ -71,6 +75,54 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser.add_argument("--summary", action="store_true", help="Emit compact summary")
     validate_parser.add_argument("--compact", action="store_true", help="Emit compact summary")
     validate_parser.add_argument("--verbose", action="store_true", help="Emit validation details")
+
+    command_parser = subparsers.add_parser("command", help="Search and execute registered CLI facade tools")
+    command_subparsers = command_parser.add_subparsers(dest="command_action", required=True)
+    command_search = command_subparsers.add_parser("search", help="Search the Salesforce CLI facade registry")
+    command_search.add_argument("query", nargs="?", default="")
+    command_search.add_argument("--toolset", choices=["core", "schema", "data-read", "metadata", "deploy", "permissions", "apex", "packages", "local"])
+    command_search.add_argument("--root", type=Path, default=Path.cwd())
+    command_search.add_argument("--limit", type=int, default=10)
+    command_search.add_argument("--json", action="store_true", help="Emit compact JSON")
+    command_example = command_subparsers.add_parser("payload-example", help="Print a minimal payload for one registered tool")
+    command_example.add_argument("tool")
+    command_example.add_argument("--root", type=Path, default=Path.cwd())
+    command_example.add_argument("--json", action="store_true", help="Emit compact JSON")
+    command_execute = command_subparsers.add_parser("execute", help="Execute one registered tool from a JSON payload")
+    command_execute.add_argument("--payload", required=True, help="JSON string or path to a JSON file")
+    command_execute.add_argument("--root", type=Path, default=Path.cwd())
+
+    soql_parser = subparsers.add_parser("soql", help="Build compact SOQL payloads")
+    soql_subparsers = soql_parser.add_subparsers(dest="soql_action", required=True)
+    soql_build = soql_subparsers.add_parser("build", help="Build a focused SOQL query and data-query payload")
+    soql_build.add_argument("--sobject", required=True)
+    soql_build.add_argument("--field", action="append", required=True)
+    soql_build.add_argument("--where")
+    soql_build.add_argument("--order-by")
+    soql_build.add_argument("--limit", type=int, default=50)
+    soql_build.add_argument("--describe-json", type=Path)
+    soql_build.add_argument("--json", action="store_true", help="Emit compact JSON")
+
+    permissions_parser = subparsers.add_parser("permissions", help="Explain access-inspect results")
+    permissions_subparsers = permissions_parser.add_subparsers(dest="permissions_action", required=True)
+    permissions_explain = permissions_subparsers.add_parser("explain", help="Explain why object/field access exists")
+    permissions_explain.add_argument("--input", type=Path, required=True, help="JSON output from access-inspect")
+    permissions_explain.add_argument("--sobject")
+    permissions_explain.add_argument("--field")
+    permissions_explain.add_argument("--json", action="store_true", help="Emit compact JSON")
+
+    live_parser = subparsers.add_parser("live-test", help="Run opt-in tests against a real Salesforce org")
+    live_parser.add_argument("--target-org", required=True, help="Explicit Salesforce org alias")
+    live_parser.add_argument("--root", type=Path, default=Path.cwd(), help="Project root with scripts/templates")
+    live_parser.add_argument("--include-write", action="store_true", help="Request sandbox-only write tests")
+    live_parser.add_argument(
+        "--write-confirmation",
+        help=f"Required exact phrase for write tests: {WRITE_CONFIRMATION}",
+    )
+    live_parser.add_argument("--max-chars", type=int, default=4000)
+    live_parser.add_argument("--max-list", type=int, default=5)
+    live_parser.add_argument("--json", action="store_true", help="Emit compact JSON")
+    live_parser.add_argument("--verbose", action="store_true", help="Emit command notes")
 
     knowledge_parser = subparsers.add_parser("knowledge", help="Manage local Salesforce Knowledge")
     knowledge_subparsers = knowledge_parser.add_subparsers(dest="knowledge_command", required=True)
@@ -165,6 +217,53 @@ def main(argv: list[str] | None = None) -> int:
             stream = sys.stdout if result.ok else sys.stderr
             print(output, end="", file=stream)
         return 0 if result.ok else 1
+    if args.command == "command":
+        if args.command_action == "search":
+            payload = search_payload(args.query, args.toolset, args.root, args.limit)
+            print_json_or_text(payload, args.json, title="Salesforce Agent Optimizer command registry")
+            return 0
+        if args.command_action == "payload-example":
+            payload = example_payload(args.tool, args.root)
+            print_json_or_text(payload, args.json, title=f"Payload example: {args.tool}")
+            return 0
+        payload = load_payload(args.payload)
+        completed = execute_payload(payload, args.root)
+        if completed.stdout:
+            print(completed.stdout, end="")
+        if completed.stderr:
+            print(completed.stderr, end="", file=sys.stderr)
+        return completed.returncode
+    if args.command == "soql":
+        payload = build_soql(
+            args.sobject,
+            args.field,
+            where=args.where,
+            order_by=args.order_by,
+            limit=args.limit,
+            describe_path=args.describe_json,
+        )
+        print_json_or_text(payload, args.json, title="Salesforce Agent Optimizer SOQL assistant")
+        return 0
+    if args.command == "permissions":
+        payload = analyze_access_file(args.input, sobject=args.sobject, field=args.field)
+        print_json_or_text(payload, args.json, title="Salesforce Agent Optimizer permission analyzer")
+        return 0
+    if args.command == "live-test":
+        progress = None if args.json else print_progress
+        report = run_live_tests(
+            args.target_org,
+            args.root,
+            include_write=args.include_write,
+            write_confirmation=args.write_confirmation,
+            max_chars=args.max_chars,
+            max_list=args.max_list,
+            progress=progress,
+        )
+        if args.json:
+            print(json.dumps(report.to_dict(), separators=(",", ":"), sort_keys=True))
+        else:
+            print(format_live_report(report, verbose=args.verbose), end="")
+        return 0 if report.ok else 1
     if args.command == "knowledge":
         progress = None if args.json else print_progress
         report = run_knowledge(
@@ -213,6 +312,14 @@ def format_validation_result(result, verbose: bool = False) -> str:
 
 def print_progress(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
+
+
+def print_json_or_text(payload: dict, json_output: bool, title: str) -> None:
+    if json_output:
+        print(json.dumps(payload, separators=(",", ":"), sort_keys=True))
+        return
+    print(title)
+    print(json.dumps(payload, indent=2, sort_keys=True))
 
 
 def print_operation_summary(action: str, report, json_output: bool = False) -> None:

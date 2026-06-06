@@ -17,13 +17,24 @@ from typing import Any
 
 
 SECRET_KEYS = re.compile(
-    r"(access.?token|session.?id|auth.?url|refresh.?token|client.?secret|password|cookie|sid|installation.?key)",
+    r"(access.?token|session.?id|auth.?url|refresh.?token|client.?secret|consumer.?secret|password|cookie|sid|installation.?key|private.?key)",
     re.IGNORECASE,
 )
+SENSITIVE_VALUE_FLAGS = {
+    "--access-token",
+    "--auth-url",
+    "--client-secret",
+    "--consumer-secret",
+    "--jwt-key-file",
+    "--password",
+    "--private-key",
+    "--sfdx-url",
+}
 
 PROD_CHECK_QUERY = "SELECT IsSandbox, OrganizationType, Name FROM Organization LIMIT 1"
 KNOWLEDGE_DIR = ".salesforce-agent-knowledge"
 DELETE_APPROVAL_PHRASE = "I explicitly approve this deletion"
+SECRET_APPROVAL_PHRASE = "I explicitly approve exposing Salesforce secrets"
 
 
 @dataclass(frozen=True)
@@ -123,7 +134,29 @@ def redact(value: Any) -> Any:
     if isinstance(value, str):
         value = re.sub(r"00D[A-Za-z0-9]{12,}", "[REDACTED_ORG_ID]", value)
         value = re.sub(r"(?i)(sid|sessionId|access_token)=([^&\s]+)", r"\1=[REDACTED]", value)
+        value = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]+", r"\1[REDACTED]", value)
+        value = re.sub(r"(?i)(force://[^:\s]+:)[^@\s]+(@)", r"\1[REDACTED]\2", value)
     return value
+
+
+def redact_cli_args(tokens: list[str]) -> list[str]:
+    redacted: list[str] = []
+    redact_next = False
+    for token in tokens:
+        if redact_next:
+            redacted.append("[REDACTED]")
+            redact_next = False
+            continue
+        if token in SENSITIVE_VALUE_FLAGS:
+            redacted.append(token)
+            redact_next = True
+            continue
+        matched = next((flag for flag in SENSITIVE_VALUE_FLAGS if token.startswith(f"{flag}=")), None)
+        if matched:
+            redacted.append(f"{matched}=[REDACTED]")
+            continue
+        redacted.append(str(redact(token)))
+    return redacted
 
 
 def compact(value: Any, max_list: int) -> Any:
@@ -189,7 +222,12 @@ def sf_run(sf_args: list[str], args: argparse.Namespace, allow_non_json: bool = 
     if not allow_non_json and "--json" not in command:
         command.append("--json")
     if getattr(args, "dry_run", False):
-        return subprocess.CompletedProcess(command, 0, json.dumps({"dry_run": True, "sf_command": command}), "")
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            json.dumps({"dry_run": True, "sf_command": redact_cli_args(command)}),
+            "",
+        )
     try:
         return subprocess.run(command, text=True, encoding="utf-8", errors="replace", capture_output=True, check=False)
     except FileNotFoundError as exc:
@@ -302,6 +340,21 @@ def is_destructive_operation(command_id: str, sf_args: list[str]) -> bool:
     return any(term in lowered for term in ("destructivechanges", "destructive changes", "purge-on-delete", "hard-delete"))
 
 
+def is_secret_exposure_operation(command_id: str, sf_args: list[str]) -> bool:
+    normalized = command_id.replace(" ", ":").replace("-", ":")
+    parts = {part for part in normalized.split(":") if part}
+    lowered = " ".join(sf_args).lower()
+    if {"auth", "show", "access", "token"} <= parts:
+        return True
+    if {"login", "access", "token"} <= parts:
+        return True
+    if "sfdx-url" in lowered or "auth-url" in lowered or "access-token" in lowered:
+        return True
+    if ("org:display" in command_id or "force:org:display" in command_id) and has_flag(sf_args, "--verbose"):
+        return True
+    return any(token in SENSITIVE_VALUE_FLAGS for token in sf_args)
+
+
 def require_delete_approval(operation: str, args: argparse.Namespace, sf_args: list[str] | None = None) -> None:
     if not is_destructive_operation(operation, sf_args or []):
         return
@@ -310,6 +363,18 @@ def require_delete_approval(operation: str, args: argparse.Namespace, sf_args: l
         raise SystemExit(
             "Blocked destructive operation. Ask the user for explicit approval before deleting data or metadata, "
             f"then pass --delete-approval \"{DELETE_APPROVAL_PHRASE}\"."
+        )
+
+
+def require_secret_approval(operation: str, args: argparse.Namespace, sf_args: list[str] | None = None) -> None:
+    if not is_secret_exposure_operation(operation, sf_args or []):
+        return
+    approval = getattr(args, "secret_approval", None)
+    if approval != SECRET_APPROVAL_PHRASE:
+        raise SystemExit(
+            "Blocked secret-exposure operation. Inform the user that the command can expose or handle "
+            "Salesforce credentials, access tokens, auth URLs, private keys, or session material. "
+            f"Run it only after explicit approval with --secret-approval \"{SECRET_APPROVAL_PHRASE}\"."
         )
 
 
@@ -322,7 +387,38 @@ def command_likely_connects(command_id: str, sf_args: list[str], target_org: str
     return has_flag(sf_args, "--target-org", "-o") or has_flag(sf_args, "--target-dev-hub", "-v")
 
 
-def detect_is_sandbox(target_org: str, args: argparse.Namespace) -> bool:
+def detect_is_scratch_or_sandbox_from_org_list(target_org: str, args: argparse.Namespace) -> bool | None:
+    completed = sf_run(["org", "list"], args)
+    if completed.returncode != 0:
+        return None
+    try:
+        payload = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        return None
+    result = payload.get("result", {})
+    buckets = ("scratchOrgs", "sandboxes", "nonScratchOrgs", "other")
+    for bucket in buckets:
+        orgs = result.get(bucket, [])
+        if not isinstance(orgs, list):
+            continue
+        for org in orgs:
+            if not isinstance(org, dict):
+                continue
+            identifiers = {str(org.get("alias") or ""), str(org.get("username") or ""), str(org.get("orgId") or "")}
+            if target_org in identifiers:
+                if org.get("isScratch") is True or bucket == "scratchOrgs":
+                    return True
+                if org.get("isSandbox") is True or bucket == "sandboxes":
+                    return True
+                if org.get("isSandbox") is False:
+                    return False
+    return None
+
+
+def detect_is_non_production(target_org: str, args: argparse.Namespace) -> bool:
+    local_status = detect_is_scratch_or_sandbox_from_org_list(target_org, args)
+    if local_status is not None:
+        return local_status
     check_args = ["data", "query", "--target-org", target_org, "--query", PROD_CHECK_QUERY]
     completed = sf_run(check_args, args)
     if completed.returncode != 0:
@@ -346,10 +442,10 @@ def enforce_safety(command_name: str, args: argparse.Namespace) -> None:
     target_org = require_alias(args)
     if getattr(args, "dry_run", False):
         return
-    if not detect_is_sandbox(target_org, args):
+    if not detect_is_non_production(target_org, args):
         raise SystemExit(
             f"Blocked: {command_name} is a {doc.safety} operation and target org '{target_org}' is production. "
-            "Production orgs are read-only for this agent CLI."
+            "Production orgs are read-only for this agent CLI. Use a Salesforce sandbox or scratch org for write tests."
         )
 
 
@@ -360,10 +456,10 @@ def enforce_dynamic_safety(command_id: str, safety: str, target_org: str | None,
         raise SystemExit("Missing --target-org. Ask the user for the Salesforce org alias before connecting.")
     if getattr(args, "dry_run", False):
         return
-    if not detect_is_sandbox(target_org, args):
+    if not detect_is_non_production(target_org, args):
         raise SystemExit(
             f"Blocked: {command_id} is classified as {safety} and target org '{target_org}' is production. "
-            "Production orgs are read-only for this agent CLI."
+            "Production orgs are read-only for this agent CLI. Use a Salesforce sandbox or scratch org for write tests."
         )
 
 
@@ -433,6 +529,70 @@ def query_result(target_org: str, query: str, args: argparse.Namespace) -> tuple
 def result_records(result: dict[str, Any]) -> list[dict[str, Any]]:
     records = result.get("records", [])
     return records if isinstance(records, list) else []
+
+
+def permission_source_label(record: dict[str, Any]) -> str:
+    permission_set = record.get("PermissionSet")
+    if isinstance(permission_set, dict):
+        return str(permission_set.get("Label") or permission_set.get("Name") or record.get("PermissionSetId"))
+    return str(record.get("PermissionSetId") or record.get("ParentId") or "unknown")
+
+
+def explain_access(payload: dict[str, Any], sobjects: list[str] | None) -> list[dict[str, Any]]:
+    assignments = result_records(payload.get("permission_set_assignments", {}))
+    object_permissions = result_records(payload.get("object_permissions", {}))
+    field_permissions = result_records(payload.get("field_permissions", {}))
+    assignment_by_ps = {
+        assignment.get("PermissionSetId"): assignment
+        for assignment in assignments
+        if assignment.get("PermissionSetId")
+    }
+    allowed_sobjects = set(sobjects or [])
+    explanations: list[dict[str, Any]] = []
+    for permission in object_permissions:
+        if allowed_sobjects and permission.get("SobjectType") not in allowed_sobjects:
+            continue
+        grants = [
+            flag
+            for flag in (
+                "PermissionsRead",
+                "PermissionsCreate",
+                "PermissionsEdit",
+                "PermissionsDelete",
+                "PermissionsViewAllRecords",
+                "PermissionsModifyAllRecords",
+            )
+            if permission.get(flag)
+        ]
+        if not grants:
+            continue
+        source = assignment_by_ps.get(permission.get("ParentId"), permission)
+        explanations.append(
+            {
+                "type": "object",
+                "sobject": permission.get("SobjectType"),
+                "grants": grants,
+                "source": permission_source_label(source),
+                "source_id": permission.get("ParentId"),
+            }
+        )
+    for permission in field_permissions:
+        if allowed_sobjects and permission.get("SobjectType") not in allowed_sobjects:
+            continue
+        grants = [flag for flag in ("PermissionsRead", "PermissionsEdit") if permission.get(flag)]
+        if not grants:
+            continue
+        source = assignment_by_ps.get(permission.get("ParentId"), permission)
+        explanations.append(
+            {
+                "type": "field",
+                "field": permission.get("Field"),
+                "grants": grants,
+                "source": permission_source_label(source),
+                "source_id": permission.get("ParentId"),
+            }
+        )
+    return explanations
 
 
 def access_inspect(args: argparse.Namespace) -> int:
@@ -530,6 +690,7 @@ def access_inspect(args: argparse.Namespace) -> int:
     elif not args.sobject:
         payload["notes"] = ["ObjectPermissions and FieldPermissions skipped. Pass --sobject for affected objects to inspect CRUD/FLS."]
 
+    payload["access_explanations"] = explain_access(payload, args.sobject)
     return emit_payload(payload, args, returncode)
 
 
@@ -572,7 +733,7 @@ def append_deploy_history(command_id: str, sf_args: list[str], args: argparse.Na
     target_org = getattr(args, "target_org", None) or extract_flag_value(sf_args, "--target-org", "-o") or "unknown"
     artifacts = flag_values(sf_args, {"--source-dir", "--manifest", "--metadata"})
     artifact_text = ", ".join(artifacts[:10]) if artifacts else "unspecified"
-    command_text = "sf " + " ".join(redact(sf_args))
+    command_text = "sf " + " ".join(redact_cli_args(sf_args))
     summary = deploy_result_summary(completed)
     requirements = getattr(args, "requirements", None)
     changed_metadata = getattr(args, "changed_metadata", None) or []
@@ -663,12 +824,18 @@ def safe_run(args: argparse.Namespace) -> int:
 
     require_deploy_history_details(command_id, args)
     require_delete_approval(command_id, args, sf_args)
+    require_secret_approval(command_id, args, sf_args)
     enforce_dynamic_safety(command_id, safety, target_org, args)
     if args.dry_run:
         dry_command = [sf_binary(), *sf_args]
         if not args.raw and "--json" not in dry_command:
             dry_command.append("--json")
-        payload = {"dry_run": True, "classified_safety": safety, "command_id": command_id, "sf_command": dry_command}
+        payload = {
+            "dry_run": True,
+            "classified_safety": safety,
+            "command_id": command_id,
+            "sf_command": redact_cli_args(dry_command),
+        }
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
     completed = sf_run(sf_args, args, allow_non_json=args.raw)
@@ -708,6 +875,111 @@ def org_inspect(args: argparse.Namespace) -> int:
     return 0 if sandbox.returncode == 0 else sandbox.returncode
 
 
+def metadata_list(args: argparse.Namespace) -> int:
+    enforce_safety("metadata-list", args)
+    sf_args = ["org", "list", "metadata", "--target-org", args.target_org, "--metadata-type", args.metadata_type]
+    if args.folder:
+        sf_args.extend(["--folder", args.folder])
+    completed = sf_run(sf_args, args)
+    if args.raw:
+        return emit_result(completed, args)
+    output = completed.stdout if completed.stdout.strip() else completed.stderr
+    try:
+        payload = json.loads(output)
+    except json.JSONDecodeError:
+        return emit_result(completed, args)
+    records = payload.get("result", [])
+    if isinstance(records, list):
+        payload["result"] = [
+            {
+                key: record.get(key)
+                for key in (
+                    "fullName",
+                    "type",
+                    "fileName",
+                    "namespacePrefix",
+                    "createdDate",
+                    "lastModifiedDate",
+                )
+                if isinstance(record, dict) and record.get(key) not in (None, "")
+            }
+            for record in records
+        ]
+        payload["summary"] = {"metadataType": args.metadata_type, "count": len(records)}
+    return emit_payload(payload, args, completed.returncode)
+
+
+def compact_describe_result(payload: dict[str, Any], field_limit: int) -> dict[str, Any]:
+    result = payload.get("result", {})
+    if not isinstance(result, dict):
+        return payload
+    fields = result.get("fields", [])
+    child_relationships = result.get("childRelationships", [])
+    record_type_infos = result.get("recordTypeInfos", [])
+    compact_fields: list[dict[str, Any]] = []
+    if isinstance(fields, list):
+        for field in fields[:field_limit]:
+            if not isinstance(field, dict):
+                continue
+            compact_fields.append(
+                {
+                    key: field.get(key)
+                    for key in (
+                        "name",
+                        "label",
+                        "type",
+                        "custom",
+                        "nillable",
+                        "createable",
+                        "updateable",
+                        "calculated",
+                        "referenceTo",
+                        "relationshipName",
+                    )
+                    if field.get(key) not in (None, "", [])
+                }
+            )
+    compact_result = {
+        "name": result.get("name"),
+        "label": result.get("label"),
+        "custom": result.get("custom"),
+        "keyPrefix": result.get("keyPrefix"),
+        "createable": result.get("createable"),
+        "updateable": result.get("updateable"),
+        "deletable": result.get("deletable"),
+        "queryable": result.get("queryable"),
+        "searchable": result.get("searchable"),
+        "fieldCount": len(fields) if isinstance(fields, list) else None,
+        "childRelationshipCount": len(child_relationships) if isinstance(child_relationships, list) else None,
+        "recordTypeCount": len(record_type_infos) if isinstance(record_type_infos, list) else None,
+        "fields": compact_fields,
+    }
+    payload["result"] = {key: value for key, value in compact_result.items() if value is not None}
+    payload["summary"] = {
+        "mode": "compact",
+        "fieldLimit": field_limit,
+        "note": "Use --raw only when a full describe is explicitly required.",
+    }
+    return payload
+
+
+def schema_sobject_describe(args: argparse.Namespace) -> int:
+    enforce_safety("schema-sobject-describe", args)
+    completed = sf_run(
+        ["sobject", "describe", "--target-org", args.target_org, "--sobject", args.sobject],
+        args,
+    )
+    if args.raw:
+        return emit_result(completed, args)
+    output = completed.stdout if completed.stdout.strip() else completed.stderr
+    try:
+        payload = json.loads(output)
+    except json.JSONDecodeError:
+        return emit_result(completed, args)
+    payload = compact_describe_result(payload, args.field_limit)
+    return emit_payload(payload, args, completed.returncode)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Token-efficient Salesforce CLI facade for AI agents.")
     parser.add_argument("--dry-run", action="store_true", help="Print the mapped sf command without executing it.")
@@ -725,6 +997,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--requirements", help="Requirement that caused a deploy; required for `project deploy start`.")
     p.add_argument("--changed-metadata", action="append", help="Modified metadata; required and repeatable for `project deploy start`.")
     p.add_argument("--delete-approval", help=f"Required exact phrase for destructive operations: {DELETE_APPROVAL_PHRASE}")
+    p.add_argument("--secret-approval", help=f"Required exact phrase for commands that can expose secrets: {SECRET_APPROVAL_PHRASE}")
     p.add_argument("sf_args", nargs=argparse.REMAINDER)
     p.set_defaults(func=safe_run)
 
@@ -783,25 +1056,19 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("schema-sobject-list", help=DOCS["schema-sobject-list"].description)
     common_org(p)
     p.add_argument("--sobject-type", choices=["all", "custom", "standard"], default="all")
-    p.set_defaults(func=lambda a: run_simple("schema-sobject-list", ["sobject", "list", "--target-org", a.target_org, "--sobject-type", a.sobject_type], a))
+    p.set_defaults(func=lambda a: run_simple("schema-sobject-list", ["sobject", "list", "--target-org", a.target_org, "--sobject", a.sobject_type], a))
 
     p = sub.add_parser("schema-sobject-describe", help=DOCS["schema-sobject-describe"].description)
     common_org(p)
     p.add_argument("--sobject", required=True)
-    p.set_defaults(func=lambda a: run_simple("schema-sobject-describe", ["sobject", "describe", "--target-org", a.target_org, "--sobject", a.sobject], a))
+    p.add_argument("--field-limit", type=int, default=12, help="Fields to include in compact describe output.")
+    p.set_defaults(func=schema_sobject_describe)
 
     p = sub.add_parser("metadata-list", help=DOCS["metadata-list"].description)
     common_org(p)
     p.add_argument("--metadata-type", required=True)
     p.add_argument("--folder")
-    p.set_defaults(
-        func=lambda a: run_simple(
-            "metadata-list",
-            ["org", "list", "metadata", "--target-org", a.target_org, "--metadata-type", a.metadata_type]
-            + (["--folder", a.folder] if a.folder else []),
-            a,
-        )
-    )
+    p.set_defaults(func=metadata_list)
 
     p = sub.add_parser("metadata-retrieve", help=DOCS["metadata-retrieve"].description)
     common_org(p)
@@ -877,7 +1144,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--sobject", required=True)
     p.add_argument("--record-id", required=True)
     p.add_argument("--delete-approval", help=f"Required exact phrase: {DELETE_APPROVAL_PHRASE}")
-    p.set_defaults(func=lambda a: run_simple("data-record-delete", ["data", "delete", "record", "--target-org", a.target_org, "--sobject", a.sobject, "--record-id", a.record_id, "--no-prompt"], a))
+    p.set_defaults(func=lambda a: run_simple("data-record-delete", ["data", "delete", "record", "--target-org", a.target_org, "--sobject", a.sobject, "--record-id", a.record_id], a))
 
     p = sub.add_parser("access-inspect", help=DOCS["access-inspect"].description)
     common_org(p)

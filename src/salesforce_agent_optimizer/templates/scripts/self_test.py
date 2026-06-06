@@ -454,10 +454,12 @@ def test_multilingual_readmes() -> dict[str, object]:
     checks: dict[str, object] = {}
     for language, path in files.items():
         text = path.read_text(encoding="utf-8")
+        lower = text.lower()
         checks[f"{language}_exists"] = path.exists()
         checks[f"{language}_version"] = version in text
-        checks[f"{language}_delete_guardrail"] = "I explicitly approve this deletion" in text
-        checks[f"{language}_least_privilege"] = "Least privilege" in text or "least privilege" in text
+        checks[f"{language}_sfao_install"] = "sfao install" in text
+        checks[f"{language}_package_xml"] = "package.xml" in text
+        checks[f"{language}_least_privilege"] = "least privilege" in lower
     assert all(checks.values())
     return checks
 

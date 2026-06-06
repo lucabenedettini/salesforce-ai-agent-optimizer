@@ -18,7 +18,6 @@ Use these official Salesforce sources to refresh guidance when the task needs ex
 - Metadata API deploy manifest/package.xml and destructive changes: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm
 - GraphQL API record deletion: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
 - LWC `deleteRecord(recordId)`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
-- Salesforce MCP SObject Deletes: https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-deletes.html
 - Apex testing and code coverage: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm
 - Application unit tests for Apex and Flow: https://help.salesforce.com/s/articleView?id=platform.code_run_tests.htm&type=5
 - LWC data access guidelines: https://developer.salesforce.com/docs/platform/lwc/guide/data.html

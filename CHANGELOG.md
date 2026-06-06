@@ -8,6 +8,35 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.0.0] - 2026-06-06
+
+### Added
+
+- Added an internal Salesforce CLI tool registry at `references/agent-tool-registry.json`.
+- Added `sfao command search`, `sfao command payload-example`, and `sfao command execute` as a CLI-only facade over the registry and existing Salesforce CLI wrapper.
+- Added dynamic toolsets for `core`, `schema`, `data-read`, `metadata`, `deploy`, `permissions`, `apex`, `packages`, and `local` command discovery.
+- Added `sfao soql build` for compact SOQL generation and ready-to-run `data-query` payloads.
+- Added `sfao permissions explain` for Permission Analyzer v2 summaries from `access-inspect` output.
+- Added mocked Salesforce CLI tests for registry/facade behavior and production write blocking.
+- Added `sfao live-test` for opt-in read-only validation against real Salesforce orgs with duration and output-size metrics.
+- Added opt-in live metadata validation that deploys a temporary Account validation rule, verifies it, then removes it through `destructiveChanges.xml`.
+- Added opt-in pytest live validation through `SFAO_LIVE_TARGET_ORG`.
+- Added `references/privacy-security.md` and wiki privacy/security guidance for secrets, customer data, org access, exports, integrations, and Knowledge safety.
+
+### Changed
+
+- Extended `access-inspect` output with compact access explanations for object and field permissions.
+- Optimized `metadata-list` output to keep high-signal metadata fields and reduce token usage.
+- Hardened `safe-run` so commands that can expose Salesforce secrets require separate explicit approval and redact sensitive values in dry-run output and deploy history.
+- Documented the registry and helper commands in the CLI reference while keeping README files focused on end-user installation and usage.
+- Packaged the registry and updated wrapper script in installable templates for Codex, Claude Code, and GitHub Copilot projects.
+
+### Preserved
+
+- Salesforce CLI remains the only org-operation runtime.
+- Production orgs remain read-only for write and execute operations.
+- Explicit org aliases, destructive-operation approval, least-privilege planning, Knowledge use, minimal patches, and token-efficient output remain core behavior.
+
 ## [1.2.3] - 2026-06-05
 
 ### Fixed

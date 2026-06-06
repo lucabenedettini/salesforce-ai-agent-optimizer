@@ -6,6 +6,8 @@ Use this workflow for every Salesforce project request: metadata information, im
 
 Keep every phase token-efficient. A small metadata-information request can use a compact one-paragraph phase output, but it still needs request review, planning/evidence, implementation decision, validation, and completion.
 
+Every phase must include the tool or command used or planned. If no tool is used, write `Tool/command: none`. For Salesforce org operations, show the exact `sfao`, `scripts/sf_agent_cli.py`, or official `sf` command shape with aliases and secrets redacted.
+
 Maximum: 3 unsuccessful cycles. On the fourth unsuccessful cycle, stop implementation and return to requirement explanation before proposing another plan.
 
 Hard stop for repository agents:
@@ -13,6 +15,7 @@ Hard stop for repository agents:
 - Do not open raw Salesforce metadata, parse project files, edit files, or run org commands as the first action.
 - First show a compact phase-gate response with request review, planned references/Knowledge to consult, whether implementation is required, and whether approval is needed.
 - Read `references/routing.md`, task-relevant references, `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, and project history before inspecting raw metadata.
+- Tell the user which reference files, Knowledge indexes, scripts, or Salesforce CLI facade commands are being used before running them.
 - If a previous answer skipped these gates, acknowledge the miss and restart from Phase 1 instead of continuing.
 
 ## Phase 1: Request Review
@@ -49,6 +52,7 @@ Consult project Knowledge first:
 - Read `references/metadata-dependencies.md` and use it as the dependency checklist for the plan.
 - Read `references/least-privilege-planning.md` and apply least privilege during every planning phase, especially access, sharing, automation, integration, package, or UI exposure decisions.
 - Read `references/deletion-guardrails.md` when deletion, uninstall, purge, hard delete, destructive changes, or source delete are possible.
+- Read `references/privacy-security.md` when the request touches org access, customer data, personal data, auth, tokens, secrets, integrations, connected apps, named credentials, data exports, Knowledge generation, AI/data activation, analytics, Experience/guest access, or documentation that could expose sensitive information.
 - Read `references/field-service-mobile-flow.md` when Field Service Mobile, Field Service mobile flows, technician mobile execution, briefcases, sync, or online/offline behavior can affect the solution.
 - Read `references/testing-and-manifest-guardrails.md` when the task touches Apex, Flow, automation, UI metadata, integrations, access, or deployable metadata.
 - Read `.salesforce-agent-knowledge/index.md` before planning any modification.
@@ -72,6 +76,7 @@ Inspect the smallest useful surface:
 - Relevant objects, fields, flows, Apex, LWC, permission sets, named credentials, custom metadata, and package dependencies.
 - Targeted org data through compact CLI output when needed.
 - Current org permissions for affected users/personas before planning access changes, using `scripts/sf_agent_cli.py access-inspect --target-org <alias> --username <user> --sobject <Object>` or a narrow `--where` filter. If the alias or personas are missing, ask before proposing the permission delta.
+- Tool/command evidence: list the exact local files read, scripts run, and `sfao`/`scripts/sf_agent_cli.py`/`sf` commands planned or executed. Keep commands compact and redact secrets.
 
 Verify official guidance when needed:
 
@@ -91,12 +96,14 @@ Then produce a plan with:
 - Multi-country/multi-currency impact: org settings and metadata/data behavior that change by country, locale, language, currency, price book, tax, reporting, integration, or compliance scope.
 - Specification coverage: web/desktop, Salesforce mobile, Field Service mobile, online behavior, offline behavior, or degraded offline path, with assumptions called out.
 - Least-privilege access plan: personas/users inspected, current access evidence, exact proposed permission delta, and why broader permissions are not needed.
+- Privacy/security plan: sensitive data or secret exposure, safer alternatives, user consent needed, redaction/retention approach, and exact command/tool scope.
 - Test/validation plan, including Apex coverage expectations and tests for Flow or other testable metadata where Salesforce/project capabilities support them.
 - Task list with type (`configuration` or `customization`), explanation, owner/role if known, and estimated execution time.
 - Risks, rollback, and assumptions.
 - Destructive action scope and separate deletion approval needs, if any.
 - Implementation decision: `required`, `not required`, or `blocked pending approval/evidence`.
 - Evidence that will be used to validate the answer or implementation.
+- Tools and commands the agent used or will use in implementation and validation.
 
 Do not invent missing evidence. If a plan depends on an unknown product behavior, metadata dependency, package version, record set, permission scope, user persona, or org state, ask the user for the missing fact or present multiple scenarios with tradeoffs and ask the user to choose.
 

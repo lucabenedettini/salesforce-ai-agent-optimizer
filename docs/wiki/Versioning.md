@@ -21,48 +21,13 @@ Every version update must include:
 
 ## Current Version
 
-`1.2.3` fixes validation false positives from local Salesforce CLI caches, clarifies doctor version-alignment reporting, adds doctor/validate progress output, and removes an unnecessary Metadata Coverage source check from version-context refresh.
+`2.0.0` adds the CLI-only agent tool registry, command facade, dynamic toolsets, compact SOQL helper, Permission Analyzer v2 summaries, real-org `sfao live-test`, compact metadata/schema output, and expanded mocked/live validation while preserving production read-only and destructive-operation guardrails.
 
-`1.2.2` fixes privacy and portability in distributed resources by removing local
-machine paths from the Salesforce CLI command catalog and by making `sfao
-doctor` Windows PATH diagnostics generic.
+## Recent Stable Lines
 
-`1.2.1` fixes PATH-safe update documentation for `pipx` and `pip`, and adds
-visible terminal progress for Knowledge and Salesforce version-context refresh
-commands while preserving compact `--json` automation output.
+- `1.2.x`: installer, PATH, progress, and validation fixes.
+- `1.1.x`: Copilot project skill compatibility, eval installation, and metadata micro-validators.
+- `1.0.x`: public distribution baseline with stable install, update, uninstall, Knowledge, version-context, validation, build, release, and PyPI workflows.
+- `0.x`: early public skill architecture, guardrails, multilingual README files, and packaging foundation.
 
-`1.2.0` adds the Field Service Mobile and mobile Flow planning reference plus the mandatory web/mobile and online/offline specification preflight for larger work.
-
-`1.1.1` is an installer bugfix that makes bare `sfao install` project-scoped by default and copies Copilot-local `references/` and `scripts/`.
-
-`1.1.0` adds Copilot project-skill compatibility and lightweight Salesforce metadata micro-validators for Apex, Flow, LWC, permissions, and `package.xml`.
-
-`1.0.5` is an installer update bugfix that lets `sfao update` add newly introduced managed templates, including evals, to existing project installs.
-
-`1.0.4` is an installer and planning bugfix that merges Copilot guidance into existing agent files, installs evals, and adds mandatory multi-country/multi-currency planning checks.
-
-`1.0.3` is a Copilot compliance bugfix that makes mandatory phase gates visible as an operational response contract before metadata parsing or implementation.
-
-`1.0.2` is an instruction-flow bugfix that makes request review, planning, implementation decision, validation, failure handling, and completion gates mandatory for all Salesforce project requests.
-
-`1.0.1` is a public distribution bugfix that keeps `sfao validate` usable from isolated PyPI, `uv`, and `pipx` installs without requiring development-only dependencies.
-
-`1.0.0` is the major public distribution release with stable `sfao` install, update, uninstall, Knowledge, version-context, validation, build, release, and PyPI Trusted Publishing workflows.
-
-`0.6.1` is a packaging and installer hotfix for `pip`, `pipx`, `uv`, the `sfao` CLI, packaged templates, release artifacts, and installer validation.
-
-`0.6.0` is an instruction architecture refactor with concise routing, generated agent adapters, trigger evals, pytest coverage, and public maintenance files.
-
-`0.5.1` is a compatibility hotfix for valid skill frontmatter, native agent install targets, local validation, and minimal cross-platform CI.
-
-`0.5.0` adds least-privilege planning guardrails, Spanish README, and the read-only `access-inspect` command for current-org permission evidence.
-
-`0.4.0` adds destructive-operation approval guardrails, CLI enforcement for delete/uninstall/destructive commands, and English/Italian/Simplified Chinese README files.
-
-`0.3.0` adds `/sf-version-update-skill`, current Salesforce release/API/SOAP/package version context, and repeatable version-resource refresh.
-
-`0.2.0` adds testing guardrails for Apex, Flow, and other testable metadata plus required `package.xml` generation for added or modified metadata.
-
-`0.1.0` adds end-of-development handoff artifact guidance.
-
-`0.0.1` is the initial public baseline with the full skill package, CLI facade, Knowledge workflow, product/package references, metadata dependency planning, and agent adapters.
+For exact historical entries, use `CHANGELOG.md`; avoid duplicating long release history in the wiki.

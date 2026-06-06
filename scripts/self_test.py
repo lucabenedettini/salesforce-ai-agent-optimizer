@@ -252,6 +252,48 @@ def test_agent_cli_guardrails() -> dict[str, object]:
         assert sf_min_delete.returncode != 0
         assert "Blocked destructive command" in (sf_min_delete.stdout + sf_min_delete.stderr)
 
+        secret_missing_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "safe-run",
+                "--target-org",
+                "dev",
+                "--",
+                "org",
+                "display",
+                "--verbose",
+                "--dry-run",
+            ],
+            cwd=root,
+            check=False,
+        )
+        assert secret_missing_approval.returncode != 0
+        assert "Blocked secret-exposure operation" in (secret_missing_approval.stdout + secret_missing_approval.stderr)
+
+        secret_with_approval = run(
+            [
+                PYTHON,
+                str(ROOT / "scripts" / "sf_agent_cli.py"),
+                "safe-run",
+                "--target-org",
+                "dev",
+                "--secret-approval",
+                "I explicitly approve exposing Salesforce secrets",
+                "--",
+                "org",
+                "login",
+                "access-token",
+                "--access-token",
+                "00D000000000000!very-secret-token",
+                "--dry-run",
+            ],
+            cwd=root,
+        )
+        assert '"dry_run": true' in secret_with_approval.stdout
+        assert "very-secret-token" not in secret_with_approval.stdout
+        assert "[REDACTED]" in secret_with_approval.stdout
+
         access_inspect = run(
             [
                 PYTHON,
@@ -279,6 +321,8 @@ def test_agent_cli_guardrails() -> dict[str, object]:
             "delete_approval_allows_dry_run": True,
             "safe_run_delete_missing_approval_blocked": True,
             "sf_min_destructive_blocked": True,
+            "secret_missing_approval_blocked": True,
+            "secret_values_redacted": True,
             "access_inspect_dry_run": True,
         }
 
@@ -454,10 +498,12 @@ def test_multilingual_readmes() -> dict[str, object]:
     checks: dict[str, object] = {}
     for language, path in files.items():
         text = path.read_text(encoding="utf-8")
+        lower = text.lower()
         checks[f"{language}_exists"] = path.exists()
         checks[f"{language}_version"] = version in text
-        checks[f"{language}_delete_guardrail"] = "I explicitly approve this deletion" in text
-        checks[f"{language}_least_privilege"] = "Least privilege" in text or "least privilege" in text
+        checks[f"{language}_sfao_install"] = "sfao install" in text
+        checks[f"{language}_package_xml"] = "package.xml" in text
+        checks[f"{language}_least_privilege"] = "least privilege" in lower
     assert all(checks.values())
     return checks
 

@@ -65,6 +65,5 @@ Prefer non-destructive options where they satisfy the requirement:
 
 - Salesforce GraphQL API record deletion: https://developer.salesforce.com/docs/platform/graphql/guide/mutations-delete.html
 - LWC `deleteRecord(recordId)`: https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html
-- Salesforce MCP SObject Deletes reference: https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-deletes.html
 - Salesforce CLI command reference: https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm
 - Metadata deploy/destructive changes guidance: https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_deploy.htm

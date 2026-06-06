@@ -40,6 +40,8 @@ def test_destructive_command_guardrails() -> None:
     assert result["delete_missing_approval_blocked"]
     assert result["safe_run_delete_missing_approval_blocked"]
     assert result["sf_min_destructive_blocked"]
+    assert result["secret_missing_approval_blocked"]
+    assert result["secret_values_redacted"]
 
 
 def test_windows_path_metadata_mapping() -> None:

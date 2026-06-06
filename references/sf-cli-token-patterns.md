@@ -13,8 +13,11 @@ Use `scripts/sf_min.py` only as a compact fallback for a read-only official `sf`
 - Prefer command-specific flags such as `--metadata`, `--source-dir`, `--target-org`, `--tests`, and `--test-level`.
 - Avoid `sf commands`, broad metadata retrieval, full org describe, or full package listings unless the task needs them.
 - Use SOQL with explicit fields and selective WHERE clauses.
+- Do not retrieve or parse all org metadata, all objects, or all fields unless the user explicitly asks for broad analysis or the planning evidence proves it is required.
+- Prefer compact summaries with counts and first relevant entries; escalate to `--raw`, larger `--max-list`, or broader metadata retrieval only after explaining why the extra context is needed.
 - Redact access tokens, session IDs, auth URLs, client secrets, named credential secrets, and cookies before returning output.
 - Summarize large arrays by count plus first few relevant items.
+- Treat commands that can expose access tokens, auth URLs, session material, private keys, or connected-app secrets as secret-exposure operations. Inform the user and require explicit approval before execution.
 
 ## Wrapper Strategy
 
@@ -25,6 +28,7 @@ Use `scripts/sf_agent_cli.py`:
 - Never use default orgs for agent work.
 - Let the facade block write/execute operations on production orgs.
 - Let the facade enforce explicit deletion approval for delete, uninstall, purge, hard-delete, source delete, and destructiveChanges workflows.
+- Let the facade block `safe-run` commands that can expose or handle secrets unless `--secret-approval "I explicitly approve exposing Salesforce secrets"` is provided.
 - Use `--select`, narrow SOQL, and narrow metadata selectors.
 - Use `safe-run` for installed official `sf` commands that are not exposed as first-class facade commands.
 - Run `catalog-refresh` after upgrading Salesforce CLI to regenerate `sf-official-command-catalog.md` and `.json`.

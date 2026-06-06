@@ -22,6 +22,8 @@ If a report requires reproduction details, provide the smallest safe example:
 - Do not commit `.sf/`, `.sfdx/`, auth files, scratch org credentials, session IDs, refresh tokens, access tokens, private keys, connected app secrets, or local secret files.
 - Production orgs must remain read-only through the CLI facade.
 - Destructive data or metadata operations require separate explicit user approval for the exact target org and scope.
+- Commands that can expose or handle Salesforce secrets require separate explicit user approval for the exact secret scope.
+- The CLI facade must redact Salesforce access tokens, session IDs, auth URLs, refresh tokens, connected-app secrets, private keys, cookies, and session material from output, dry-runs, and Knowledge history.
 - When in doubt, stop and ask for clarification instead of guessing access, delete scope, org behavior, or package state.
 
 ## Package Publishing Safety

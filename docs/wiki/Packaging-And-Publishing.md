@@ -10,7 +10,7 @@ details outside the end-user README.
 - CLI command: `sfao`
 - Source layout: `src/salesforce_agent_optimizer/`
 - Packaged templates: `src/salesforce_agent_optimizer/templates/`
-- Current version: `1.2.3`
+- Current version: `2.0.0`
 
 ## Local Development Install
 
@@ -59,7 +59,7 @@ dist/salesforce_agent_optimizer-<version>.tar.gz
 Check package metadata before publishing:
 
 ```bash
-python -m twine check dist/*
+python -m twine check dist/*.whl dist/*.tar.gz
 ```
 
 ## Local Wheel Smoke Test
@@ -119,8 +119,8 @@ Recommended publishing uses PyPI Trusted Publishing from GitHub Actions.
 Release tag example:
 
 ```bash
-git tag v1.2.3
-git push origin v1.2.3
+git tag v2.0.0
+git push origin v2.0.0
 ```
 
 The release workflow runs validation, tests, ruff, `sfao validate`, build,
@@ -134,8 +134,8 @@ Use manual upload only when Trusted Publishing is unavailable:
 
 ```bash
 python -m build
-python -m twine check dist/*
-python -m twine upload dist/*
+python -m twine check dist/*.whl dist/*.tar.gz
+python -m twine upload dist/*.whl dist/*.tar.gz
 ```
 
 Never commit `.pypirc`, PyPI tokens, passwords, or API credentials.
@@ -148,7 +148,7 @@ Never commit `.pypirc`, PyPI tokens, passwords, or API credentials.
 4. Sync generated agent adapters.
 5. Run the required local checks.
 6. Build wheel and sdist.
-7. Run `python -m twine check dist/*`.
+7. Run `python -m twine check dist/*.whl dist/*.tar.gz`.
 8. Build release artifacts and verify `release-manifest.json`.
 9. Commit the release patch.
 10. Tag `v<version>` and push the tag.

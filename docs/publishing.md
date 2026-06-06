@@ -16,8 +16,8 @@ The repository expects PyPI Trusted Publishing from GitHub Actions.
 Tag a release:
 
 ```bash
-git tag v1.2.3
-git push origin v1.2.3
+git tag v2.0.0
+git push origin v2.0.0
 ```
 
 ## Required Local Checks
@@ -28,7 +28,7 @@ Run these before tagging:
 python -m pip install -e ".[dev]"
 sfao validate
 python -m build
-python -m twine check dist/*
+python -m twine check dist/*.whl dist/*.tar.gz
 ```
 
 The release workflow also runs generated-instruction checks, validation, self tests, pytest, ruff, wheel/sdist build, `twine check`, skill ZIP generation, checksum generation, and release manifest generation.
@@ -79,5 +79,5 @@ Wheel or sdist missing:
 
 Twine validation failure:
 
-- Run `python -m twine check dist/*`.
+- Run `python -m twine check dist/*.whl dist/*.tar.gz`.
 - Fix README rendering, package metadata, or missing files before tagging again.

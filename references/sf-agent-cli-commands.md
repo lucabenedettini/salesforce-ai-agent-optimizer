@@ -14,8 +14,73 @@ Rules:
 - If `IsSandbox=false` or the org type cannot be determined, block write/execute commands.
 - Production orgs are read-only.
 - Destructive commands require separate explicit user approval and `--delete-approval "I explicitly approve this deletion"`.
+- Commands that can expose or handle Salesforce secrets require separate explicit user approval and `--secret-approval "I explicitly approve exposing Salesforce secrets"`.
 - If Salesforce CLI is not discoverable in `PATH`, set `SF_AGENT_SF_BIN` to the full `sf`, `sf.cmd`, or `sf.exe` path.
 - Use `--select`, explicit SOQL fields, specific metadata selectors, and bounded output.
+- Do not retrieve or parse all org metadata, all fields, or all objects unless the user asks for broad analysis or the task cannot be planned safely without it.
+- Use `--raw` only when the compact facade omits evidence that is required for the current decision.
+
+## Agent Tool Registry
+
+The local registry is `references/agent-tool-registry.json`. It is the agent-facing catalog for every Salesforce CLI operation wrapped by Salesforce Agent Optimizer.
+
+Use it before choosing a command:
+
+- `sfao command search "permission access" --toolset permissions`
+- `sfao command payload-example access-inspect`
+- `sfao command execute --payload payload.json`
+
+The registry records command category, safety level, production policy, alias requirement, arguments, compact output selectors, and an example payload. It is intentionally small so agents can inspect one relevant toolset instead of loading the whole CLI surface.
+
+Available toolsets: `core`, `schema`, `data-read`, `metadata`, `deploy`, `permissions`, `apex`, `packages`, and `local`.
+
+## Schema, SOQL, And Permission Helpers
+
+Use `sfao soql build` to produce a focused query and a ready-to-run `data-query` payload:
+
+```bash
+sfao soql build --sobject Account --field Id --field Name --where "Name != null" --limit 25 --json
+```
+
+Use `sfao permissions explain` on compact `access-inspect` JSON to explain why object or field access exists:
+
+```bash
+sfao permissions explain --input access-inspect.json --sobject Account --json
+```
+
+These helpers do not replace org evidence. They reduce token use by building focused commands and summarizing access paths before the agent plans permission changes.
+
+## Live Org Validation
+
+Use `sfao live-test` only after the user provides an explicit org alias.
+
+Default mode is read-only and validates representative facade commands against a real org:
+
+```bash
+sfao live-test --target-org dev-sandbox
+sfao live-test --target-org dev-sandbox --json
+```
+
+The report includes command success, elapsed milliseconds, raw output size, compact output size, sandbox detection, and optimization warnings when a command is slow or returns too much output. This helps tune `--select`, `--max-list`, SOQL filters, and metadata scope without losing required evidence.
+
+Write tests are intentionally not run by default. They are blocked unless the org is proven to be a sandbox and the exact write confirmation is supplied:
+
+```bash
+sfao live-test --target-org dev-sandbox --include-write --write-confirmation "I understand this will write test data to a sandbox"
+```
+
+The write suite is intentionally small and reversible:
+
+- Create one Account test record, update it, read it back, and delete it with the standard destructive approval phrase.
+- Deploy one temporary Account validation rule, verify that it blocks Account names that do not start with `ACC`, create and delete one valid Account, delete the validation rule with a targeted `destructiveChanges.xml`, then verify the rule no longer blocks data.
+
+If Salesforce CLI reports the alias as production, write and destructive tests remain blocked even when the alias name suggests otherwise.
+
+For automated live read-only pytest validation, set:
+
+```bash
+SFAO_LIVE_TARGET_ORG=dev-sandbox python -m pytest tests/test_live_salesforce_cli.py
+```
 
 ## Printing Press Design Applied
 
@@ -34,6 +99,7 @@ Rules:
 - The facade appends `--json` unless `--raw` is used.
 - The facade classifies safety and blocks `write`/`execute` commands on production.
 - Delete, uninstall, purge, hard-delete, source delete, and destructiveChanges deploy commands require `--delete-approval "I explicitly approve this deletion"` after the user approves the exact destructive scope.
+- Commands that can expose or handle access tokens, auth URLs, private keys, connected-app secrets, or session material require `--secret-approval "I explicitly approve exposing Salesforce secrets"` after the user approves the exact secret scope.
 - If the official command is `project deploy start` and succeeds, the facade appends deploy history.
 
 ```bash
@@ -41,6 +107,7 @@ python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- data query -
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox -- project retrieve preview --concise
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox --requirements "Add priority tracking to Account" --changed-metadata CustomField:Account.Priority__c -- project deploy start --source-dir force-app
 python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox --delete-approval "I explicitly approve this deletion" -- data delete record --sobject Account --record-id 001...
+python scripts/sf_agent_cli.py safe-run --target-org dev-sandbox --secret-approval "I explicitly approve exposing Salesforce secrets" -- org display --verbose
 ```
 
 ### `catalog-refresh`
@@ -136,12 +203,13 @@ python scripts/sf_agent_cli.py schema-sobject-list --target-org dev-sandbox --so
 
 ### `schema-sobject-describe`
 
-Describe one sObject.
+Describe one sObject. The default output is compact: object capabilities, counts, and the first high-signal fields. Use `--raw` only when full field metadata is explicitly required.
 
 Maps to: `sf sobject describe`
 
 ```bash
-python scripts/sf_agent_cli.py schema-sobject-describe --target-org dev-sandbox --sobject Account --select result.fields
+python scripts/sf_agent_cli.py schema-sobject-describe --target-org dev-sandbox --sobject Account --field-limit 8
+python scripts/sf_agent_cli.py schema-sobject-describe --target-org dev-sandbox --sobject Account --raw --select result.fields
 ```
 
 ### `metadata-list`
@@ -431,4 +499,5 @@ When an agent needs an official Salesforce CLI command that is not listed:
 6. Require `--target-org` for org access.
 7. Block `write` and `execute` commands on production.
 8. Require explicit deletion approval for destructive commands.
-9. Add one section to this file documenting the command.
+9. Require explicit secret approval for commands that can expose credentials, tokens, auth URLs, private keys, connected-app secrets, or session material.
+10. Add one section to this file documenting the command.

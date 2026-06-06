@@ -64,10 +64,6 @@ EXTRA_OFFICIAL_SOURCES = [
         "https://developer.salesforce.com/docs/platform/lwc/guide/reference-delete-record.html",
     ),
     (
-        "Salesforce MCP SObject Deletes",
-        "https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-deletes.html",
-    ),
-    (
         "Apex testing and code coverage",
         "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_code_coverage_intro.htm",
     ),
