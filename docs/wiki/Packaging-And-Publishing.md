@@ -10,7 +10,7 @@ details outside the end-user README.
 - CLI command: `sfao`
 - Source layout: `src/salesforce_agent_optimizer/`
 - Packaged templates: `src/salesforce_agent_optimizer/templates/`
-- Current version: `2.2.3`
+- Current version: `2.2.4`
 
 ## Local Development Install
 

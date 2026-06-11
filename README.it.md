@@ -4,7 +4,7 @@
 
 Salesforce Agent Optimizer e' una CLI `sfao` e una skill per Codex, Claude Code e GitHub Copilot, distribuita con licenza MIT.
 
-Versione corrente: `2.2.3`
+Versione corrente: `2.2.4`
 
 Aiuta gli agenti AI sui progetti Salesforce con pianificazione Salesforce-first, configurazione prima del codice custom, modifiche minime e reversibili, Knowledge locale, uso token-efficient della Salesforce CLI, least privilege, alias org espliciti, consapevolezza di `package.xml` e guardrail per operazioni distruttive.
 
@@ -37,7 +37,7 @@ python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 ```
 
-`sfao install` installa adapter project-scoped per tutti gli agenti supportati. Usa `sfao install --user --platform all` solo quando vuoi un'installazione Codex/Claude a livello utente.
+`sfao install` installa adapter project-scoped per tutti gli agenti supportati. Installa anche `references/` e `scripts/` gestiti nella root del progetto; gli agenti li usano per primi e fanno fallback alle cartelle locali della skill dentro l'adapter quando serve. Usa `sfao install --user --platform all` solo quando vuoi un'installazione Codex/Claude a livello utente.
 
 ## Comandi Principali
 

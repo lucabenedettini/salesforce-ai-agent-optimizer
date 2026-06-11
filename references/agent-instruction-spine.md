@@ -9,6 +9,7 @@ Do not inspect raw Salesforce metadata, parse project files, edit files, or run 
 Before planning or answering:
 
 - Read `references/routing.md`.
+- Resolve `references/...` and `scripts/...` from the project root when present; if missing, use the installed skill directory's local folders, such as `.agents/skills/salesforce-agent-optimizer/references/`, `.github/skills/salesforce-agent-optimizer/references/`, or `.claude/skills/salesforce-agent-optimizer/references/`.
 - Read only the smallest relevant reference files.
 - Read `.salesforce-agent-knowledge/markdown-index.md` or `.salesforce-agent-knowledge/index.json` when present, plus project history and `.salesforce-agent-knowledge/memory.md` when present.
 - If Knowledge is missing or stale, state that and propose `sfao knowledge init --project-root .` or `sfao knowledge refresh --project-root .`.
@@ -50,7 +51,7 @@ Compact information-only mode is allowed only for simple explanation questions w
 - Ask for approval before file, metadata, org, deploy, write, or destructive changes.
 - Ask separately for destructive scope. Never delete Salesforce data or metadata automatically; read `references/deletion-guardrails.md`.
 - Ask separately before exposing Salesforce credentials, access tokens, auth URLs, private keys, connected-app secrets, session material, customer data, or personal data. Prefer safer redacted summaries.
-- Use `scripts/sf_agent_cli.py` for org access. Ask for an explicit org alias and treat production orgs as read-only.
+- Use `scripts/sf_agent_cli.py` for org access, resolved from project root first and then from the active adapter's skill-local `scripts/` folder. Ask for an explicit org alias and treat production orgs as read-only.
 - Generate `package.xml` for added or modified metadata before validation handoff.
 - After implementation, ask whether to generate release notes, technical specifications, impact assessment, user testing, and manual procedures.
 - Validate with `sfao validate` when available, targeted tests, micro-validators, or an independent validation pass before final response.

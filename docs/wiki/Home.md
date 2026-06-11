@@ -28,7 +28,7 @@ The Codex skill name remains `salesforce-agent-optimizer`. The GitHub repository
 ## Start Here
 
 - Install from GitHub: `https://github.com/lucabenedettini/salesforce-ai-agent-optimizer`
-- Current version: `2.2.3`
+- Current version: `2.2.4`
 - Version policy: see `VERSIONING.md`
 - Change history: see `CHANGELOG.md`
 - End-user install guide: see `Installation.md`
@@ -142,6 +142,15 @@ Aliases are allowed; secrets, tokens, auth URLs, passwords, and private keys mus
 | `sfao live-test --target-org <alias>` | Run opt-in real-org validation; write/destructive suites require non-production/scratch evidence and explicit confirmation. | Real validation with consent. |
 
 ## Installed Paths
+
+Project-root resources:
+
+```text
+references/
+scripts/
+```
+
+Agents resolve `references/...` and `scripts/...` from the project root first. If those copies are unavailable, they fall back to the active adapter's local skill folders below.
 
 Codex:
 

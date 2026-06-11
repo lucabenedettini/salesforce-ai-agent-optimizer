@@ -8,6 +8,13 @@ This project starts at `0.0.1`. Version bumps follow `VERSIONING.md`:
 - Minor: new feature or minor refactor.
 - Major: extensive refactor or many added capabilities.
 
+## [2.2.4] - 2026-06-11
+
+### Fixed
+
+- Fixed project-scoped installs so managed root-level `references/` and `scripts/` are installed alongside adapter-local resources, allowing agents to resolve `references/routing.md` and `scripts/sf_agent_cli.py` from the project root.
+- Clarified agent path resolution so adapters fall back to their skill-local `references/` and `scripts/` folders when project-root copies are unavailable.
+
 ## [2.2.3] - 2026-06-07
 
 ### Changed

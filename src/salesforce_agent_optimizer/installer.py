@@ -181,6 +181,8 @@ def template_targets(root, destination: Path, project: bool, platforms: Iterable
                 destination / "evals" / "salesforce-agent-optimizer-quality-evals.json",
             )
         )
+        targets.extend(tree_targets(root / "references", destination / "references"))
+        targets.extend(tree_targets(root / "scripts", destination / "scripts"))
     for item in platforms:
         if item == "codex":
             base = destination / ".agents" / "skills" / SKILL_NAME

@@ -76,6 +76,15 @@ sfao install --project --platform copilot
 
 ## Installed Paths
 
+Project-root resources used by the instruction spine:
+
+```text
+references/
+scripts/
+```
+
+Agents resolve `references/...` and `scripts/...` from the project root first. If those copies are unavailable, they fall back to the active adapter's local skill folders below.
+
 Codex:
 
 ```text

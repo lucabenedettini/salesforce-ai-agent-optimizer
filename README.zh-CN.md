@@ -2,11 +2,11 @@
 
 [English](README.md) | [Italiano](README.it.md) | [Espanol](README.es.md) | [Simplified Chinese](README.zh-CN.md)
 
-Salesforce Agent Optimizer 是一个 MIT 许可的 `sfao` CLI 和 agent skill，面向 Codex、Claude Code 与 GitHub Copilot。
+Salesforce Agent Optimizer æ˜¯ä¸€ä¸ª MIT è®¸å¯çš„ `sfao` CLI å’Œ agent skillï¼Œé¢å‘ Codexã€Claude Code ä¸Ž GitHub Copilotã€‚
 
-当前版本：`2.2.3`
+å½“å‰ç‰ˆæœ¬ï¼š`2.2.4`
 
-它帮助 AI agent 在 Salesforce 项目中执行 Salesforce-first 规划、配置优先于自定义代码、最小且可回滚的变更、本地 Knowledge、token-efficient Salesforce CLI 使用、least privilege、显式 org alias、`package.xml` 管理和破坏性操作 guardrail。
+å®ƒå¸®åŠ© AI agent åœ¨ Salesforce é¡¹ç›®ä¸­æ‰§è¡Œ Salesforce-first è§„åˆ’ã€é…ç½®ä¼˜å…ˆäºŽè‡ªå®šä¹‰ä»£ç ã€æœ€å°ä¸”å¯å›žæ»šçš„å˜æ›´ã€æœ¬åœ° Knowledgeã€token-efficient Salesforce CLI ä½¿ç”¨ã€least privilegeã€æ˜¾å¼ org aliasã€`package.xml` ç®¡ç†å’Œç ´åæ€§æ“ä½œ guardrailã€‚
 
 Specialized Salesforce guidance includes Apex, LWC, Flow, SOQL, deploy, data operations, and Agentforce; each file is loaded only when relevant and coordinates with the existing SFAO references.
 
@@ -19,7 +19,7 @@ sfao knowledge init --project-root .
 sfao doctor
 ```
 
-推荐使用 `uv tool install` 或 `python -m pipx install` 进行隔离 CLI 安装。需要把 `sfao` 安装到当前 Python 环境时，也可以使用 `python -m pip install`。
+æŽ¨èä½¿ç”¨ `uv tool install` æˆ– `python -m pipx install` è¿›è¡Œéš”ç¦» CLI å®‰è£…ã€‚éœ€è¦æŠŠ `sfao` å®‰è£…åˆ°å½“å‰ Python çŽ¯å¢ƒæ—¶ï¼Œä¹Ÿå¯ä»¥ä½¿ç”¨ `python -m pip install`ã€‚
 
 ## Install
 
@@ -29,7 +29,7 @@ sfao install
 sfao validate
 ```
 
-替代方式：
+æ›¿ä»£æ–¹å¼ï¼š
 
 ```bash
 python -m pipx install salesforce-agent-optimizer
@@ -37,45 +37,45 @@ python -m pip install git+https://github.com/lucabenedettini/salesforce-ai-agent
 uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optimizer.git
 ```
 
-`sfao install` 会为所有支持的 agent 安装 project-scoped adapters。只有需要用户级 Codex/Claude 安装时才使用 `sfao install --user --platform all`。
+`sfao install` ä¼šä¸ºæ‰€æœ‰æ”¯æŒçš„ agent å®‰è£… project-scoped adaptersï¼Œå¹¶åœ¨é¡¹ç›®æ ¹ç›®å½•å®‰è£…æ‰˜ç®¡çš„ `references/` å’Œ `scripts/`ï¼›agent ä¼šä¼˜å…ˆä½¿ç”¨è¿™äº›æ ¹ç›®å½•èµ„æºï¼Œå¹¶åœ¨éœ€è¦æ—¶å›žé€€åˆ° adapter å†…çš„ skill æœ¬åœ°ç›®å½•ã€‚åªæœ‰éœ€è¦ç”¨æˆ·çº§ Codex/Claude å®‰è£…æ—¶æ‰ä½¿ç”¨ `sfao install --user --platform all`ã€‚
 
 ## Main Commands
 
-| Command | 功能与使用时机 | Principle |
+| Command | åŠŸèƒ½ä¸Žä½¿ç”¨æ—¶æœº | Principle |
 | --- | --- | --- |
-| `sfao version` | 显示已安装版本。安装或升级后使用。 | 版本清晰。 |
-| `sfao install` | 在当前 repo 安装 project-scoped agent adapters。每个 Salesforce 项目首次使用。 | 低摩擦安装。 |
-| `sfao install --project --platform all` | 显式安装 Codex、Claude Code、GitHub Copilot adapters。repo onboarding 时使用。 | Agent 兼容性。 |
-| `sfao update --project --platform all` | 升级包后刷新生成的 adapters 与 templates。 | 安全升级。 |
-| `sfao uninstall --project --platform all --yes` | 只删除 SFAO 生成文件。移除项目 skill 时使用。 | 可逆变更。 |
-| `sfao doctor` | 检查 Python、OS、Git、Salesforce CLI、adapters、PATH 与验证状态。安装/升级后或 skill 不可见时使用。 | 早期诊断。 |
-| `sfao doctor --verbose` | 输出详细诊断。排查 warnings 时使用。 | 透明分析。 |
-| `sfao validate` | 验证 skill 文件、版本、生成 adapters、格式和 Salesforce metadata guardrails。commit/release 前使用。 | 质量门禁。 |
-| `sfao validate --json` | 输出机器可读验证结果。CI 或 agent validation 阶段使用。 | 自动化友好。 |
-| `sfao report --project-root .` | 生成本地 Markdown health snapshot，覆盖 adapters、Knowledge、memory、guardrails、guidance、evals 与 version context。planning 或 handoff 前使用。 | 可观察的本地状态。 |
-| `sfao knowledge init --project-root .` | 创建紧凑的本地 Salesforce 项目 Knowledge。第一次 planning 前使用。 | 先 Knowledge，后原始 metadata。 |
-| `sfao knowledge refresh --project-root .` | metadata 变更后刷新 Knowledge。 | 新鲜 planning evidence。 |
-| `sfao knowledge init --project-root . --scan-root` | 执行有意的广范围扫描。仅在 `packageDirectories` 不够时使用。 | Token-efficient scope。 |
-| `sfao knowledge doctor --project-root .` | 检查 Knowledge 结构。Knowledge 缺失或 stale 时使用。 | 可靠本地上下文。 |
-| `sfao memory init --project-root .` | 创建 curated project memory。开始沉淀项目经验时使用。 | 紧凑持久记忆。 |
-| `sfao memory add --project-root . --task-type bugfix --summary "..."` | 添加已脱敏的 lesson、decision、risk 或 follow-up。实现或验证后使用。 | 不存原始日志，不存 secrets。 |
-| `sfao memory compact --project-root . --max-bytes 60000` | 保持 memory 小而有用。memory 过大时使用。 | Token efficiency。 |
-| `sfao memory doctor --project-root .` | 验证 memory 结构与脱敏。planning 前依赖 memory 时使用。 | Privacy-safe memory。 |
-| `sfao version-context scaffold` | 缺失时创建 version-context 文件。初始化 references 时使用。 | 官方来源准备。 |
-| `sfao version-context update` | 从 Salesforce 官方来源刷新 release/API context。上下文 stale 或 release-sensitive 时使用。 | 不编造行为。 |
-| `sfao version-context validate --max-age-days 90` | 检查 version-context 新鲜度。验证或 release-sensitive planning 前使用。 | 当前 API evidence。 |
-| `sfao command search "permission account"` | 搜索内部安全 Salesforce CLI facade registry。运行 org 命令前使用。 | 先发现，后执行。 |
-| `sfao command payload-example access-inspect` | 输出注册命令的紧凑 payload 示例。避免编造 flags 时使用。 | Schema-guided commands。 |
-| `sfao command execute --payload payload.json` | 通过 guardrails 执行注册命令。需要 org 时必须使用显式 alias。 | 安全 Salesforce CLI facade。 |
-| `sfao soql build --object Account --fields Id,Name` | 构建聚焦 SOQL 和 `data-query` payload。查询 org data 前使用。 | 最小数据读取。 |
-| `sfao permissions explain --input access.json` | 基于 `access-inspect` 输出解释访问证据。least-privilege planning 时使用。 | 可解释访问。 |
-| `sfao live-test --target-org <alias>` | 对真实 org 执行 opt-in 检查。write/destructive suite 只可在明确 sandbox/scratch alias 下使用。 | 经同意的真实验证。 |
+| `sfao version` | æ˜¾ç¤ºå·²å®‰è£…ç‰ˆæœ¬ã€‚å®‰è£…æˆ–å‡çº§åŽä½¿ç”¨ã€‚ | ç‰ˆæœ¬æ¸…æ™°ã€‚ |
+| `sfao install` | åœ¨å½“å‰ repo å®‰è£… project-scoped agent adaptersã€‚æ¯ä¸ª Salesforce é¡¹ç›®é¦–æ¬¡ä½¿ç”¨ã€‚ | ä½Žæ‘©æ“¦å®‰è£…ã€‚ |
+| `sfao install --project --platform all` | æ˜¾å¼å®‰è£… Codexã€Claude Codeã€GitHub Copilot adaptersã€‚repo onboarding æ—¶ä½¿ç”¨ã€‚ | Agent å…¼å®¹æ€§ã€‚ |
+| `sfao update --project --platform all` | å‡çº§åŒ…åŽåˆ·æ–°ç”Ÿæˆçš„ adapters ä¸Ž templatesã€‚ | å®‰å…¨å‡çº§ã€‚ |
+| `sfao uninstall --project --platform all --yes` | åªåˆ é™¤ SFAO ç”Ÿæˆæ–‡ä»¶ã€‚ç§»é™¤é¡¹ç›® skill æ—¶ä½¿ç”¨ã€‚ | å¯é€†å˜æ›´ã€‚ |
+| `sfao doctor` | æ£€æŸ¥ Pythonã€OSã€Gitã€Salesforce CLIã€adaptersã€PATH ä¸ŽéªŒè¯çŠ¶æ€ã€‚å®‰è£…/å‡çº§åŽæˆ– skill ä¸å¯è§æ—¶ä½¿ç”¨ã€‚ | æ—©æœŸè¯Šæ–­ã€‚ |
+| `sfao doctor --verbose` | è¾“å‡ºè¯¦ç»†è¯Šæ–­ã€‚æŽ’æŸ¥ warnings æ—¶ä½¿ç”¨ã€‚ | é€æ˜Žåˆ†æžã€‚ |
+| `sfao validate` | éªŒè¯ skill æ–‡ä»¶ã€ç‰ˆæœ¬ã€ç”Ÿæˆ adaptersã€æ ¼å¼å’Œ Salesforce metadata guardrailsã€‚commit/release å‰ä½¿ç”¨ã€‚ | è´¨é‡é—¨ç¦ã€‚ |
+| `sfao validate --json` | è¾“å‡ºæœºå™¨å¯è¯»éªŒè¯ç»“æžœã€‚CI æˆ– agent validation é˜¶æ®µä½¿ç”¨ã€‚ | è‡ªåŠ¨åŒ–å‹å¥½ã€‚ |
+| `sfao report --project-root .` | ç”Ÿæˆæœ¬åœ° Markdown health snapshotï¼Œè¦†ç›– adaptersã€Knowledgeã€memoryã€guardrailsã€guidanceã€evals ä¸Ž version contextã€‚planning æˆ– handoff å‰ä½¿ç”¨ã€‚ | å¯è§‚å¯Ÿçš„æœ¬åœ°çŠ¶æ€ã€‚ |
+| `sfao knowledge init --project-root .` | åˆ›å»ºç´§å‡‘çš„æœ¬åœ° Salesforce é¡¹ç›® Knowledgeã€‚ç¬¬ä¸€æ¬¡ planning å‰ä½¿ç”¨ã€‚ | å…ˆ Knowledgeï¼ŒåŽåŽŸå§‹ metadataã€‚ |
+| `sfao knowledge refresh --project-root .` | metadata å˜æ›´åŽåˆ·æ–° Knowledgeã€‚ | æ–°é²œ planning evidenceã€‚ |
+| `sfao knowledge init --project-root . --scan-root` | æ‰§è¡Œæœ‰æ„çš„å¹¿èŒƒå›´æ‰«æã€‚ä»…åœ¨ `packageDirectories` ä¸å¤Ÿæ—¶ä½¿ç”¨ã€‚ | Token-efficient scopeã€‚ |
+| `sfao knowledge doctor --project-root .` | æ£€æŸ¥ Knowledge ç»“æž„ã€‚Knowledge ç¼ºå¤±æˆ– stale æ—¶ä½¿ç”¨ã€‚ | å¯é æœ¬åœ°ä¸Šä¸‹æ–‡ã€‚ |
+| `sfao memory init --project-root .` | åˆ›å»º curated project memoryã€‚å¼€å§‹æ²‰æ·€é¡¹ç›®ç»éªŒæ—¶ä½¿ç”¨ã€‚ | ç´§å‡‘æŒä¹…è®°å¿†ã€‚ |
+| `sfao memory add --project-root . --task-type bugfix --summary "..."` | æ·»åŠ å·²è„±æ•çš„ lessonã€decisionã€risk æˆ– follow-upã€‚å®žçŽ°æˆ–éªŒè¯åŽä½¿ç”¨ã€‚ | ä¸å­˜åŽŸå§‹æ—¥å¿—ï¼Œä¸å­˜ secretsã€‚ |
+| `sfao memory compact --project-root . --max-bytes 60000` | ä¿æŒ memory å°è€Œæœ‰ç”¨ã€‚memory è¿‡å¤§æ—¶ä½¿ç”¨ã€‚ | Token efficiencyã€‚ |
+| `sfao memory doctor --project-root .` | éªŒè¯ memory ç»“æž„ä¸Žè„±æ•ã€‚planning å‰ä¾èµ– memory æ—¶ä½¿ç”¨ã€‚ | Privacy-safe memoryã€‚ |
+| `sfao version-context scaffold` | ç¼ºå¤±æ—¶åˆ›å»º version-context æ–‡ä»¶ã€‚åˆå§‹åŒ– references æ—¶ä½¿ç”¨ã€‚ | å®˜æ–¹æ¥æºå‡†å¤‡ã€‚ |
+| `sfao version-context update` | ä»Ž Salesforce å®˜æ–¹æ¥æºåˆ·æ–° release/API contextã€‚ä¸Šä¸‹æ–‡ stale æˆ– release-sensitive æ—¶ä½¿ç”¨ã€‚ | ä¸ç¼–é€ è¡Œä¸ºã€‚ |
+| `sfao version-context validate --max-age-days 90` | æ£€æŸ¥ version-context æ–°é²œåº¦ã€‚éªŒè¯æˆ– release-sensitive planning å‰ä½¿ç”¨ã€‚ | å½“å‰ API evidenceã€‚ |
+| `sfao command search "permission account"` | æœç´¢å†…éƒ¨å®‰å…¨ Salesforce CLI facade registryã€‚è¿è¡Œ org å‘½ä»¤å‰ä½¿ç”¨ã€‚ | å…ˆå‘çŽ°ï¼ŒåŽæ‰§è¡Œã€‚ |
+| `sfao command payload-example access-inspect` | è¾“å‡ºæ³¨å†Œå‘½ä»¤çš„ç´§å‡‘ payload ç¤ºä¾‹ã€‚é¿å…ç¼–é€  flags æ—¶ä½¿ç”¨ã€‚ | Schema-guided commandsã€‚ |
+| `sfao command execute --payload payload.json` | é€šè¿‡ guardrails æ‰§è¡Œæ³¨å†Œå‘½ä»¤ã€‚éœ€è¦ org æ—¶å¿…é¡»ä½¿ç”¨æ˜¾å¼ aliasã€‚ | å®‰å…¨ Salesforce CLI facadeã€‚ |
+| `sfao soql build --object Account --fields Id,Name` | æž„å»ºèšç„¦ SOQL å’Œ `data-query` payloadã€‚æŸ¥è¯¢ org data å‰ä½¿ç”¨ã€‚ | æœ€å°æ•°æ®è¯»å–ã€‚ |
+| `sfao permissions explain --input access.json` | åŸºäºŽ `access-inspect` è¾“å‡ºè§£é‡Šè®¿é—®è¯æ®ã€‚least-privilege planning æ—¶ä½¿ç”¨ã€‚ | å¯è§£é‡Šè®¿é—®ã€‚ |
+| `sfao live-test --target-org <alias>` | å¯¹çœŸå®ž org æ‰§è¡Œ opt-in æ£€æŸ¥ã€‚write/destructive suite åªå¯åœ¨æ˜Žç¡® sandbox/scratch alias ä¸‹ä½¿ç”¨ã€‚ | ç»åŒæ„çš„çœŸå®žéªŒè¯ã€‚ |
 
-执行 org 操作前，agent 必须请求显式 org alias。通过 skill guardrail，生产 org 对写入和破坏性操作保持 read-only。
+æ‰§è¡Œ org æ“ä½œå‰ï¼Œagent å¿…é¡»è¯·æ±‚æ˜¾å¼ org aliasã€‚é€šè¿‡ skill guardrailï¼Œç”Ÿäº§ org å¯¹å†™å…¥å’Œç ´åæ€§æ“ä½œä¿æŒ read-onlyã€‚
 
 ## Agent Workflow
 
-安装后的 agent 对信息查询、bugfix、实现、架构、review、org inspection 和 release work 都必须使用相同的可见阶段：
+å®‰è£…åŽçš„ agent å¯¹ä¿¡æ¯æŸ¥è¯¢ã€bugfixã€å®žçŽ°ã€æž¶æž„ã€reviewã€org inspection å’Œ release work éƒ½å¿…é¡»ä½¿ç”¨ç›¸åŒçš„å¯è§é˜¶æ®µï¼š
 
 1. `Request review`
 2. `Planning evidence`
@@ -84,25 +84,25 @@ uv tool install git+https://github.com/lucabenedettini/salesforce-ai-agent-optim
 5. `Validation`
 6. `Completion`
 
-每个阶段都必须说明正在使用或计划使用的 tool/command。访问 Salesforce CLI 时，必须展示简洁的 `sfao`、`scripts/sf_agent_cli.py` 或 `sf` 命令形式，并隐藏 alias/secrets 中的敏感信息。
+æ¯ä¸ªé˜¶æ®µéƒ½å¿…é¡»è¯´æ˜Žæ­£åœ¨ä½¿ç”¨æˆ–è®¡åˆ’ä½¿ç”¨çš„ tool/commandã€‚è®¿é—® Salesforce CLI æ—¶ï¼Œå¿…é¡»å±•ç¤ºç®€æ´çš„ `sfao`ã€`scripts/sf_agent_cli.py` æˆ– `sf` å‘½ä»¤å½¢å¼ï¼Œå¹¶éšè— alias/secrets ä¸­çš„æ•æ„Ÿä¿¡æ¯ã€‚
 
-对于纯说明性问题，如果不涉及项目决策、org 访问、metadata 检查、deploy、数据操作、secrets、破坏性操作、release-sensitive 判断、实现或 bugfix，agent 可以使用紧凑模式：`Request review`、`Evidence`、`Answer`、`Validation`。
+å¯¹äºŽçº¯è¯´æ˜Žæ€§é—®é¢˜ï¼Œå¦‚æžœä¸æ¶‰åŠé¡¹ç›®å†³ç­–ã€org è®¿é—®ã€metadata æ£€æŸ¥ã€deployã€æ•°æ®æ“ä½œã€secretsã€ç ´åæ€§æ“ä½œã€release-sensitive åˆ¤æ–­ã€å®žçŽ°æˆ– bugfixï¼Œagent å¯ä»¥ä½¿ç”¨ç´§å‡‘æ¨¡å¼ï¼š`Request review`ã€`Evidence`ã€`Answer`ã€`Validation`ã€‚
 
 ## Safety
 
-- 优先使用 Salesforce configuration、Flow、permission set、UI API/LDS、named credential 和 managed package，再考虑自定义代码。
-- 修改 Salesforce metadata 前先查询本地 Knowledge。
-- 使用 `.salesforce-agent-knowledge/memory.md` 保存项目本地的持久决策、经验、风险和 follow-up。它是 curated planning knowledge，不是原始日志，不能包含 secrets、客户数据、原始记录或大日志。
-- Knowledge 默认使用 Salesforce DX `packageDirectories`；只有需要有意进行全项目扫描时才使用 `--scan-root`。
-- Apex、LWC、Flow、SOQL、deploy、data operations 和 Agentforce 的专项 guidance 只在相关任务中加载。
-- 外部 Salesforce skills 只能作为已安装时的可选参考，不能绕过 SFAO guardrails。
-- `safe-run --safety` 不能降低自动风险分类。
-- 在访问、sharing、UI、package、integration 或 automation 变更前应用 least privilege。
-- 除非用户要求广泛分析或任务确实需要，不要检索或解析全部 org metadata。
-- 未获得针对确切范围的单独批准，不得删除数据或 metadata。
-- 未获得针对确切范围的单独批准，不得暴露 Salesforce secrets 或客户数据。
-- 对新增或修改的 metadata 生成 `package.xml`。
-- 实现后询问是否生成 release notes、technical specifications、impact assessment、user testing 和 manual procedures。
+- ä¼˜å…ˆä½¿ç”¨ Salesforce configurationã€Flowã€permission setã€UI API/LDSã€named credential å’Œ managed packageï¼Œå†è€ƒè™‘è‡ªå®šä¹‰ä»£ç ã€‚
+- ä¿®æ”¹ Salesforce metadata å‰å…ˆæŸ¥è¯¢æœ¬åœ° Knowledgeã€‚
+- ä½¿ç”¨ `.salesforce-agent-knowledge/memory.md` ä¿å­˜é¡¹ç›®æœ¬åœ°çš„æŒä¹…å†³ç­–ã€ç»éªŒã€é£Žé™©å’Œ follow-upã€‚å®ƒæ˜¯ curated planning knowledgeï¼Œä¸æ˜¯åŽŸå§‹æ—¥å¿—ï¼Œä¸èƒ½åŒ…å« secretsã€å®¢æˆ·æ•°æ®ã€åŽŸå§‹è®°å½•æˆ–å¤§æ—¥å¿—ã€‚
+- Knowledge é»˜è®¤ä½¿ç”¨ Salesforce DX `packageDirectories`ï¼›åªæœ‰éœ€è¦æœ‰æ„è¿›è¡Œå…¨é¡¹ç›®æ‰«ææ—¶æ‰ä½¿ç”¨ `--scan-root`ã€‚
+- Apexã€LWCã€Flowã€SOQLã€deployã€data operations å’Œ Agentforce çš„ä¸“é¡¹ guidance åªåœ¨ç›¸å…³ä»»åŠ¡ä¸­åŠ è½½ã€‚
+- å¤–éƒ¨ Salesforce skills åªèƒ½ä½œä¸ºå·²å®‰è£…æ—¶çš„å¯é€‰å‚è€ƒï¼Œä¸èƒ½ç»•è¿‡ SFAO guardrailsã€‚
+- `safe-run --safety` ä¸èƒ½é™ä½Žè‡ªåŠ¨é£Žé™©åˆ†ç±»ã€‚
+- åœ¨è®¿é—®ã€sharingã€UIã€packageã€integration æˆ– automation å˜æ›´å‰åº”ç”¨ least privilegeã€‚
+- é™¤éžç”¨æˆ·è¦æ±‚å¹¿æ³›åˆ†æžæˆ–ä»»åŠ¡ç¡®å®žéœ€è¦ï¼Œä¸è¦æ£€ç´¢æˆ–è§£æžå…¨éƒ¨ org metadataã€‚
+- æœªèŽ·å¾—é’ˆå¯¹ç¡®åˆ‡èŒƒå›´çš„å•ç‹¬æ‰¹å‡†ï¼Œä¸å¾—åˆ é™¤æ•°æ®æˆ– metadataã€‚
+- æœªèŽ·å¾—é’ˆå¯¹ç¡®åˆ‡èŒƒå›´çš„å•ç‹¬æ‰¹å‡†ï¼Œä¸å¾—æš´éœ² Salesforce secrets æˆ–å®¢æˆ·æ•°æ®ã€‚
+- å¯¹æ–°å¢žæˆ–ä¿®æ”¹çš„ metadata ç”Ÿæˆ `package.xml`ã€‚
+- å®žçŽ°åŽè¯¢é—®æ˜¯å¦ç”Ÿæˆ release notesã€technical specificationsã€impact assessmentã€user testing å’Œ manual proceduresã€‚
 
 ## Update
 
@@ -112,7 +112,7 @@ sfao update --project --platform all
 sfao doctor
 ```
 
-替代方式：
+æ›¿ä»£æ–¹å¼ï¼š
 
 ```bash
 python -m pipx upgrade salesforce-agent-optimizer
@@ -126,7 +126,7 @@ sfao uninstall --project --platform all --yes
 uv tool uninstall salesforce-agent-optimizer
 ```
 
-替代方式：
+æ›¿ä»£æ–¹å¼ï¼š
 
 ```bash
 python -m pipx uninstall salesforce-agent-optimizer
@@ -134,8 +134,8 @@ python -m pipx uninstall salesforce-agent-optimizer
 
 ## More Documentation
 
-安装、命令、troubleshooting、publishing、release 和 versioning 的详细文档位于 `docs/wiki/`。
+å®‰è£…ã€å‘½ä»¤ã€troubleshootingã€publishingã€release å’Œ versioning çš„è¯¦ç»†æ–‡æ¡£ä½äºŽ `docs/wiki/`ã€‚
 
 ## License
 
-MIT。任何人都可以在 `LICENSE` 条款下使用、复制、修改、分发和 fork 本仓库。
+MITã€‚ä»»ä½•äººéƒ½å¯ä»¥åœ¨ `LICENSE` æ¡æ¬¾ä¸‹ä½¿ç”¨ã€å¤åˆ¶ã€ä¿®æ”¹ã€åˆ†å‘å’Œ fork æœ¬ä»“åº“ã€‚

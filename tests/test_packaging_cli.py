@@ -212,6 +212,8 @@ def test_sfao_install_project_all_and_validate(tmp_path: Path) -> None:
     completed = run_cli(["install", "--project", "--platform", "all"], tmp_path)
     assert completed.returncode == 0, completed.stdout + completed.stderr
     expected = [
+        tmp_path / "references" / "routing.md",
+        tmp_path / "scripts" / "sf_agent_cli.py",
         tmp_path / ".agents" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / ".claude" / "skills" / "salesforce-agent-optimizer" / "SKILL.md",
         tmp_path / "AGENTS.md",
@@ -258,6 +260,8 @@ def test_sfao_install_defaults_to_project_all(tmp_path: Path) -> None:
     completed = run_cli(["install"], tmp_path)
     assert completed.returncode == 0, completed.stdout + completed.stderr
     expected = [
+        tmp_path / "references" / "routing.md",
+        tmp_path / "scripts" / "sf_agent_cli.py",
         tmp_path / ".agents" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
         tmp_path / ".claude" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
         tmp_path / ".github" / "skills" / "salesforce-agent-optimizer" / "references" / "routing.md",
@@ -408,6 +412,10 @@ def test_copilot_instructions_enforce_mandatory_phase_gates() -> None:
         "Do not inspect raw Salesforce metadata",
         "Do not skip directly to metadata parsing",
         "references/routing.md",
+        "Resolve `references/...` and `scripts/...`",
+        ".agents/skills/salesforce-agent-optimizer/references/",
+        ".github/skills/salesforce-agent-optimizer/references/",
+        ".claude/skills/salesforce-agent-optimizer/references/",
         ".salesforce-agent-knowledge/markdown-index.md",
         ".salesforce-agent-knowledge/index.json",
         "Request review",

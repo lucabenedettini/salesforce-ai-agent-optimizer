@@ -169,6 +169,8 @@ SOURCE_REQUIRED_FILES = [
     "tests/test_packaging_cli.py",
 ]
 INSTALL_REQUIRED_FILES = [
+    "references/routing.md",
+    "scripts/sf_agent_cli.py",
     ".agents/skills/salesforce-agent-optimizer/SKILL.md",
     ".agents/skills/salesforce-agent-optimizer/references/routing.md",
     ".agents/skills/salesforce-agent-optimizer/scripts/sf_agent_cli.py",

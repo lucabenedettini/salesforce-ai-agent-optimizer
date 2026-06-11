@@ -16,7 +16,7 @@ from salesforce_agent_optimizer.validation import (
 )
 
 
-TARGET_VERSION = "2.2.3"
+TARGET_VERSION = "2.2.4"
 SPECIALIZED_DIR = ROOT / "src" / "salesforce_agent_optimizer" / "templates" / "references" / "specialized-guidance"
 TEMPLATE_REFERENCES = ROOT / "src" / "salesforce_agent_optimizer" / "templates" / "references"
 REQUIRED_HEADINGS = [

@@ -21,7 +21,7 @@ Every version update must include:
 
 ## Current Version
 
-`2.2.3` adds a local Markdown health report and hardens validation for specialized guidance command hints, destructive wording, routing efficiency, and Agentforce documentation consistency.
+`2.2.4` fixes project install path resolution by installing root-level `references/` and `scripts/`, and by telling agents to fall back to adapter-local skill folders when root copies are unavailable.
 
 ## Recent Stable Lines
 

@@ -16,7 +16,7 @@ compatibility:
     - Git
     - Salesforce CLI
 metadata:
-  version: 2.2.3
+  version: 2.2.4
 ---
 
 # Salesforce Agent Optimizer
@@ -25,7 +25,7 @@ Use this skill for Salesforce solution design, metadata/code changes, org inspec
 
 ## Start
 
-Read `references/routing.md` first, then only the task-relevant references and local Knowledge. For implementation work, read `references/delivery-methodology.md`.
+Read `references/routing.md` first, then only the task-relevant references and local Knowledge. Resolve `references/...` and `scripts/...` from the project root when present; if they are not present there, use this installed skill directory's local `references/` and `scripts/` folders, for example `.agents/skills/salesforce-agent-optimizer/references/`, `.github/skills/salesforce-agent-optimizer/references/`, or `.claude/skills/salesforce-agent-optimizer/references/`. For implementation work, read `references/delivery-methodology.md`.
 
 Do not inspect raw Salesforce metadata, parse project files, edit files, or run org commands as the first action. First show the visible phase gate below.
 
@@ -69,7 +69,7 @@ Compact information-only mode is allowed only for simple explanation questions w
 
 ## Salesforce CLI Facade
 
-Use `scripts/sf_agent_cli.py` before direct `sf` calls for org access. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
+Use `scripts/sf_agent_cli.py` before direct `sf` calls for org access. Resolve it from the project root first; if missing, use the installed skill-local copy under the active adapter's `scripts/` folder. Always ask for an explicit org alias; never rely on a default org. Production orgs are read-only for write, execute, and destructive operations through the facade.
 
 Secret-exposure commands through `safe-run` are blocked unless the user explicitly approves the exact secret scope with:
 
